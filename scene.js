@@ -21,8 +21,8 @@ window.createLearningScene = function (container, fallback) {
   const grid = new THREE.GridHelper(24, 30, 0x284854, 0x142c38);
   grid.position.y = -2.3; grid.material.transparent = true; grid.material.opacity = 0.45; scene.add(grid);
   const colors = { mint: 0xa6f4c5, orange: 0xffb15c, blue: 0x88a8ce };
-  const state = { mode: 'rsa', noise: 2, phase: 0, algorithm: 'shor', hybrid: true, encrypted: false };
-  let movingObject = null, observation = null, noiseLine = null, time = 0, frame = 0, lastTime = 0, dragging = null, lost = false;
+  const state = { mode: 'rsa', noise: 2, phase: 0, algorithm: 'shor', hybrid: true, encrypted: false, rsa: { n: 323, p: 17, q: 19, revealed: false }, observer: 'learner' };
+  let movingObject = null, observation = null, noiseLine = null, noiseArrow = null, time = 0, frame = 0, lastTime = 0, dragging = null, lost = false;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let paused = motion.matches;
   function material(color, opacity = 1) { return new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity }); }
@@ -44,13 +44,13 @@ window.createLearningScene = function (container, fallback) {
     const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 96;
     const ctx = canvas.getContext('2d'); ctx.font = '28px Arial'; ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.fillText(text, 256, 55);
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true, depthWrite: false }));
-    sprite.position.set(...position); sprite.scale.set(3.3 * scale, 0.62 * scale, 1); root.add(sprite); return sprite;
+    sprite.userData.text = text; sprite.position.set(...position); sprite.scale.set(3.3 * scale, 0.62 * scale, 1); root.add(sprite); return sprite;
   }
   function clear() {
     const geometries = new Set(), materials = new Set(), textures = new Set();
     root.traverse(object => { if (object.geometry) geometries.add(object.geometry); if (object.material) for (const mat of [].concat(object.material)) { materials.add(mat); if (mat.map) textures.add(mat.map); } });
     geometries.forEach(g => g.dispose()); textures.forEach(t => t.dispose()); materials.forEach(m => m.dispose());
-    root.clear(); movingObject = observation = noiseLine = null;
+    root.clear(); movingObject = observation = noiseLine = noiseArrow = null;
   }
   function makeLattice() {
     const geometry = new THREE.SphereGeometry(0.055, 10, 8);
@@ -68,9 +68,12 @@ window.createLearningScene = function (container, fallback) {
     }
     const edgeGeometry = new THREE.BufferGeometry(); edgeGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     root.add(new THREE.LineSegments(edgeGeometry, new THREE.LineBasicMaterial({ color: colors.mint, transparent: true, opacity: 0.32 })));
-    ball([0.85, 0.85, 0.85], 0.085, colors.mint);
+    if (state.observer !== 'eve') { ball([0.85, 0.85, 0.85], 0.085, colors.mint); label('Reference point', [0.85, 1.3, 0.85], '#a6f4c5', 0.6); }
     observation = ball([0.85, 0.85, 0.85], 0.115, colors.orange);
     noiseLine = line([[0.85,0.85,0.85], [0.85,0.85,0.85]], colors.orange, 0.8);
+    noiseArrow = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0.85,0.85,0.85), 0.1, colors.orange, 0.15, 0.09);
+    root.add(noiseArrow);
+    label('Noisy observation', [1.9, 0.7, 1.6], '#ffb15c', 0.6);
     updateNoise();
   }
   function updateNoise() {
@@ -80,16 +83,23 @@ window.createLearningScene = function (container, fallback) {
     const p = noiseLine.geometry.attributes.position;
     p.setXYZ(1, observation.position.x, observation.position.y, observation.position.z); p.needsUpdate = true;
     noiseLine.geometry.computeBoundingSphere();
+    const delta = observation.position.clone().sub(new THREE.Vector3(0.85,0.85,0.85));
+    noiseLine.visible = state.observer !== 'eve' && n > 0;
+    noiseArrow.visible = state.observer !== 'eve' && n > 0;
+    if (n > 0) { noiseArrow.setDirection(delta.clone().normalize()); noiseArrow.setLength(delta.length(), Math.min(0.15, delta.length() * 0.3), Math.min(0.09, delta.length() * 0.2)); }
   }
   function makeModel() {
     clear();
     if (state.mode === 'lattice') makeLattice();
     if (state.mode === 'rsa') {
-      ball([0, 1.2, 0], 0.6, colors.mint); label('N = 323', [0, 2.25, 0]);
-      ball([-2.1, -1, 0], 0.4, colors.orange); ball([2.1, -1, 0], 0.4, colors.orange);
-      label('p = 17', [-2.1, -1.85, 0], '#ffb15c', 0.8); label('q = 19', [2.1, -1.85, 0], '#ffb15c', 0.8);
+      const { n, p, q, revealed } = state.rsa;
+      const visible = state.observer === 'bob' || (state.observer === 'learner' && revealed);
+      ball([0, 1.2, 0], 0.6, colors.mint); label(`N = ${n}`, [0, 2.25, 0]);
+      ball([-2.1, -1, 0], 0.4, visible ? colors.orange : colors.blue); ball([2.1, -1, 0], 0.4, visible ? colors.orange : colors.blue);
+      label(visible ? `p = ${p}` : 'p = ?', [-2.1, -1.85, 0], visible ? '#ffb15c' : '#9eb0c8', 0.8);
+      label(visible ? `q = ${q}` : 'q = ?', [2.1, -1.85, 0], visible ? '#ffb15c' : '#9eb0c8', 0.8);
       line([[-2.1,-1,0],[0,1.2,0],[2.1,-1,0]], colors.mint, 0.5);
-      label('easy multiply / hard reverse at scale', [0, -2.5, 0], '#9eb0c8', 0.9);
+      label(visible ? `${p} × ${q} = ${n}` : 'public product / hidden factors', [0, -2.5, 0], '#9eb0c8', 0.9);
     }
     if (state.mode === 'quantum') {
       const points = [];
@@ -105,11 +115,21 @@ window.createLearningScene = function (container, fallback) {
       box([-2.5,0,0], [1.3,1.6,1.3], colors.mint); box([2.5,0,0], [1.3,1.6,1.3], colors.mint);
       label('ALICE', [-2.5,-1.35,0], '#a6f4c5', 0.8); label('BOB', [2.5,-1.35,0], '#a6f4c5', 0.8);
       line([[-1.8,0,0],[1.8,0,0]], colors.blue, 0.35);
-      label('public channel', [0,-0.8,0], '#9eb0c8', 0.75);
-      if (state.phase === 0) { ball([2.5,1.4,0],0.15,colors.mint); label('ek public / dk private', [2.5,2,0], '#c5d6e7',0.7); movingObject = ball([0,0,0],0.14,colors.orange); }
-      if (state.phase === 1 || state.phase === 2) { ball([-2.5,1.4,0],0.15,colors.mint); label('K stays here', [-2.5,2,0], '#a6f4c5',0.7); movingObject = box([0,0,0],[0.45,0.45,0.45],colors.orange); label('ciphertext c', [0,0.8,0], '#ffb15c',0.75); }
-      if (state.phase >= 2) { ball([2.5,1.4,0],0.15,colors.mint); label('same secret K', [2.5,2,0], '#a6f4c5',0.7); }
-      if (state.phase === 3) { line([[-2.5,1.4,0],[2.5,1.4,0]],colors.mint,0.25); label('derive traffic keys → AES-GCM', [0,2.2,0], '#a6f4c5',0.85); }
+      const alicePrivate = state.observer === 'learner' || state.observer === 'alice';
+      const bobPrivate = state.observer === 'learner' || state.observer === 'bob';
+      if (state.phase === 0) {
+        label('ek: Bob → Alice', [0,0.8,0], '#ffb15c',0.75);
+        movingObject = ball([1.8,0,0],0.14,colors.orange);
+      } else if (state.phase === 1) {
+        label('c: Alice → Bob', [0,0.8,0], '#ffb15c',0.75);
+        movingObject = box([-1.8,0,0],[0.45,0.45,0.45],colors.orange);
+      } else {
+        label('no secret crosses the channel', [0,-0.65,0], '#9eb0c8',0.7);
+        label(state.phase === 2 ? 'Decaps: local at Bob' : 'KDF: local at each endpoint', [0,0.9,0], '#c5d6e7',0.75);
+      }
+      if (state.phase >= 1 && alicePrivate) { ball([-2.5,1.4,0],0.15,colors.mint); label(state.phase === 3 ? 'traffic key: private' : 'K: private', [-2.5,2,0], '#a6f4c5',0.7); }
+      if (bobPrivate) { ball([2.5,1.4,0],0.15,colors.mint); label(state.phase >= 2 ? (state.phase === 3 ? 'traffic key: private' : 'K: private') : 'dk: private', [2.5,2,0], '#a6f4c5',0.7); }
+      if (state.observer === 'eve') label('EVE sees ek and c only', [0,2,0], '#ffb15c',0.85);
     }
     if (state.mode === 'aes') {
       box([0,0,0], [3.2,1.8,0.8], colors.orange);
@@ -127,6 +147,7 @@ window.createLearningScene = function (container, fallback) {
       label(state.hybrid ? 'a specified protocol combiner matters' : 'vulnerable public-key math remains', [0,-2,0], '#9eb0c8',0.8);
       movingObject = ball([0,0,0.1],0.16,state.hybrid ? colors.mint : colors.orange);
     }
+    container.setAttribute('aria-label', `${state.mode} educational model. ${root.children.filter(object => object.userData.text).map(object => object.userData.text).join('. ')}. Drag or use arrow keys to rotate.`);
   }
   function draw() { if (!lost) renderer.render(scene, camera); }
   function animate(now) {
@@ -135,7 +156,7 @@ window.createLearningScene = function (container, fallback) {
     const delta = lastTime ? Math.min((now-lastTime)/1000,0.05) : 0; lastTime = now; time += delta;
     if (!dragging) root.rotation.y += delta * (state.mode === 'lattice' ? 0.06 : 0.025);
     if (movingObject) {
-      if (state.mode === 'kem') movingObject.position.x = (state.phase === 0 ? -1 : 1) * Math.sin(time * 0.9) * 1.5;
+      if (state.mode === 'kem') movingObject.position.x = (state.phase === 0 ? 1 : -1) * (1.8 - ((time * 0.3) % 1) * 3.6);
       if (state.mode === 'quantum') movingObject.position.set(Math.sin(time * 0.6) * 3, Math.sin(time * 2) * 0.85, 0.4);
       if (state.mode === 'migration') movingObject.position.set(Math.cos(time)*0.7,Math.sin(time)*0.7,0.2);
     }

@@ -47,3 +47,23 @@ Intentional changes from the generated concept:
 - Only the explicitly labeled AES-GCM demo executes cryptography; the other scenes are educational models.
 
 Above-the-fold copy was checked against the title, navigation, lesson content, and intentional changes above. No accidental Thai copy or unrelated marketing content remains. No outstanding functional failures were found. Visual direction and implementation were compared directly; the changes above are deliberate adaptations for correctness and the expanded learning scope.
+
+## Perspective and journey update — 2026-10-12
+
+Validated with Playwright and Chromium software WebGL. Reviewed desktop and mobile screenshots.
+
+- All six chapters, correct quizzes, deep explanations and detail sections.
+- Selected RSA product/formula/model synchronization, reveal gating and Eve redaction.
+- Fixed lattice reference, numeric displacement and hidden reference in Eve view.
+- Correct ek and c transmission directions; decapsulation remains local.
+- Sequential journey gates and blocked substituted identity key.
+- Independent real HKDF keys and AES-GCM round trips for empty text, Unicode/literal HTML, and 500 characters.
+- Modified packet rejection, cleared recovered plaintext, restoration and re-verification.
+- Eve cannot see message input or recovered plaintext; public ciphertext stays available.
+- Reset returns to authentication and invalidates pending operations.
+- Existing standalone AES demo round trip, Eve redaction and tampering rejection.
+- All six chapters at 320, 390, 768 and 1440 pixels without horizontal overflow.
+- English visible content; no application runtime or resource HTTP errors.
+- WebGL unavailable fallback retains authentication and progression controls; reduced-motion preference supported.
+
+Authentication and ML-KEM remain simulations. The HKDF input is fresh random stand-in material. This is an educational browser experience, not a deployed post-quantum secure channel.

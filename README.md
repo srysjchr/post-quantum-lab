@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -31,7 +31,7 @@ Each chapter has a distinct 3D illustration, deeper explanations, a worked examp
 
 ## Cryptography and limitations
 
-The Three.js scenes, noise slider, RSA examples, and ML-KEM states are educational models. They do not run ML-KEM or quantify attack effort. The AES demo alone performs real cryptography via Web Crypto: a fresh non-extractable AES-256 key, random 96-bit nonce, and 128-bit authentication tag for each encryption. It verifies an exact UTF-8 round trip and can check rejection after changing one ciphertext byte. No data or key is sent to a server or saved by the application.
+The Three.js scenes, noise slider, RSA examples, and ML-KEM states are educational models. They do not run ML-KEM or quantify attack effort. The standalone AES demo performs real cryptography via Web Crypto: a fresh non-extractable AES-256 key, random 96-bit nonce, and 128-bit authentication tag for each encryption. It verifies an exact UTF-8 round trip and can check rejection after changing one ciphertext byte. No data or key is sent to a server or saved by the application.
 
 The AES demo is not an authenticated post-quantum channel. A real deployment needs reviewed libraries, a supported protocol, correct peer authentication, key derivation, nonce management, and operational security. WebGL failure does not prevent reading lessons or using the learning controls. Web Crypto availability depends on browser/context support; localhost is supported by modern browsers.
 
@@ -40,3 +40,15 @@ The AES demo is not an authenticated post-quantum channel. A real deployment nee
 Primary sources are linked in the Reference section: NIST FIPS 203, FIPS 204, PQC FAQ, NCCoE migration guidance, and Shor's original paper.
 
 Three.js 0.160.1 is bundled as a classic browser script to support direct file opening. MIT license: vendor/THREE-LICENSE.txt. No external fonts or runtime network dependencies are required.
+
+## Perspectives and one-message journey
+
+Learner, Alice, Bob, and Eve views update the model and information panel. RSA products, hidden/revealed factors, and formulas share one state. The lattice observation moves from a fixed reference; the slider measures illustration displacement, not security. KEM transmissions travel Bob to Alice for ek and Alice to Bob for c; private secrets stay at their endpoints.
+
+The continuous journey gates five stages: simulated identity binding, simulated ML-KEM, real HKDF-SHA-256, real AES-256-GCM, and authenticated verification. A random stand-in secret supplies the HKDF demo; this is explicitly not an ML-KEM output. Independent endpoint derivations must decrypt the same packet. Try an untrusted public key, change a packet byte, restore it, or switch to Eve. Private values are hidden for teaching; all code and demo state run in the same browser and do not create an isolation boundary.
+
+Web Crypto reference: https://www.w3.org/TR/webcrypto/
+
+## Browser regression checks
+
+Install Playwright in your test environment and supply a Chromium executable if required. Serve the repository over localhost and run `node tests/browser.cjs`. Optional environment variables: `TEST_URL`, `PLAYWRIGHT_MODULE`, and `CHROMIUM_PATH`. The test captures the desktop and mobile previews in the repository root.
