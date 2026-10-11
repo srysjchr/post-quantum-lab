@@ -2,6 +2,12 @@
 
 A detailed, all-English HTML/CSS/Three.js learning experience. No framework or build step is required.
 
+## Online
+
+[Open the live website](https://srysjchr.github.io/post-quantum-lab/)
+
+Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automatically. The GitHub repository is public.
+
 ## Open
 
 Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, app.js, and vendor together.
