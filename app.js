@@ -8,10 +8,11 @@
   window.createPracticeLabs();
   const journey=window.createMessageJourney();
   const doubleEncapsulation=window.createDoubleEncapsulation();
+  const keySubstitution=window.createKeySubstitutionStory();
   let refreshAes=()=>{};
   function updateObserver(){
     document.querySelectorAll('[data-observer]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.observer===observer)));
-    setScene('observer',observer);journey.setObserver(observer);doubleEncapsulation.setObserver(observer);refreshAes();
+    setScene('observer',observer);journey.setObserver(observer);doubleEncapsulation.setObserver(observer);keySubstitution.setObserver(observer);refreshAes();
     const descriptions=chapter===0?['Public N and public exponent; no private factors.','Private factors and private exponent.','Public N. Tiny examples can be factored by hand; real RSA needs cryptographic sizes.']:chapter===3?kemKnowledge().people:['Public protocol data and Alice’s local secrets.','Public protocol data and Bob’s local secrets.','Public observations and transmitted data. Secrets are hidden in this teaching view; the browser itself is not a security boundary.'];
     $('observer-panel').replaceChildren(...['alice','bob','eve'].map((name,i)=>{const article=make('article',undefined,observer===name?'active':'');article.append(make('h3',name.toUpperCase()+(name==='eve'?' · ATTACKER':'')),make('p',descriptions[i]));return article;}));
     renderKemBoundary();

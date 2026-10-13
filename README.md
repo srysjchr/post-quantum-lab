@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -88,3 +88,11 @@ Chapter 4 now lets Alice and Eve independently create symbolic (K, c) pairs usin
 This is an explicitly labeled symbolic simulation: labels and the recovery mapping are teaching examples, not real ML-KEM randomness, ciphertexts or secrets. It models valid encapsulations and does not prove sender identity or guarantee that mathematical collisions are impossible. The experiment has independent state from the four-step timeline; perspective controls apply to both. Small screens can scroll the comparison table with touch or keyboard.
 
 Run `node tests/double-encapsulation.cjs` with the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` optionally captures screenshots outside the repository.
+
+## Key Substitution Story
+
+Chapter 4 includes a five-step symbolic story comparing correct identity binding with skipping that check. Eve substitutes her own public ek_Eve as if it belonged to Bob. The protected path stops before encapsulation. In the unchecked path Alice encapsulates to ek_Eve, then Eve decapsulates with her own dk_Eve; Alice and Eve hold K_AE, while Bob does not. Bob’s private key was never stolen, and the story does not model breaking ML-KEM.
+
+Step controls reveal the sequence, actor cards track local knowledge and the global perspective controls highlight the selected actor. The final explanation is gated on completing the story. Rewinding or restarting clears the answer. Story state is independent from the main timeline and other experiments. All operations and identity checks are explicitly simulated; no ML-KEM, certificate or signature implementation is added.
+
+Run `node tests/key-substitution.cjs` using the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` captures optional screenshots outside the repository.
