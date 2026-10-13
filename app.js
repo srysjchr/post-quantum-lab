@@ -4,17 +4,59 @@
   const lessons = window.LESSONS;
   const scene = window.createLearningScene($('scene'), $('fallback'));
   if (!scene) { $('pause').disabled=true; $('reset').disabled=true; }
-  let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0;
+  let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive';
   window.createPracticeLabs();
   const journey=window.createMessageJourney();
   let refreshAes=()=>{};
   function updateObserver(){
     document.querySelectorAll('[data-observer]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.observer===observer)));
     setScene('observer',observer);journey.setObserver(observer);refreshAes();
-    const descriptions=chapter===0?['Public N and public exponent; no private factors.','Private factors and private exponent.','Public N. Tiny examples can be factored by hand; real RSA needs cryptographic sizes.']:chapter===3?['Authenticated ek'+(phase>=1?'; local K and ciphertext c.':'.'), 'Private dk'+(phase>=2?'; decapsulated K.':'; published ek.'), 'Published ek and transmitted c; no dk or K.']:['Public protocol data and Alice’s local secrets.','Public protocol data and Bob’s local secrets.','Public observations and transmitted data. Secrets are hidden in this teaching view; the browser itself is not a security boundary.'];
+    const descriptions=chapter===0?['Public N and public exponent; no private factors.','Private factors and private exponent.','Public N. Tiny examples can be factored by hand; real RSA needs cryptographic sizes.']:chapter===3?kemKnowledge().people:['Public protocol data and Alice’s local secrets.','Public protocol data and Bob’s local secrets.','Public observations and transmitted data. Secrets are hidden in this teaching view; the browser itself is not a security boundary.'];
     $('observer-panel').replaceChildren(...['alice','bob','eve'].map((name,i)=>{const article=make('article',undefined,observer===name?'active':'');article.append(make('h3',name.toUpperCase()+(name==='eve'?' · ATTACKER':'')),make('p',descriptions[i]));return article;}));
+    renderKemBoundary();
     if(chapter===0)refreshRsa();
     if(chapter===3)$('scene-annotation').textContent=['PUBLIC ek: BOB → ALICE','PUBLIC c: ALICE → BOB','LOCAL: BOB DECAPSULATES','LOCAL: ENDPOINTS DERIVE KEYS'][phase]+' · Illustrative protocol state';
+  }
+  function kemKnowledge(){
+    const encapsulated=phase>=1, decapsulated=phase>=2, derived=phase===3;
+    return {
+      people:[
+        'Public authenticated ek.'+(encapsulated?' Creates c and holds private K using her own randomness.':' No c or K yet.')+(derived?' Derives her private traffic key.':'' )+' Never learns Bob’s dk.',
+        'Owns public ek and private dk.'+(encapsulated?' Receives public c.':' No c has arrived.')+(decapsulated?' Obtains K locally with Decaps(dk, c).':' Has not decapsulated K yet.')+(derived?' Derives his private traffic key.':''),
+        encapsulated?'Captures public ek and c, plus traffic metadata. No dk, K or private traffic key. Seeing c does not reveal K.':'Captures public ek and metadata. No ciphertext c yet; no dk or K is available to Eve.'
+      ],
+      rows:[
+        ['ek · encapsulation key','Public','Public','Public'],
+        ['dk · decapsulation key','Hidden','Private','Hidden'],
+        ['c · KEM ciphertext',encapsulated?'Public':'Not yet',encapsulated?'Public':'Not yet',encapsulated?'Public':'Not yet'],
+        ['K · shared secret',encapsulated?'Private':'Not yet',decapsulated?'Private':'Not yet',encapsulated?'Hidden':'Not yet'],
+        ['Traffic key',derived?'Private':'Not yet',derived?'Private':'Not yet',derived?'Hidden':'Not yet']
+      ]
+    };
+  }
+  function renderKemBoundary(){
+    $('kem-boundaries').hidden=chapter!==3;
+    if(chapter!==3)return;
+    const names=['KeyGen + publish ek','Encaps + deliver c','Decaps locally at Bob','Derive traffic keys locally'];
+    $('kem-table-caption').textContent=`${names[phase]} · ${observer.toUpperCase()} perspective`;
+    $('kem-phase-summary').textContent=[
+      'Bob creates (ek, dk) and publishes ek. Alice and Eve can see ek; only Bob has dk. Neither c nor K has been created.',
+      'Alice runs Encaps(ek) and obtains (K, c), then sends c to Bob. Eve can copy c. Bob has c and dk, but has not yet run Decaps.',
+      'Bob runs Decaps(dk, c) locally. For this valid encapsulation, his K matches Alice’s K. No shared secret is transmitted.',
+      'Both endpoints derive a traffic key from K and agreed protocol context. Only public context needs to be shared; secret K and traffic keys stay local.'
+    ][phase];
+    $('kem-knowledge').querySelector('tbody').replaceChildren(...kemKnowledge().rows.map(([name,...values])=>{
+      const row=make('tr');row.dataset.object=name.split(' · ')[0];const heading=make('th',name);heading.scope='row';row.append(heading);
+      values.forEach((value,i)=>{const cell=make('td',value,value==='Private'?'knowledge-private':value==='Public'?'knowledge-public':'knowledge-unavailable');cell.dataset.role=['alice','bob','eve'][i];row.append(cell);});return row;
+    }));
+    $('kem-knowledge').querySelectorAll('[data-role]').forEach(cell=>cell.classList.toggle('selected-perspective',cell.dataset.role===observer));
+    const transcript=[['01 · Bob → Alice','ek · PUBLIC','Eve may copy the encapsulation key. dk stays at Bob.']];
+    if(phase>=1)transcript.push(['02 · Alice → Bob','c · PUBLIC','Eve may copy the KEM ciphertext. K is not a field in this packet.']);
+    $('kem-transcript').replaceChildren(...transcript.map(([direction,object,note])=>{const item=make('li');item.append(make('strong',direction),make('span',object),make('p',note));return item;}));
+    $('kem-inference').textContent=phase===0?'Capture so far: ek only. There is no c to analyze yet. Knowing a public key is expected; private dk is still hidden.':'Capture so far: (ek, c). Recovering this encapsulation’s K from those public objects is the hard problem the KEM is designed to resist. The transcript contains no secret-key bytes. It also contains no encrypted chat message yet.';
+    document.querySelectorAll('[data-threat-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.threatMode===threatMode)));
+    $('kem-threat-description').textContent=threatMode==='passive'?'PASSIVE EVE: can record ek, c once sent, and metadata. She cannot read local dk or K through the wire. Saving ciphertext for later is a reason to consider quantum-resistant key establishment; this diagram does not promise that every implementation is secure.':'ACTIVE EVE: may replace an unauthenticated ek, change c, replay or drop packets. If Alice trusts Eve’s substituted key, Alice may establish a secret with Eve instead of Bob. Bind Bob’s identity to ek before encapsulation, then use an authenticated protocol with message verification and freshness checks.';
+    $('kem-threat-link').hidden=threatMode!=='active';
   }
   function refreshRsa(){
     const visible=observer==='bob'||(observer==='learner'&&rsa.revealed);
@@ -102,5 +144,7 @@
   $('quiz').addEventListener('change',()=>{$('feedback').textContent='';$('feedback').className='';});
   $('quiz').addEventListener('submit',event=>{event.preventDefault();const selected=$('answers').querySelector('input:checked');if(!selected){$('feedback').textContent='Choose an answer first.';$('feedback').className='incorrect';return;}const lesson=lessons[chapter];const correct=Number(selected.value)===lesson.correct;$('feedback').textContent=(correct?'Correct. ':'Not quite. ')+lesson.feedback;$('feedback').className=correct?'correct':'incorrect';});
   document.querySelectorAll('[data-observer]').forEach(button=>button.addEventListener('click',()=>{observer=button.dataset.observer;updateObserver();}));
+  $('kem-eve-view').addEventListener('click',()=>{observer='eve';updateObserver();});
+  document.querySelectorAll('[data-threat-mode]').forEach(button=>button.addEventListener('click',()=>{threatMode=button.dataset.threatMode;renderKemBoundary();}));
   const initial=Number(new URLSearchParams(location.search).get('chapter'));select(Number.isInteger(initial)&&initial>=1&&initial<=6?initial-1:0);
 })();

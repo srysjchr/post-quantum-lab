@@ -83,3 +83,15 @@ Validated using the committed Playwright suites on localhost with Chromium and s
 - Existing six-chapter suite passed, including quizzes, 3D synchronization, observer boundaries, real HKDF/AES round trips, tamper rejection, pending-operation reset and WebGL fallback.
 
 Identity binding, ML-KEM and network delivery remain illustrative. AES-GCM operations are real; replay tracking is an in-memory demonstration policy. Tested browser coverage is Chromium, not a claim of cross-browser certification.
+
+## Deeper KEM attacker perspective — 2026-10-13
+
+- Verified all four KEM phases for Alice, Bob and Eve: five knowledge rows, highlighted role, correct public transcript length and hidden private 3D objects.
+- Corrected the initial Eve view to show ek only; c appears after encapsulation.
+- Verified Bob’s K remains “Not yet” until decapsulation; traffic keys appear only at Derive.
+- Tested the Eve shortcut, keyboard-operated passive/active controls, experiment link visibility and four expandable explanations.
+- Reviewed screenshots at 1440 and 390 pixels; checked no page overflow at 320, 390, 768 and 1440 pixels.
+- Verified chapter re-entry resets the KEM timeline, English-only visible content, reduced motion and fully functional knowledge tables without WebGL.
+- Existing practice-lab and six-chapter regression suites were run after integration.
+
+The comparison shows who knows symbolic objects under stated assumptions; it does not execute ML-KEM, estimate attack effort or isolate browser memory.

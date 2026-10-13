@@ -129,7 +129,7 @@ window.createLearningScene = function (container, fallback) {
       }
       if (state.phase >= 1 && alicePrivate) { ball([-2.5,1.4,0],0.15,colors.mint); label(state.phase === 3 ? 'traffic key: private' : 'K: private', [-2.5,2,0], '#a6f4c5',0.7); }
       if (bobPrivate) { ball([2.5,1.4,0],0.15,colors.mint); label(state.phase >= 2 ? (state.phase === 3 ? 'traffic key: private' : 'K: private') : 'dk: private', [2.5,2,0], '#a6f4c5',0.7); }
-      if (state.observer === 'eve') label('EVE sees ek and c only', [0,2,0], '#ffb15c',0.85);
+      if (state.observer === 'eve') label(state.phase===0?'EVE sees ek; no c yet':'EVE sees ek and c only', [0,2,0], '#ffb15c',0.85);
     }
     if (state.mode === 'aes') {
       box([0,0,0], [3.2,1.8,0.8], colors.orange);

@@ -66,3 +66,11 @@ All experiments run locally. No account or backend is needed, and progress lasts
 Run `node tests/labs.cjs` with the same Playwright configuration as the chapter suite. Set `EVIDENCE_DIR` to an existing directory to capture desktop and mobile screenshots outside the repository. Use `SKIP_SCREENSHOTS=1` with `tests/browser.cjs` when you only need regression checks.
 
 AEAD protocol boundaries: https://www.rfc-editor.org/rfc/rfc5116#section-1.2
+
+## Deeper attacker perspective
+
+In chapter 4, open “Look through Eve’s eyes” to highlight Eve’s knowledge and hide private objects in the 3D model. The phase-specific comparison lists ek, dk, c, K and traffic keys for Alice, Bob and Eve. It distinguishes public data, private local knowledge, hidden data and operations that have not happened yet. At Encaps, Bob has c but does not have K until Decaps; at KeyGen, Eve has ek but there is no c to capture.
+
+The captured transcript shows only transmissions that have occurred. Passive eavesdropping and active interference explain different capabilities, including public-key substitution and metadata observations. Expand the four questions to distinguish encapsulating a new secret from recovering Alice’s secret, key possession from identity, and a KEM ciphertext from an encrypted chat message. All values are symbolic illustrations; no real ML-KEM secrets are generated or disclosed.
+
+Run `node tests/kem-perspectives.cjs` with the same Playwright environment variables as the other suites. Optional `EVIDENCE_DIR` captures desktop/mobile screenshots outside the repository.
