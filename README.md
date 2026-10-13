@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -52,3 +52,17 @@ Web Crypto reference: https://www.w3.org/TR/webcrypto/
 ## Browser regression checks
 
 Install Playwright in your test environment and supply a Chromium executable if required. Serve the repository over localhost and run `node tests/browser.cjs`. Optional environment variables: `TEST_URL`, `PLAYWRIGHT_MODULE`, and `CHROMIUM_PATH`. The test captures the desktop and mobile previews in the repository root.
+
+## Practice labs
+
+Use the Practice navigation link to reach three interactive learning surfaces:
+
+- Scenario Lab: three decisions about archive confidentiality, shared-secret establishment and signed software releases. Every choice has explanatory feedback; solved scenarios are counted once.
+- Attack Playground: substitute a public key (simulated identity binding), change a ciphertext/tag byte (real AES-GCM rejection), replay a valid packet with and without duplicate tracking, and drop a packet (simulated delivery failure). Packet preparation uses a fresh non-exportable AES-256 key and a fresh 96-bit nonce. The exercise sequence is authenticated as additional data. No private key or message bytes are displayed.
+- Guided Missions: three missions record actual experiment outcomes and require a correct explanation. Checklists cannot be completed just by selecting an answer. Hints link to the existing message journey or playground. Choose a mission before experimenting; changing missions starts a fresh checklist.
+
+All experiments run locally. No account or backend is needed, and progress lasts only for the current page session. The playground has its own packet and keys; it does not reuse the journey’s keys. Each replay comparison starts a clean demo receiver, accepts one packet, then presents its duplicate. Duplicate tracking illustrates a protocol policy; this is not a complete secure network protocol.
+
+Run `node tests/labs.cjs` with the same Playwright configuration as the chapter suite. Set `EVIDENCE_DIR` to an existing directory to capture desktop and mobile screenshots outside the repository. Use `SKIP_SCREENSHOTS=1` with `tests/browser.cjs` when you only need regression checks.
+
+AEAD protocol boundaries: https://www.rfc-editor.org/rfc/rfc5116#section-1.2

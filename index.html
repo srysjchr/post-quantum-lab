@@ -5,10 +5,10 @@
 <meta name="description" content="An interactive, detailed English guide to post-quantum encryption: RSA, Shor, lattice noise, ML-KEM, AES-GCM, and migration. Explore with Three.js.">
 <title>Post / Quantum — A Visual Field Guide</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%23080e1c%27/%3E%3Ctext x=%276%27 y=%2724%27 font-family=%27Arial%27 font-size=%2725%27 fill=%27%23a6f4c5%27%3EQ%3C/text%3E%3C/svg%3E"><link rel="stylesheet" href="styles.css">
-<script src="vendor/three.min.js" defer></script><script src="lessons.js" defer></script><script src="scene.js" defer></script><script src="journey.js" defer></script><script src="app.js" defer></script>
+<script src="vendor/three.min.js" defer></script><script src="lessons.js" defer></script><script src="scene.js" defer></script><script src="journey.js" defer></script><script src="labs.js" defer></script><script src="app.js" defer></script>
 </head>
 <body>
-<header><a class="brand" href="#lesson">POST <span>/ QUANTUM</span></a><span class="tagline">A visual field guide to quantum-resistant encryption</span><nav aria-label="Page navigation"><a href="#lesson">The lesson</a><a href="#reference">Reference</a></nav></header>
+<header><a class="brand" href="#lesson">POST <span>/ QUANTUM</span></a><span class="tagline">A visual field guide to quantum-resistant encryption</span><nav aria-label="Page navigation"><a href="#lesson">The lesson</a><a href="#practice-labs">Practice</a><a href="#reference">Reference</a></nav></header>
 <main id="lesson">
 <section class="intro"><h1>Different math. Same privacy.</h1><p>Understand what quantum computers threaten—and how post-quantum cryptography changes the lock.</p></section>
 <nav id="chapters" class="chapters" aria-label="Choose a chapter"></nav>
@@ -19,6 +19,34 @@
 </section>
 <section id="observer-panel" class="observer-panel" aria-label="Information available to Alice, Bob, and Eve"></section>
 <section class="deep-dive" id="deep-dive" aria-label="A closer look"></section>
+<section id="practice-labs" class="practice-labs" aria-labelledby="practice-title">
+<div class="section-heading"><span class="section-number">LEARN BY DOING</span><h2 id="practice-title">Choose a tool. Test its boundaries.</h2><p>Work through a scenario, experiment as Eve, then prove your understanding in a mission. Progress lasts for this page session.</p></div>
+<div class="practice-grid">
+<section class="practice-card" id="scenario-lab" aria-labelledby="scenario-heading">
+<div class="practice-heading"><h3 id="scenario-heading">Scenario Lab</h3><button id="scenario-reset">Reset scenarios</button></div>
+<p id="scenario-count" class="micro"></p><h4 id="scenario-title"></h4><p id="scenario-prompt"></p>
+<form id="scenario-form"><fieldset id="scenario-options"></fieldset><button type="submit" class="primary">Check my choice</button></form>
+<p id="scenario-feedback" role="status"></p><div class="journey-navigation"><button id="scenario-prev">Previous scenario</button><button id="scenario-next">Next scenario</button></div>
+</section>
+<section class="practice-card" id="attack-playground" aria-labelledby="attack-heading">
+<div class="practice-heading"><h3 id="attack-heading">Attack Playground</h3><button id="attack-reset">Reset packet</button></div>
+<p class="micro">REAL AES-GCM · simulated identity binding and network delivery · local only</p>
+<label for="attack-mode">Choose Eve’s action</label><select id="attack-mode"><option value="substitute">Substitute a public key</option><option value="tamper">Modify a packet byte</option><option value="replay">Replay a valid packet</option><option value="drop">Drop the packet</option></select>
+<h4 id="attack-title"></h4><p id="attack-description"></p>
+<label id="replay-control" class="toggle-row" hidden><input id="replay-policy" type="checkbox" checked>Enable the receiver’s freshness policy</label>
+<div class="demo-actions"><button id="attack-prepare">Prepare a fresh packet</button><button id="attack-run" class="primary">Run attack</button></div>
+<div id="attack-wire" class="attack-wire" aria-label="Public network packet"></div><p id="attack-result" role="status"></p>
+<p class="micro">Each replay run starts a clean receiver, delivers packet 1 once, then repeats it. The session sequence is authenticated as additional data. Private key and message bytes are not displayed.</p>
+<a href="https://www.rfc-editor.org/rfc/rfc5116#section-1.2" target="_blank" rel="noopener noreferrer">Why AEAD needs separate protocol policies ↗</a>
+</section>
+</div>
+<section id="guided-missions" class="practice-card mission-card" aria-labelledby="missions-heading">
+<div class="practice-heading"><h3 id="missions-heading">Guided Missions</h3><button id="mission-restart">Restart mission progress</button></div>
+<p>Choose a mission before running its experiments. The checklist records successful actions; finish by explaining the result. Selecting another mission starts its checklist fresh.</p>
+<label for="mission-select">Choose a mission</label><select id="mission-select"><option value="0">1. Deliver one authentic message</option><option value="1">2. Stop a substituted key and a modified packet</option><option value="2">3. Explain the replay boundary</option></select>
+<div class="mission-grid"><div><p id="mission-counter" class="micro" aria-live="polite"></p><h4 id="mission-title"></h4><ul id="mission-checklist" class="mission-checklist" aria-label="Experiment evidence"></ul><a id="mission-link" class="mission-link"></a><details id="mission-hints"><summary>Need a hint?</summary><p id="mission-hint"></p></details></div><form id="mission-form"><p id="mission-question"></p><fieldset id="mission-options"></fieldset><button type="submit" class="primary">Check mission</button><p id="mission-feedback" role="status"></p></form></div>
+</section>
+</section>
 <section id="message-journey" class="message-journey" aria-labelledby="journey-title"><div class="journey-heading"><div><span class="section-number">FOLLOW ONE MESSAGE</span><h2 id="journey-title">From identity to a verified message.</h2><p>Authentication and ML-KEM are simulated. HKDF and AES-GCM run locally with a fresh random stand-in secret, not an ML-KEM output.</p></div><button id="journey-reset">Start a new journey</button></div><ol id="journey-stages" class="journey-stages" aria-label="Message journey stages"></ol><div class="journey-body"><div><div id="journey-kind" class="journey-kind"></div><h3 id="journey-step-title"></h3><p id="journey-description"></p><div id="journey-controls"></div><p id="journey-status" role="status"></p></div><div><div id="journey-channel" class="journey-channel" aria-label="Network transmission"></div><div id="journey-observer" class="journey-observer"></div></div></div><div id="journey-payload" class="journey-payload" hidden></div><div class="journey-navigation"><button id="journey-back">Previous stage</button><button id="journey-forward">Next stage</button></div></section>
 <section class="details" aria-labelledby="details-title"><div class="section-heading"><span class="section-number">01 / EXPLORE FURTHER</span><h2 id="details-title">Under the surface</h2></div><div id="details-content"></div></section>
 <section class="knowledge" aria-labelledby="knowledge-title"><div><span class="section-number">02 / CHECK YOUR UNDERSTANDING</span><h2 id="knowledge-title">One question before you move on.</h2><p id="question"></p></div><div><form id="quiz"><fieldset id="answers"><legend class="sr-only">Choose an answer</legend></fieldset><button type="submit" class="primary">Check answer</button></form><p id="feedback" role="status"></p></div></section>

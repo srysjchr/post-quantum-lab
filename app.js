@@ -5,6 +5,7 @@
   const scene = window.createLearningScene($('scene'), $('fallback'));
   if (!scene) { $('pause').disabled=true; $('reset').disabled=true; }
   let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0;
+  window.createPracticeLabs();
   const journey=window.createMessageJourney();
   let refreshAes=()=>{};
   function updateObserver(){

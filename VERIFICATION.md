@@ -67,3 +67,19 @@ Validated with Playwright and Chromium software WebGL. Reviewed desktop and mobi
 - WebGL unavailable fallback retains authentication and progression controls; reduced-motion preference supported.
 
 Authentication and ML-KEM remain simulations. The HKDF input is fresh random stand-in material. This is an educational browser experience, not a deployed post-quantum secure channel.
+
+## Scenario Lab, Attack Playground and Guided Missions — 2026-10-13
+
+Validated using the committed Playwright suites on localhost with Chromium and software WebGL. Browser plugin was not available. Desktop and mobile screenshots were captured outside the repository and visually reviewed.
+
+- Three scenario choices: missing answer, incorrect explanation, correct explanation, unique solved count, navigation and reset.
+- Four attacks: simulated key substitution blocking, real AES-GCM tag rejection, real verification of a replay with duplicate policy on/off, and simulated missing delivery.
+- New packet preparations produce different public packet bytes and fresh nonces.
+- Three missions require both recorded experiment outcomes plus a correct reflection answer. Missing steps, missing/wrong explanations, hints, mission changes and restarts were checked.
+- Journey resets clear mission evidence and completion feedback. Chapter and observer changes preserve independent scenario state.
+- Reset during an asynchronous packet preparation cannot restore an obsolete packet.
+- Missing Web Crypto displays an actionable error while scenario exercises remain usable.
+- English-only visible content, no horizontal overflow at 320, 390, 768 and 1440 pixels, and no application runtime or HTTP resource errors.
+- Existing six-chapter suite passed, including quizzes, 3D synchronization, observer boundaries, real HKDF/AES round trips, tamper rejection, pending-operation reset and WebGL fallback.
+
+Identity binding, ML-KEM and network delivery remain illustrative. AES-GCM operations are real; replay tracking is an in-memory demonstration policy. Tested browser coverage is Chromium, not a claim of cross-browser certification.
