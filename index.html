@@ -21,6 +21,12 @@
 <section id="kem-boundaries" class="kem-boundaries" aria-labelledby="kem-boundary-title" hidden>
 <div class="practice-heading"><div><span class="section-number">FOLLOW THE KNOWLEDGE, NOT JUST THE PACKET</span><h2 id="kem-boundary-title">What can Eve actually learn?</h2></div><button id="kem-eve-view">Look through Eve’s eyes</button></div>
 <p id="kem-phase-summary" role="status"></p>
+<section id="kem-prediction" class="kem-prediction" aria-labelledby="prediction-title">
+<div class="practice-heading"><div><span class="section-number">PREDICT BEFORE REVEAL</span><h3 id="prediction-title">Pause the timeline. Make a prediction.</h3></div><button id="prediction-start">Start guided predictions</button></div>
+<p class="micro">Three checkpoints follow the same illustrative KEM timeline. Choose an answer before revealing each operation. Free exploration with the phase buttons remains available.</p>
+<div id="prediction-body" hidden><p id="prediction-count" class="micro"></p><p id="prediction-question"></p><form id="prediction-form"><fieldset id="prediction-answers"><legend class="sr-only">Choose your prediction</legend></fieldset><button id="prediction-reveal" type="submit" class="primary" disabled>Reveal the next operation</button></form><p id="prediction-feedback" role="status"></p><button id="prediction-next" hidden>Next prediction</button></div>
+</section>
+
 <div class="kem-boundary-grid"><div><h3>Knowledge at this stage</h3><p class="micro">Public = available on the wire. Private = local knowledge at that endpoint. Not yet = the operation has not happened.</p><div class="kem-table-wrap"><table id="kem-knowledge"><caption id="kem-table-caption"></caption><thead><tr><th scope="col">Object</th><th scope="col" data-role="alice">Alice</th><th scope="col" data-role="bob">Bob</th><th scope="col" data-role="eve">Eve</th></tr></thead><tbody></tbody></table></div></div>
 <div><h3>Eve’s captured transcript</h3><ol id="kem-transcript" class="kem-transcript"></ol><p id="kem-inference"></p></div></div>
 <div class="kem-threat"><h3>Choose Eve’s capabilities</h3><div class="choice-buttons"><button data-threat-mode="passive" aria-pressed="true">Passive eavesdropping</button><button data-threat-mode="active" aria-pressed="false">Active interference</button></div><p id="kem-threat-description"></p><a id="kem-threat-link" href="#attack-playground">Explore active attacks in the playground →</a></div>

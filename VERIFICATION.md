@@ -95,3 +95,7 @@ Identity binding, ML-KEM and network delivery remain illustrative. AES-GCM opera
 - Existing practice-lab and six-chapter regression suites were run after integration.
 
 The comparison shows who knows symbolic objects under stated assumptions; it does not execute ML-KEM, estimate attack effort or isolate browser memory.
+
+## Predict Before Reveal — 2026-10-13
+
+Verified three checkpoints with correct and incorrect answers, disabled reveal before selection, guarded form submission, keyboard reveal, observer-selection persistence, synchronized KEM phase/table/transcript, restart, manual timeline exit and chapter re-entry. Reviewed desktop/mobile screenshots and checked 320, 390, 768 and 1440 pixel layouts, English visible content and runtime errors. Existing KEM perspective and six-chapter regression suites were also run. The exercise does not execute real ML-KEM.

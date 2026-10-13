@@ -4,7 +4,7 @@
   const lessons = window.LESSONS;
   const scene = window.createLearningScene($('scene'), $('fallback'));
   if (!scene) { $('pause').disabled=true; $('reset').disabled=true; }
-  let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive';
+  let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive', prediction=null;
   window.createPracticeLabs();
   const journey=window.createMessageJourney();
   let refreshAes=()=>{};
@@ -37,6 +37,7 @@
   function renderKemBoundary(){
     $('kem-boundaries').hidden=chapter!==3;
     if(chapter!==3)return;
+    renderPrediction();
     const names=['KeyGen + publish ek','Encaps + deliver c','Decaps locally at Bob','Derive traffic keys locally'];
     $('kem-table-caption').textContent=`${names[phase]} · ${observer.toUpperCase()} perspective`;
     $('kem-phase-summary').textContent=[
@@ -57,6 +58,31 @@
     document.querySelectorAll('[data-threat-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.threatMode===threatMode)));
     $('kem-threat-description').textContent=threatMode==='passive'?'PASSIVE EVE: can record ek, c once sent, and metadata. She cannot read local dk or K through the wire. Saving ciphertext for later is a reason to consider quantum-resistant key establishment; this diagram does not promise that every implementation is secure.':'ACTIVE EVE: may replace an unauthenticated ek, change c, replay or drop packets. If Alice trusts Eve’s substituted key, Alice may establish a secret with Eve instead of Bob. Bind Bob’s identity to ek before encapsulation, then use an authenticated protocol with message verification and freshness checks.';
     $('kem-threat-link').hidden=threatMode!=='active';
+  }
+  const predictions=[
+    {question:'Alice is about to run Encaps with Bob’s authenticated ek. What will she obtain?',options:['A private K and a public ciphertext c','Bob’s private decapsulation key dk','K at all three parties, including Eve'],correct:0,explanation:'Encaps gives Alice (K, c). Alice keeps K locally and sends c. Bob has c and dk, but has not yet decapsulated; Eve can capture c without learning K.'},
+    {question:'Before Bob runs Decaps, does receiving c mean he already holds Alice’s K?',options:['Not yet. Bob must compute Decaps(dk, c) locally','Yes. K arrived inside the public packet','Yes. Anyone who sees c automatically knows K'],correct:0,explanation:'Receiving c is not the same as computing K. After this valid Decaps(dk, c), Bob obtains the same K Alice holds. The transcript stays unchanged; Eve gets no new secret.'},
+    {question:'Both endpoints are about to derive traffic keys locally. Which secret must now cross the public channel?',options:['No secret; derive locally from K and agreed context','The shared secret K','Bob’s private dk'],correct:0,explanation:'Key derivation happens locally. Agreed context may be public; K and the derived traffic keys remain private. Eve’s capture still contains ek and c, not a traffic key.'}
+  ];
+  function renderPrediction(){
+    $('prediction-body').hidden=!prediction;
+    $('prediction-start').textContent=prediction?'Restart guided predictions':'Start guided predictions';
+    if(!prediction)return;
+    const item=predictions[prediction.index];
+    $('prediction-count').textContent=`CHECKPOINT ${prediction.index+1} / 3`+(prediction.revealed&&prediction.index===2?' · COMPLETE':'');
+    $('prediction-question').textContent=item.question;
+    $('prediction-answers').replaceChildren(make('legend','Choose your prediction','sr-only'));
+    item.options.forEach((text,index)=>{const label=make('label',undefined,'answer'),input=make('input');input.type='radio';input.name='kem-prediction';input.value=index;input.checked=prediction.answer===index;input.disabled=prediction.revealed;input.addEventListener('change',()=>{prediction.answer=index;$('prediction-reveal').disabled=false;});label.append(input,document.createTextNode(text));$('prediction-answers').append(label);});
+    $('prediction-reveal').disabled=prediction.answer===null||prediction.revealed;
+    $('prediction-feedback').textContent=prediction.revealed?`${prediction.answer===item.correct?'Correct prediction.':'Compare your prediction with the result.'} ${item.explanation}`:'';
+    $('prediction-feedback').className=prediction.revealed?(prediction.answer===item.correct?'correct':'incorrect'):'';
+    $('prediction-next').hidden=!prediction.revealed||prediction.index===2;
+  }
+  function movePredictionTimeline(){
+    const nextPhase=prediction.index+(prediction.revealed?1:0);
+    const saved=prediction;
+    $('interaction').querySelector(`[data-phase="${nextPhase}"]`).click();
+    prediction=saved;renderPrediction();
   }
   function refreshRsa(){
     const visible=observer==='bob'||(observer==='learner'&&rsa.revealed);
@@ -93,8 +119,8 @@
   function renderKem(parent) {
     const stages=[['KeyGen','Bob creates ek and dk. Only ek is published; dk remains private.'],['Encaps','Alice uses Bob’s authenticated ek to generate secret K and ciphertext c.'],['Decaps','Bob applies dk to c and obtains the same K for a valid encapsulation.'],['Derive','The protocol derives traffic keys from K, then protects messages with AES-GCM.']];
     const buttons=make('div',undefined,'phase-buttons');const description=make('p',stages[0][1],'phase-description');description.id='phase-description';description.setAttribute('aria-live','polite');
-    stages.forEach(([name,text],index)=>{const button=make('button',`${index+1} · ${name}`);button.dataset.phase=index;button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>{buttons.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));description.textContent=text;phase=index;setScene('phase',index);updateObserver();});buttons.append(button);});
-    parent.append(buttons,description,make('p','Protocol illustration only. No real ML-KEM operation is executed.','micro'));phase=0;setScene('phase',0);
+    stages.forEach(([name,text],index)=>{const button=make('button',`${index+1} · ${name}`);button.dataset.phase=index;button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>{buttons.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));description.textContent=text;prediction=null;phase=index;setScene('phase',index);updateObserver();});buttons.append(button);});
+    parent.append(buttons,description,make('p','Protocol illustration only. No real ML-KEM operation is executed.','micro'));prediction=null;phase=0;setScene('phase',0);
   }
   function renderAes(parent,version) {
     const label=make('label','Your message','demo-label');label.htmlFor='message';const input=make('textarea');input.id='message';input.maxLength=500;input.value='The future should not reveal today’s secrets.';input.setAttribute('aria-describedby','aes-note');
@@ -146,5 +172,8 @@
   document.querySelectorAll('[data-observer]').forEach(button=>button.addEventListener('click',()=>{observer=button.dataset.observer;updateObserver();}));
   $('kem-eve-view').addEventListener('click',()=>{observer='eve';updateObserver();});
   document.querySelectorAll('[data-threat-mode]').forEach(button=>button.addEventListener('click',()=>{threatMode=button.dataset.threatMode;renderKemBoundary();}));
+  $('prediction-start').addEventListener('click',()=>{prediction={index:0,answer:null,revealed:false};movePredictionTimeline();});
+  $('prediction-form').addEventListener('submit',event=>{event.preventDefault();if(!prediction||prediction.answer===null||prediction.revealed)return;prediction.revealed=true;movePredictionTimeline();});
+  $('prediction-next').addEventListener('click',()=>{if(!prediction||!prediction.revealed||prediction.index>=2)return;prediction={index:prediction.index+1,answer:null,revealed:false};movePredictionTimeline();});
   const initial=Number(new URLSearchParams(location.search).get('chapter'));select(Number.isInteger(initial)&&initial>=1&&initial<=6?initial-1:0);
 })();

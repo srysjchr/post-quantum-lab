@@ -74,3 +74,9 @@ In chapter 4, open “Look through Eve’s eyes” to highlight Eve’s knowledg
 The captured transcript shows only transmissions that have occurred. Passive eavesdropping and active interference explain different capabilities, including public-key substitution and metadata observations. Expand the four questions to distinguish encapsulating a new secret from recovering Alice’s secret, key possession from identity, and a KEM ciphertext from an encrypted chat message. All values are symbolic illustrations; no real ML-KEM secrets are generated or disclosed.
 
 Run `node tests/kem-perspectives.cjs` with the same Playwright environment variables as the other suites. Optional `EVIDENCE_DIR` captures desktop/mobile screenshots outside the repository.
+
+## Predict Before Reveal
+
+Chapter 4 includes an optional three-checkpoint exercise: predict what Encaps gives Alice, whether Bob holds K before Decaps, and whether deriving traffic keys sends secrets over the wire. Choose an answer to unlock the next operation. The result updates the same phase buttons, 3D model, knowledge table and captured transcript, with feedback for both correct and incorrect predictions. Observer changes preserve your selection. Restart resets to KeyGen; manual phase exploration exits the guided exercise. This is still a symbolic KEM illustration.
+
+Run `node tests/predictions.cjs` with the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` optionally captures screenshots outside the repository.
