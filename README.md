@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -80,3 +80,11 @@ Run `node tests/kem-perspectives.cjs` with the same Playwright environment varia
 Chapter 4 includes an optional three-checkpoint exercise: predict what Encaps gives Alice, whether Bob holds K before Decaps, and whether deriving traffic keys sends secrets over the wire. Choose an answer to unlock the next operation. The result updates the same phase buttons, 3D model, knowledge table and captured transcript, with feedback for both correct and incorrect predictions. Observer changes preserve your selection. Restart resets to KeyGen; manual phase exploration exits the guided exercise. This is still a symbolic KEM illustration.
 
 Run `node tests/predictions.cjs` with the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` optionally captures screenshots outside the repository.
+
+## Two Encapsulations, Two Secrets
+
+Chapter 4 now lets Alice and Eve independently create symbolic (K, c) pairs using Bob’s same public ek. Select each public ciphertext and let Bob decapsulate it locally. Bob recovers the corresponding secret, while Eve’s view shows only Eve’s own K, not Alice’s K. Regenerating a party’s pair invalidates Bob’s recovery for that old pair. Both recoveries are required before checking the explanation.
+
+This is an explicitly labeled symbolic simulation: labels and the recovery mapping are teaching examples, not real ML-KEM randomness, ciphertexts or secrets. It models valid encapsulations and does not prove sender identity or guarantee that mathematical collisions are impossible. The experiment has independent state from the four-step timeline; perspective controls apply to both. Small screens can scroll the comparison table with touch or keyboard.
+
+Run `node tests/double-encapsulation.cjs` with the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` optionally captures screenshots outside the repository.
