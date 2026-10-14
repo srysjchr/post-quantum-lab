@@ -11,6 +11,7 @@
   const keySubstitution=window.createKeySubstitutionStory();
   const wireBuilder=window.createWireBuilder();
   window.createProtocolRepair();
+  window.createTeachBack(()=>wireBuilder.snapshot());
   let refreshAes=()=>{};
   function updateObserver(){
     document.querySelectorAll('[data-observer]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.observer===observer)));

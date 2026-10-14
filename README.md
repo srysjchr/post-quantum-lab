@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -112,3 +112,11 @@ Four symbolic cases distinguish authenticated key establishment, public-key iden
 Cases isolate wrong-key ownership, missing ciphertext integrity, unchanged-packet replay and absent shared secret input for a proposed ML-KEM session. Other reviewed authenticated key-establishment protocols can fill the same role; the exercise does not claim ML-KEM is the only option. All before/after outcomes are simulated and assume the other listed roles are implemented correctly. Use Attack Playground for actual AES-GCM experiments.
 
 Run `node tests/protocol-repair.cjs` with the existing Playwright configuration. Optional `EVIDENCE_DIR` captures screenshots outside the repository.
+
+## Teach It Back
+
+Three explanation topics use evidence from the current Build the Wire experiment (public-only transcript or dk+c exposure) and both observed replay-policy outcomes from Attack Playground. Fill three claims to build an explanation; feedback identifies each misconception rather than accepting a memorized word. Evidence changes invalidate the checked explanation. Replay evidence is historical within this page session; wire evidence always reflects the current exchange.
+
+Optional notes let learners restate the result in their own words. Notes are not automatically graded, saved or submitted. Clearing the form preserves experiment evidence; resetting the wire starts a different symbolic exchange. No AI service or backend is used.
+
+Run `node tests/teach-back.cjs` using the existing Playwright configuration. Optional `EVIDENCE_DIR` captures screenshots outside the repository.

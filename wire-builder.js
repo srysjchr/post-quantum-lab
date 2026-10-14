@@ -55,6 +55,7 @@ window.createWireBuilder = function () {
     $('wire-feedback').textContent = ''; $('wire-feedback').className = '';
     $('wire-status').textContent = `Transmitted ${selection.join(', ')}. Eve’s capture and inferred knowledge have updated.`;
     render();
+    window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
   $('wire-check').onclick = () => {
     const leaked = ['dk', 'K', 'traffic'].filter(id => sent.has(id));
@@ -65,6 +66,7 @@ window.createWireBuilder = function () {
     sent.clear(); queued.clear(); $('wire-transcript').replaceChildren(); $('wire-feedback').textContent = ''; $('wire-feedback').className = '';
     $('wire-status').textContent = 'Fresh illustrative exchange. The previous capture belongs to a different experiment; a real leaked secret cannot be recalled.';
     render();
+    window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
-  render(); return { setObserver(value) { observer = value; render(); } };
+  render(); return { setObserver(value) { observer = value; render(); }, snapshot() { return { sent:[...sent] }; } };
 };
