@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -96,3 +96,19 @@ Chapter 4 includes a five-step symbolic story comparing correct identity binding
 Step controls reveal the sequence, actor cards track local knowledge and the global perspective controls highlight the selected actor. The final explanation is gated on completing the story. Rewinding or restarting clears the answer. Story state is independent from the main timeline and other experiments. All operations and identity checks are explicitly simulated; no ML-KEM, certificate or signature implementation is added.
 
 Run `node tests/key-substitution.cjs` using the existing Playwright configuration. `TEST_URL` accepts the site root; `EVIDENCE_DIR` captures optional screenshots outside the repository.
+
+## Build the Wire
+
+Choose symbolic ek, c, dk, K or traffic-key objects and transmit a batch to a public channel. Eve’s capture persists within the experiment. The participant cards distinguish direct observations from the illustrated inference chains: compromised dk exposes the matching public ek; dk plus c yields K; K plus public context yields the traffic key. Direct traffic-key exposure does not establish knowledge of K or dk. Bob’s valid local decapsulation and derivation are illustrated when c arrives.
+
+A correct intended public transcript contains ek and c without secret objects. A captured secret cannot be removed by changing a selection; start a fresh illustrative exchange instead. Queued selections survive observer changes. The model starts with prepared valid objects, tracks limited inference rules, and does not perform real ML-KEM or exhaustive cryptanalysis.
+
+Run `node tests/wire-builder.cjs` with the existing Playwright configuration. Optional `EVIDENCE_DIR` captures desktop/mobile screenshots outside the repository.
+
+## Find the Missing Protection
+
+Four symbolic cases distinguish authenticated key establishment, public-key identity binding, authenticated message encryption and freshness state. Run a baseline, select the smallest missing protection and apply the patch to compare outcomes. A larger symmetric key is a deliberate distractor; adding an already-present or unrelated role does not count as a minimal patch. Each accepted case is counted only once per page session. Changing a selection invalidates the displayed patch result.
+
+Cases isolate wrong-key ownership, missing ciphertext integrity, unchanged-packet replay and absent shared secret input for a proposed ML-KEM session. Other reviewed authenticated key-establishment protocols can fill the same role; the exercise does not claim ML-KEM is the only option. All before/after outcomes are simulated and assume the other listed roles are implemented correctly. Use Attack Playground for actual AES-GCM experiments.
+
+Run `node tests/protocol-repair.cjs` with the existing Playwright configuration. Optional `EVIDENCE_DIR` captures screenshots outside the repository.

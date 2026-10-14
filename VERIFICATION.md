@@ -107,3 +107,11 @@ Verified same public key and separate symbolic pairs, selective Bob decapsulatio
 ## Key Substitution Story — 2026-10-14
 
 Verified five sequential stages, protected-path blocking before Encaps, unchecked Alice/Eve secret ownership, Bob’s absence from that encapsulation, Eve’s pre-Decaps state, missing/wrong/correct reflection answers, guarded early submission, actor highlighting, preserved observer selection, rewind/reset, independent chapter/timeline state and keyboard navigation. Checked 320/390/768/1440 pixel layouts, English visible content, WebGL fallback and runtime/resource errors; reviewed desktop/mobile screenshots. Existing chapter, double-encapsulation and prediction suites were also run. This is an explicitly symbolic trust-boundary demonstration.
+
+## Build the Wire — 2026-10-14
+
+Verified public-only and incomplete transcripts, queued selection privacy/persistence, dk+c secret inference in both transmission orders, direct K and traffic-key exposure, no reverse inference from a traffic key, cumulative capture, inability to recall transmitted secrets, participant views, reset, independent timeline/chapter state, keyboard operation, four responsive widths, English and WebGL fallback. Reviewed styled desktop/mobile screenshots; request failures and missing CSS are checked by the new suite. This exercise uses symbolic prepared objects and limited inference rules, not actual cryptographic operations.
+
+## Find the Missing Protection — 2026-10-14
+
+Verified four defects and minimal patches, baseline outcomes, missing/wrong/extra selections, unique solved counts, stale-result invalidation, observer/chapter persistence, navigation/reset, keyboard operation, four responsive widths, English and styled UI, and runtime/request errors. Reviewed desktop/mobile screenshots. Reran Build the Wire on the combined page; existing chapter and key-substitution regressions also passed. All repair outcomes are symbolic, not executed cryptographic attacks or a proof of complete protocol security.
