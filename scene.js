@@ -115,6 +115,7 @@ window.createLearningScene = function (container, fallback) {
       box([-2.5,0,0], [1.3,1.6,1.3], colors.mint); box([2.5,0,0], [1.3,1.6,1.3], colors.mint);
       label('ALICE', [-2.5,-1.35,0], '#a6f4c5', 0.8); label('BOB', [2.5,-1.35,0], '#a6f4c5', 0.8);
       line([[-1.8,0,0],[1.8,0,0]], colors.blue, 0.35);
+      box([0,-0.5,2.8], [0.8,1,0.8], colors.orange);label('EVE / PUBLIC CAPTURE', [0,-1.35,2.8], '#ffb15c',0.65);
       const alicePrivate = state.observer === 'learner' || state.observer === 'alice';
       const bobPrivate = state.observer === 'learner' || state.observer === 'bob';
       if (state.phase === 0) {
@@ -149,12 +150,17 @@ window.createLearningScene = function (container, fallback) {
     }
     container.setAttribute('aria-label', `${state.mode} educational model. ${root.children.filter(object => object.userData.text).map(object => object.userData.text).join('. ')}. Drag or use arrow keys to rotate.`);
   }
+  function participantCamera() {
+    const presets = {learner:[6.8,4.4,8.3],alice:[-7,4.4,7],bob:[7,4.4,7],eve:[0,5.5,10]};
+    camera.position.set(...(state.mode === 'kem' ? presets[state.observer] : presets.learner));
+    camera.lookAt(0,0,0);
+  }
   function draw() { if (!lost) renderer.render(scene, camera); }
   function animate(now) {
     frame = 0;
     if (paused || document.hidden || lost) return;
     const delta = lastTime ? Math.min((now-lastTime)/1000,0.05) : 0; lastTime = now; time += delta;
-    if (!dragging) root.rotation.y += delta * (state.mode === 'lattice' ? 0.06 : 0.025);
+    if (!dragging && state.mode !== 'kem') root.rotation.y += delta * (state.mode === 'lattice' ? 0.06 : 0.025);
     if (movingObject) {
       if (state.mode === 'kem') movingObject.position.x = (state.phase === 0 ? 1 : -1) * (1.8 - ((time * 0.3) % 1) * 3.6);
       if (state.mode === 'quantum') movingObject.position.set(Math.sin(time * 0.6) * 3, Math.sin(time * 2) * 0.85, 0.4);
@@ -165,9 +171,9 @@ window.createLearningScene = function (container, fallback) {
   function schedule() { if (!frame && !paused && !document.hidden && !lost) { lastTime = 0; frame = requestAnimationFrame(animate); } }
   function syncPause() { const button=document.getElementById('pause'); button.textContent=paused?'Play motion':'Pause motion'; button.setAttribute('aria-pressed',String(paused)); }
   const api = {
-    select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); time=0; makeModel(); draw(); schedule(); },
-    set(name,value) { state[name]=value; if (name==='noise') updateNoise(); else makeModel(); draw(); },
-    reset() { root.rotation.set(0,0,0); draw(); },
+    select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
+    set(name,value) { state[name]=value; if(name==='observer'&&state.mode==='kem'){root.rotation.set(0,0,0);participantCamera();} if (name==='noise') updateNoise(); else makeModel(); draw(); },
+    reset() { root.rotation.set(0,0,0); participantCamera(); draw(); },
     togglePause() { paused=!paused; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); }
   };
   document.getElementById('reset').addEventListener('click',api.reset);

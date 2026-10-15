@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, progress.js, navigation.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-scene.js, wire-builder.js, protocol-repair.js, teach-back.js, progress.js, navigation.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -139,3 +139,14 @@ The exercise menu provides direct entry to ten exercises and a recommended seque
 Exercises use native keyboard-accessible disclosure panels. Only one is expanded at a time, reducing page length while retaining running experiments and typed notes in the current page session. Opening a KEM-specific exercise selects chapter 4 automatically. Direct fragment links, mission links, Continue learning and the completion checklist expand their destination before scrolling and focusing it. Browser back/forward follows exercise links; changing chapters clears stale exercise fragments. Reloading still resets experimental inputs as described under Learning Progress.
 
 `navigation.js` owns the menu and panel navigation. Run `node tests/navigation.cjs` in the existing Playwright environment. Existing regression suites use `tests/navigation-helper.cjs` to enter collapsed exercises through the visible menu. Optional `EVIDENCE_DIR` saves navigation screenshots outside the repository.
+
+
+## Participant cameras and interactive 3D wire
+
+Open **Build the Wire** in the exercise menu. Overview and Alice/Bob/Eve cameras show participant areas, a public channel and Eve's copy of transmitted objects. The local perspective buttons stay synchronized with the page's observer controls. The existing chapter-4 timeline also changes camera position for each participant and includes Eve's public-capture area.
+
+Drag the orange ek or c marker into the public channel, click a marker, or use the explicit Send buttons/keyboard. Touch dragging is supported. Dropping outside the channel or pressing Escape cancels a drag. The public packet moves toward its recipient with a copy branching toward Eve; reduced-motion users receive the same final state without animation. Each public object is captured only once. Other queued selections remain local until explicitly sent.
+
+This shares Build the Wire's existing symbolic rules, transcript, knowledge cards, reflection evidence and completion history. Alice starts with authenticated ek and a prepared (K, c); sending c illustrates Bob's local decapsulation. K has no public trajectory. Transmitting dk, K or a traffic key through the existing object list updates the same 3D knowledge view, including compromise inference. Unknown labels represent unavailable knowledge rather than missing protocol roles. These are teaching models, not real ML-KEM operations or browser-side security boundaries.
+
+`wire-scene.js` only renders the model and forwards send actions to `wire-builder.js`; it does not implement parallel cryptographic rules. Without WebGL, the Send controls and knowledge cards retain the complete experiment. No new dependencies or saved data are introduced. Run `node tests/wire-3d.cjs` with the existing Playwright setup; optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repo.

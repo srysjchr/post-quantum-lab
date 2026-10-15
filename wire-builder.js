@@ -11,6 +11,7 @@ window.createWireBuilder = function () {
   ];
   const sent = new Set(), queued = new Set();
   let observer = 'learner';
+  const wireScene = window.createWireScene(id => transmit([id]));
   function knowledge() {
     const eveK = sent.has('K') || (sent.has('dk') && sent.has('c'));
     return {
@@ -28,6 +29,8 @@ window.createWireBuilder = function () {
       label.append(input, document.createTextNode(object.name + (sent.has(object.id) ? ' · already captured' : ''))); return label;
     }));
     $('wire-send').disabled = queued.size===0;
+    $('wire-send-ek').disabled = sent.has('ek');
+    $('wire-send-c').disabled = sent.has('c');
     const known = knowledge();
     $('wire-knowledge').replaceChildren(...['alice', 'bob', 'eve'].map(role => {
       const article = node('article', ''); article.dataset.wireActor = role; article.className = role === observer ? 'active' : '';
@@ -39,24 +42,28 @@ window.createWireBuilder = function () {
       });
       article.append(list); return article;
     }));
+    wireScene.render({sent:[...sent], known, observer});
     const eveK = known.eve.includes('K');
     $('wire-inference').textContent = sent.has('dk') && sent.has('c') ? 'EVE’S INFERENCE: captured dk + c → decapsulate K → derive traffic key using public context. Even though K was never sent, it is now exposed in this model.' : sent.has('K') ? 'EVE’S INFERENCE: K was sent directly. Eve can derive the traffic key using the agreed public context. Keeping the traffic key off the wire no longer protects it.' : sent.has('traffic') ? 'EVE’S INFERENCE: the traffic key was sent directly. Eve can use it against packets protected by that key; this does not establish knowledge of dk or K.' : sent.has('dk') ? 'EVE’S INFERENCE: dk is exposed. This exchange’s K is not yet obtained in the illustrated path, but capturing c would let Eve decapsulate it. A compromised private key is unsafe even before c arrives.' : 'EVE’S INFERENCE: public ek and c do not expose dk, K or the traffic key under the stated KEM assumptions. Timing, ordering and sizes can still be visible.';
     $('wire-view').textContent = `${observer.toUpperCase()} VIEW · Captures are cumulative within this experiment. ${eveK ? 'Eve knows K and the traffic key.' : 'Use the knowledge cards to distinguish transmitted objects from secrets inferred later.'}`;
   }
-  $('wire-send').onclick = () => {
-    const selection = [...queued];
+  function transmit(ids) {
+    const selection = ids.filter(id => objects.some(object => object.id === id) && !sent.has(id));
     if (!selection.length) return;
     selection.forEach(id => {
       sent.add(id); const object = objects.find(item => item.id === id), entry = document.createElement('li');
       entry.dataset.wireCapture = id; entry.append(node('strong', object.name), node('p', object.direction), node('p', object.explanation));
       $('wire-transcript').append(entry);
     });
-    queued.clear();
+    selection.forEach(id => queued.delete(id));
     $('wire-feedback').textContent = ''; $('wire-feedback').className = '';
     $('wire-status').textContent = `Transmitted ${selection.join(', ')}. Eve’s capture and inferred knowledge have updated.`;
     render();
     window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
+  $('wire-send').onclick = () => transmit([...queued]);
+  $('wire-send-ek').onclick = () => transmit(['ek']);
+  $('wire-send-c').onclick = () => transmit(['c']);
   $('wire-check').onclick = () => {
     const leaked = ['dk', 'K', 'traffic'].filter(id => sent.has(id));
     if(!leaked.length&&sent.has('ek')&&sent.has('c'))window.completeLearning('wire');

@@ -17,7 +17,7 @@
   window.createTeachBack(()=>wireBuilder.snapshot());
   let refreshAes=()=>{};
   function updateObserver(){
-    document.querySelectorAll('[data-observer]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.observer===observer)));
+    document.querySelectorAll('[data-observer],[data-wire-observer]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.observer||b.dataset.wireObserver)===observer)));
     setScene('observer',observer);journey.setObserver(observer);doubleEncapsulation.setObserver(observer);keySubstitution.setObserver(observer);wireBuilder.setObserver(observer);refreshAes();
     const descriptions=chapter===0?['Public N and public exponent; no private factors.','Private factors and private exponent.','Public N. Tiny examples can be factored by hand; real RSA needs cryptographic sizes.']:chapter===3?kemKnowledge().people:['Public protocol data and Alice’s local secrets.','Public protocol data and Bob’s local secrets.','Public observations and transmitted data. Secrets are hidden in this teaching view; the browser itself is not a security boundary.'];
     $('observer-panel').replaceChildren(...['alice','bob','eve'].map((name,i)=>{const article=make('article',undefined,observer===name?'active':'');article.append(make('h3',name.toUpperCase()+(name==='eve'?' · ATTACKER':'')),make('p',descriptions[i]));return article;}));
@@ -177,7 +177,7 @@
   $('previous').addEventListener('click',()=>select(chapter-1));$('next').addEventListener('click',()=>select(chapter+1));
   $('quiz').addEventListener('change',()=>{$('feedback').textContent='';$('feedback').className='';});
   $('quiz').addEventListener('submit',event=>{event.preventDefault();const selected=$('answers').querySelector('input:checked');if(!selected){$('feedback').textContent='Choose an answer first.';$('feedback').className='incorrect';return;}const lesson=lessons[chapter];const correct=Number(selected.value)===lesson.correct;if(correct)window.completeLearning(`chapter-${chapter}`);$('feedback').textContent=(correct?'Correct. ':'Not quite. ')+lesson.feedback;$('feedback').className=correct?'correct':'incorrect';});
-  document.querySelectorAll('[data-observer]').forEach(button=>button.addEventListener('click',()=>{observer=button.dataset.observer;updateObserver();}));
+  document.querySelectorAll('[data-observer],[data-wire-observer]').forEach(button=>button.addEventListener('click',()=>{observer=button.dataset.observer||button.dataset.wireObserver;updateObserver();}));
   $('kem-eve-view').addEventListener('click',()=>{observer='eve';updateObserver();});
   document.querySelectorAll('[data-threat-mode]').forEach(button=>button.addEventListener('click',()=>{threatMode=button.dataset.threatMode;renderKemBoundary();}));
   $('prediction-start').addEventListener('click',()=>{prediction={index:0,answer:null,revealed:false,correct:0};movePredictionTimeline();});
