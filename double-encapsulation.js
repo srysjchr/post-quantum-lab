@@ -53,7 +53,7 @@ window.createDoubleEncapsulation = function () {
     if (!pairs.alice || !pairs.eve || !recovered.alice || !recovered.eve) { $('double-feedback').textContent = 'Create and decapsulate both pairs before checking your explanation.'; return; }
     const answer = $('double-answers').querySelector('input:checked');
     if (!answer) { $('double-feedback').textContent = 'Choose an explanation first.'; return; }
-    const correct = answer.value === 'separate';
+    const correct = answer.value === 'separate';if(correct)window.completeLearning('double');
     $('double-feedback').className = correct ? 'correct' : 'incorrect';
     $('double-feedback').textContent = correct ? 'Correct. Eve’s own Encaps gives Eve her own K. It does not recover Alice’s K from Alice’s public ciphertext. Bob can decapsulate both because both were created for his ek and he holds the matching private dk.' : 'Not quite. Sharing a public ek does not make every encapsulation share one K. Fresh encapsulation randomness creates a separate pair. Knowing Eve’s K does not give Eve Alice’s K.';
   };

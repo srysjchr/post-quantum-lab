@@ -56,7 +56,7 @@ window.createKeySubstitutionStory = function () {
     if (step !== 4) { $('substitution-feedback').textContent = 'Walk through all five steps before checking your explanation.'; return; }
     const answer = $('substitution-answers').querySelector('input:checked');
     if (!answer) { $('substitution-feedback').textContent = 'Choose who actually holds the secret.'; return; }
-    const correct = answer.value === 'alice-eve';
+    const correct = answer.value === 'alice-eve';if(correct)window.completeLearning('substitution');
     $('substitution-feedback').className = correct ? 'correct' : 'incorrect';
     $('substitution-feedback').textContent = correct ? 'Correct. Alice believes her peer is Bob, but Alice and Eve hold K_AE. Correct identity binding would have rejected ek_Eve before any encapsulation. A KEM does not authenticate an advertised name on its own.' : answer.value === 'alice-bob' ? 'Not quite. Alice used ek_Eve. Bob’s dk_Bob is not the matching private key for this encapsulation; Eve holds the matching dk_Eve.' : 'Not quite. A public encapsulation key does not reveal every shared secret. Eve learns this K because Alice encapsulated to Eve’s key and Eve used its matching private dk.';
   };

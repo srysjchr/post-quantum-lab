@@ -39,7 +39,7 @@ window.createPracticeLabs = function () {
     const index = Number(answer.value), item = scenarios[scenario];
     $('scenario-feedback').textContent = item.feedback[index];
     $('scenario-feedback').className = index === item.correct ? 'correct' : 'incorrect';
-    if (index === item.correct) { solved.add(scenario); $('scenario-count').textContent = `SCENARIO ${scenario + 1} / ${scenarios.length} · ${solved.size} solved`; }
+    if (index === item.correct) { solved.add(scenario);window.completeLearning(`scenario-${scenario}`); $('scenario-count').textContent = `SCENARIO ${scenario + 1} / ${scenarios.length} · ${solved.size} solved`; }
   });
   $('scenario-form').addEventListener('change', () => { $('scenario-feedback').textContent = ''; });
   $('scenario-prev').onclick = () => { scenario--; renderScenario(); };
@@ -185,7 +185,7 @@ window.createPracticeLabs = function () {
     if (!item.requirements.every(([type]) => evidence.has(type))) { $('mission-feedback').textContent = 'Complete both experiment steps first. Open the hint for guidance.'; return; }
     if (!answer) { $('mission-feedback').textContent = 'Choose an explanation for your result.'; return; }
     if (Number(answer.value) !== item.correct) { $('mission-feedback').textContent = 'Not quite. Compare the experiment outcomes and try the explanation again.'; return; }
-    missionComplete = true;
+    missionComplete = true;window.completeLearning(`mission-${mission}`);
     $('mission-counter').textContent = `MISSION ${mission + 1} / ${missions.length} · COMPLETE`;
     $('mission-feedback').textContent = 'Mission complete. You demonstrated the behavior and explained why it happened.';
   };

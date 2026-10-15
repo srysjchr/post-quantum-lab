@@ -59,6 +59,7 @@ window.createWireBuilder = function () {
   };
   $('wire-check').onclick = () => {
     const leaked = ['dk', 'K', 'traffic'].filter(id => sent.has(id));
+    if(!leaked.length&&sent.has('ek')&&sent.has('c'))window.completeLearning('wire');
     $('wire-feedback').className = leaked.length ? 'incorrect' : sent.has('ek') && sent.has('c') ? 'correct' : '';
     $('wire-feedback').textContent = leaked.length ? `Secret exposure: ${leaked.join(', ')}. Sending more public data cannot undo a capture. Start a fresh experiment and keep secret objects local.` : !sent.has('ek') || !sent.has('c') ? 'Incomplete public transcript. Include both Bob’s public ek and Alice’s public c; neither private key nor shared secret belongs on the wire.' : 'Correct wire. Only ek and c were transmitted; Bob decapsulates locally and derives his key. Eve has the public transcript, not the private secrets, under the stated assumptions. A real protocol also needs authentication, AEAD and freshness policies.';
   };

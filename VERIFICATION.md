@@ -119,3 +119,10 @@ Verified four defects and minimal patches, baseline outcomes, missing/wrong/extr
 ## Teach It Back — 2026-10-14
 
 Verified three evidence-backed explanations; blocked checks before experiment completion; missing/wrong/correct claims; per-field misconception feedback; invalidation when wire evidence changes; both real AES-GCM replay-policy outcomes; observer persistence; safe local-only literal-HTML notes; reset; four responsive widths; English content and runtime/request errors. Reviewed desktop/mobile screenshots and reran wire and chapter regression suites. Freeform notes are explicitly not automatically graded.
+
+## Browser-local Learning Progress — 2026-10-15
+
+- Dedicated progress suite: correct-only chapter completion, duplicate prevention, actual exercise completion, reload and Continue learning for chapter/exercise sections, no experimental-state restoration, metadata-only storage, clear-history and cross-tab updates, corrupt and untrusted saved data, blocked storage and quota failures, four responsive widths and runtime errors.
+- Existing chapter and exercise suites assert saved milestones after real successful flows: six quizzes, scenarios, missions, five attack outcomes, verified journey, standalone AES, predictions, two-encapsulation explanation, substitution story, public-only wire, four repairs and three Teach It Back topics.
+- All eight updated exercise suites passed, including their original behavior checks. Desktop and mobile screenshots were reviewed outside the repository.
+- Storage holds only validated completion IDs and last-location metadata. Experiment secrets and typed reflection/message data are excluded. This history is a learning aid, not an assessment credential or cloud sync service.

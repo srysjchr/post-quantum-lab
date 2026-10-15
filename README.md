@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, progress.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -120,3 +120,13 @@ Three explanation topics use evidence from the current Build the Wire experiment
 Optional notes let learners restate the result in their own words. Notes are not automatically graded, saved or submitted. Clearing the form preserves experiment evidence; resetting the wire starts a different symbolic exchange. No AI service or backend is used.
 
 Run `node tests/teach-back.cjs` using the existing Playwright configuration. Optional `EVIDENCE_DIR` captures screenshots outside the repository.
+
+## Learning Progress
+
+The learning panel saves a versioned, browser-local completion history for six chapter quizzes and 24 exercise milestones. A visit alone never completes a lesson. Existing exercise success paths record milestones; all three guided predictions must be correct in one run. Continue learning opens the last chapter or exercise section. The completion checklist opens the relevant section, and chapter buttons show completion badges.
+
+Only milestone IDs and the last chapter/section are saved under `post-quantum-lab.progress.v1` in localStorage. Messages, secret keys, ciphertext, radio answers, reflection notes and running experiments are not saved. Exercise counters and experimental state restart for the page session; past completion history remains independent. No account, backend or cross-device sync is used. Progress is specific to this browser/profile and origin. Clearing browser data also clears it.
+
+Clear saved progress removes only this app’s history. Other open tabs update their history display. Corrupt/unsupported records and unknown IDs are filtered safely. Blocked storage or quota failures fall back to session-only progress without blocking lessons or experiments.
+
+Run `node tests/progress.cjs` with the existing Playwright environment variables. Existing exercise suites also assert their corresponding saved completion milestones. Optional `EVIDENCE_DIR` captures screenshots outside the repository.

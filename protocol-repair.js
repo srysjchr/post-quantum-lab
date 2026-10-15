@@ -46,7 +46,7 @@ window.createProtocolRepair = function () {
     $('repair-before').textContent = item.before;
     $('repair-after').textContent = fixes ? item.after : `Defect still present. ${item.before}`;
     if (fixes && selected.length === 1) {
-      solved.add(index); $('repair-count').textContent = `CASE ${index + 1} / ${cases.length} · ${solved.size} patched`;
+      solved.add(index);window.completeLearning(`repair-${index}`); $('repair-count').textContent = `CASE ${index + 1} / ${cases.length} · ${solved.size} patched`;
       $('repair-feedback').className = 'correct'; $('repair-feedback').textContent = `Minimal patch accepted. ${item.why} This fixes the modeled defect, not every possible protocol weakness.`;
     } else {
       $('repair-feedback').className = 'incorrect';
