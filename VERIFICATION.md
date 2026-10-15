@@ -126,3 +126,11 @@ Verified three evidence-backed explanations; blocked checks before experiment co
 - Existing chapter and exercise suites assert saved milestones after real successful flows: six quizzes, scenarios, missions, five attack outcomes, verified journey, standalone AES, predictions, two-encapsulation explanation, substitution story, public-only wire, four repairs and three Teach It Back topics.
 - All eight updated exercise suites passed, including their original behavior checks. Desktop and mobile screenshots were reviewed outside the repository.
 - Storage holds only validated completion IDs and last-location metadata. Experiment secrets and typed reflection/message data are excluded. This history is a learning aid, not an assessment credential or cloud sync service.
+
+## Learning Navigation — 2026-10-15
+
+- Added one menu for ten exercises, a recommended learning sequence, previous/next controls and a return-to-menu action. Native disclosure panels keep only one exercise expanded while preserving current page-session experiments and notes.
+- Dedicated navigation suite passed: initial collapsed state, menu/order/endpoints, automatic KEM chapter selection, preserved shareable fragments, browser Back/Forward including the initial collapsed page, keyboard/focus, recommended-path buttons, mission links, Continue learning, checklist destinations, session-state preservation, malformed hashes, four responsive widths, English, and runtime/HTTP errors.
+- All eleven browser suites passed across navigation, progress, six chapters/real crypto flows, KEM perspectives, predictions, independent encapsulations, key substitution, scenarios/attacks/missions, wire building, protocol repair and Teach It Back. Navigation and progress were rerun after the final automatic-routing correction.
+- Existing regression flows enter collapsed exercises through the visible exercise picker. JavaScript syntax and Git whitespace checks passed. Desktop/mobile menu and expanded-wire screenshots were reviewed outside the repository.
+- The browser plugin is unavailable in this environment; verification used the bundled Playwright/Chromium fallback with software WebGL and the existing no-WebGL/crypto/storage fallback cases.

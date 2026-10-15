@@ -5,6 +5,7 @@
   const scene = window.createLearningScene($('scene'), $('fallback'));
   if (!scene) { $('pause').disabled=true; $('reset').disabled=true; }
   let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive', prediction=null;
+  const learningNavigation=window.createLearningNavigation(index=>select(index),()=>chapter);
   const learningProgress=window.createLearningProgress(index=>select(index));
   let initialRender=true;
   window.createPracticeLabs();
@@ -171,7 +172,7 @@
     $('deep-dive').replaceChildren(...lesson.deep.map(([title,text],index)=>{const article=make('article',undefined,'deep-item');const heading=make('h3');const icon=make('span',['◇','≋','△'][index],'deep-icon');icon.setAttribute('aria-hidden','true');heading.append(icon,document.createTextNode(title));article.append(heading,make('p',text));return article;}));
     const details=make('div',undefined,'details-grid');lesson.details.forEach(([title,html])=>{const article=make('article',undefined,'detail-block');article.append(make('h3',title));const content=make('div');content.innerHTML=html;article.append(content);details.append(article);});$('details-content').replaceChildren(details);
     $('question').textContent=lesson.question;const answers=$('answers');answers.replaceChildren(make('legend','Choose an answer','sr-only'));
-    lesson.options.forEach((text,index)=>{const label=make('label',undefined,'answer');const input=make('input');input.type='radio';input.name='answer';input.value=index;label.append(input,document.createTextNode(text));answers.append(label);});$('feedback').textContent='';$('feedback').className='';$('previous').disabled=chapter===0;$('next').disabled=chapter===lessons.length-1;updateObserver();learningProgress.chapterChanged(chapter,!initialRender);
+    lesson.options.forEach((text,index)=>{const label=make('label',undefined,'answer');const input=make('input');input.type='radio';input.name='answer';input.value=index;label.append(input,document.createTextNode(text));answers.append(label);});$('feedback').textContent='';$('feedback').className='';$('previous').disabled=chapter===0;$('next').disabled=chapter===lessons.length-1;updateObserver();learningProgress.chapterChanged(chapter,!initialRender);learningNavigation.chapterChanged(chapter,!initialRender);
   }
   $('previous').addEventListener('click',()=>select(chapter-1));$('next').addEventListener('click',()=>select(chapter+1));
   $('quiz').addEventListener('change',()=>{$('feedback').textContent='';$('feedback').className='';});
@@ -182,5 +183,5 @@
   $('prediction-start').addEventListener('click',()=>{prediction={index:0,answer:null,revealed:false,correct:0};movePredictionTimeline();});
   $('prediction-form').addEventListener('submit',event=>{event.preventDefault();if(!prediction||prediction.answer===null||prediction.revealed)return;if(prediction.answer===predictions[prediction.index].correct)prediction.correct++;prediction.revealed=true;if(prediction.index===2&&prediction.correct===3)window.completeLearning('predictions');movePredictionTimeline();});
   $('prediction-next').addEventListener('click',()=>{if(!prediction||!prediction.revealed||prediction.index>=2)return;prediction={index:prediction.index+1,answer:null,revealed:false,correct:prediction.correct};movePredictionTimeline();});
-  const initial=Number(new URLSearchParams(location.search).get('chapter'));const explicitChapter=Number.isInteger(initial)&&initial>=1&&initial<=6;select(explicitChapter?initial-1:0);initialRender=false;if(explicitChapter)learningProgress.rememberRoute(chapter);
+  const initial=Number(new URLSearchParams(location.search).get('chapter'));const explicitChapter=Number.isInteger(initial)&&initial>=1&&initial<=6;select(explicitChapter?initial-1:0);initialRender=false;if(explicitChapter)learningProgress.rememberRoute(chapter);learningNavigation.openHash();
 })();

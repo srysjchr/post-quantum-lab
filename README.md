@@ -10,7 +10,7 @@ Hosted on GitHub Pages over HTTPS. Updates pushed to main are published automati
 
 ## Open
 
-Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, progress.js, app.js, and vendor together.
+Open index.html directly in Chrome, Edge, or Firefox. All libraries are bundled, so the lessons work offline. Keep index.html, styles.css, lessons.js, scene.js, journey.js, labs.js, double-encapsulation.js, key-substitution.js, wire-builder.js, protocol-repair.js, teach-back.js, progress.js, navigation.js, app.js, and vendor together.
 
 For a local web server:
 
@@ -130,3 +130,12 @@ Only milestone IDs and the last chapter/section are saved under `post-quantum-la
 Clear saved progress removes only this app’s history. Other open tabs update their history display. Corrupt/unsupported records and unknown IDs are filtered safely. Blocked storage or quota failures fall back to session-only progress without blocking lessons or experiments.
 
 Run `node tests/progress.cjs` with the existing Playwright environment variables. Existing exercise suites also assert their corresponding saved completion milestones. Optional `EVIDENCE_DIR` captures screenshots outside the repository.
+
+
+## Learning Navigation
+
+The exercise menu provides direct entry to ten exercises and a recommended sequence, from selecting cryptographic roles to explaining observed attacker behavior. Previous/next controls follow this order; Back to exercise menu returns focus to the picker. The six chapter buttons remain available independently, with no locked prerequisites.
+
+Exercises use native keyboard-accessible disclosure panels. Only one is expanded at a time, reducing page length while retaining running experiments and typed notes in the current page session. Opening a KEM-specific exercise selects chapter 4 automatically. Direct fragment links, mission links, Continue learning and the completion checklist expand their destination before scrolling and focusing it. Browser back/forward follows exercise links; changing chapters clears stale exercise fragments. Reloading still resets experimental inputs as described under Learning Progress.
+
+`navigation.js` owns the menu and panel navigation. Run `node tests/navigation.cjs` in the existing Playwright environment. Existing regression suites use `tests/navigation-helper.cjs` to enter collapsed exercises through the visible menu. Optional `EVIDENCE_DIR` saves navigation screenshots outside the repository.
