@@ -12,7 +12,7 @@ window.createWireScene = function (transmit) {
   const origins = {...publicPositions, dk:[3,1,-1], K:[-3,1,-1], traffic:[-3,1,-1]};
   const secretIds = ['dk','K','traffic'];
   let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false;
-  let previous=new Set(), disposed=false;
+  let previous=new Set(), disposed=false, yaw=0, sceneDescription='';
   const meshes = new Map();
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   function announce(data) {
@@ -22,7 +22,7 @@ window.createWireScene = function (transmit) {
     const exposed=data.sent.filter(id=>secretIds.includes(id));
     const exposure=document.getElementById('wire-exposure');exposure.textContent=exposed.length?`EXPOSED: ${exposed.join(', ')}. Red packets are secret objects sent by mistake. Eve’s knowledge cards include any resulting inference; more public data cannot recall this capture.`:'Secret objects remain local. Orange packets are intended public objects; red packets illustrate an explicit secret exposure.';exposure.classList.toggle('incorrect',exposed.length>0);
     status.textContent=`${captured.length?'Eve captured '+captured.join(' and ')+'.':'No public objects transmitted yet.'} ${data.known.bob.includes('K')?'Bob has K locally.':'Bob has not decapsulated c yet.'} ${data.known.eve.includes('K')?'Eve knows K in this experiment.':'Eve cannot infer K from the public transcript in this model.'}`;
-    host.setAttribute('aria-label',`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`);
+    sceneDescription=`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`;host.setAttribute('aria-label',sceneDescription);
     document.getElementById('wire-observer-knowledge').textContent=role==='learner'?'Overview: private state at both endpoints is visible.':`${role.toUpperCase()} KNOWS: ${data.known[role].join(', ')||'no exchange objects yet'} · ${data.known[role].includes('K')?'K: Known':'K: Unknown'} · ${data.known[role].includes('dk')?'dk: Known':'dk: Unknown'}`;
     for(const token of tokens) token.disabled=data.sent.includes(token.dataset.wireToken);
   }
@@ -34,6 +34,7 @@ window.createWireScene = function (transmit) {
     scene=new THREE.Scene();root=new THREE.Group();scene.add(root);
     camera=new THREE.PerspectiveCamera(43,1,.1,60);
   } catch {
+    for(const id of ['wire-turn-left','wire-turn-right','wire-camera-reset'])document.getElementById(id).disabled=true;
     host.classList.add('unavailable');fallback.textContent='3D is unavailable. Use the Send buttons and participant knowledge cards below; the same experiment still works.';
     return {render:announce};
   }
@@ -61,7 +62,10 @@ window.createWireScene = function (transmit) {
   function setCamera(role){
     const presets={learner:[0,8,11],alice:[-7,6,8],bob:[7,6,8],eve:[0,5,11]};
     camera.zoom=host.clientWidth>700?1.4:host.clientWidth>400?1.1:.85;camera.updateProjectionMatrix();
-    camera.position.set(...presets[role]);camera.lookAt(0,.1,.4);camera.updateMatrixWorld();
+    const target=new THREE.Vector3(0,.1,.4);
+    camera.position.fromArray(presets[role]).sub(target).applyAxisAngle(new THREE.Vector3(0,1,0),yaw*Math.PI/180).add(target);camera.lookAt(target);camera.updateMatrixWorld();
+    document.getElementById('wire-camera-angle').textContent=`Camera offset: ${yaw}°`;
+
     // Reserve screen space for the 54px drag controls, including narrow side views.
     const extent=Math.max(...Object.values(publicPositions).map(p=>Math.abs(new THREE.Vector3(...p).project(camera).x)));
     const safe=Math.max(.3,1-72/Math.max(host.clientWidth,1));
@@ -91,7 +95,7 @@ window.createWireScene = function (transmit) {
 
     for(const id of ['ek','c'])if(!snapshot.sent.includes(id))meshes.set(id,sphere(publicPositions[id],0xffb15c,.2));
     snapshot.sent.forEach((id,index)=>sphere([(index-(snapshot.sent.length-1)/2)*.42,.6,2.5],secretIds.includes(id)?0xff6969:0xffb15c,.12));
-    host.setAttribute('aria-label',`${host.getAttribute('aria-label')} ${labels.join('. ')}.`);
+    host.setAttribute('aria-label',`${sceneDescription} ${labels.join('. ')}.`);
     overlays();draw();
   }
   function animateTransmissions(ids){
@@ -112,6 +116,10 @@ window.createWireScene = function (transmit) {
     }
     frame=requestAnimationFrame(tick);
   }
+  function turn(delta){cancelDrag();yaw=((yaw+delta+540)%360)-180;if(snapshot)build();}
+  document.getElementById('wire-turn-left').onclick=()=>turn(-15);
+  document.getElementById('wire-turn-right').onclick=()=>turn(15);
+  document.getElementById('wire-camera-reset').onclick=()=>{cancelDrag();yaw=0;if(snapshot)build();};
   function cancelDrag(){
     if(!drag)return;const {token,pointer}=drag;drag=null;host.classList.remove('dragging');
     if(token.hasPointerCapture?.(pointer))token.releasePointerCapture(pointer);
@@ -148,5 +156,5 @@ window.createWireScene = function (transmit) {
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;fallback.hidden=true;if(snapshot)build();});
   window.addEventListener('pagehide',()=>{disposed=true;cancelAnimationFrame(frame);frame=0;});
   window.addEventListener('pageshow',()=>{disposed=false;if(snapshot)build();});
-  return {render(data){const fresh=data.sent.filter(id=>!previous.has(id)&&origins[id]);snapshot=data;previous=new Set(data.sent);drag=null;host.classList.remove('dragging');announce(data);build();if(fresh.length)animateTransmissions(fresh);}};
+  return {render(data){if(snapshot&&snapshot.observer!==data.observer)yaw=0;const fresh=data.sent.filter(id=>!previous.has(id)&&origins[id]);snapshot=data;previous=new Set(data.sent);drag=null;host.classList.remove('dragging');announce(data);build();if(fresh.length)animateTransmissions(fresh);}};
 };

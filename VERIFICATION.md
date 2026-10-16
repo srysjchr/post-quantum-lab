@@ -149,3 +149,6 @@ Added a live three-check guide inside Build the Wire with an Eve-view shortcut. 
 
 ## 3D continuation 2/5 — 2026-10-16
 The scene now renders every captured object and animates all newly sent objects in a batch. Secret exposures use red packets and explicit text, while intended public packets remain orange. Secret-exposure checks for dk/K/traffic, wire-3d, wire-builder, syntax and whitespace checks passed. Inference remains owned by wire-builder.js.
+
+## 3D continuation 3/5 — 2026-10-16
+Added 15-degree camera rotation and reset controls that preserve transmissions and reset to each newly selected participant view. Responsive projection still fits drag controls. Fixed repeated redraws appending duplicate accessible labels. Camera/guide tests and wire-3d passed with syntax and whitespace checks.

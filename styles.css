@@ -18,3 +18,5 @@
 #wire-observer-knowledge{position:absolute;bottom:10px;left:10px;right:10px;z-index:1;padding:8px 10px;border-radius:6px;background:#080e1ce6;color:#c5d6e7;font-size:12px;line-height:1.5;pointer-events:none}.wire-scene.unavailable #wire-observer-knowledge{display:none}
 
 .wire-guide{padding:14px 18px;margin-bottom:18px;border:1px solid #304759;border-radius:10px;background:#0c1522}.wire-guide summary{cursor:pointer;color:#a6f4c5}.wire-guide li{margin:8px 0}.wire-guide p{line-height:1.6}
+
+.wire-camera-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0}.wire-camera-controls span{color:#a5b8cc;font-size:12px}
