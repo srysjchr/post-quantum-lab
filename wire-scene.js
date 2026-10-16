@@ -22,7 +22,7 @@ window.createWireScene = function (transmit) {
     const exposed=data.sent.filter(id=>secretIds.includes(id));
     const exposure=document.getElementById('wire-exposure');exposure.textContent=exposed.length?`EXPOSED: ${exposed.join(', ')}. Red packets are secret objects sent by mistake. Eve’s knowledge cards include any resulting inference; more public data cannot recall this capture.`:'Secret objects remain local. Orange packets are intended public objects; red packets illustrate an explicit secret exposure.';exposure.classList.toggle('incorrect',exposed.length>0);
     status.textContent=`${captured.length?'Eve captured '+captured.join(' and ')+'.':'No public objects transmitted yet.'} ${data.known.bob.includes('K')?'Bob has K locally.':'Bob has not decapsulated c yet.'} ${data.known.eve.includes('K')?'Eve knows K in this experiment.':'Eve cannot infer K from the public transcript in this model.'}`;
-    sceneDescription=`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`;host.setAttribute('aria-label',sceneDescription);
+    sceneDescription=`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`;if(data.focus)sceneDescription+=` Inspecting captured ${data.focus}.`;host.setAttribute('aria-label',sceneDescription);
     document.getElementById('wire-observer-knowledge').textContent=role==='learner'?'Overview: private state at both endpoints is visible.':`${role.toUpperCase()} KNOWS: ${data.known[role].join(', ')||'no exchange objects yet'} · ${data.known[role].includes('K')?'K: Known':'K: Unknown'} · ${data.known[role].includes('dk')?'dk: Known':'dk: Unknown'}`;
     for(const token of tokens) token.disabled=data.sent.includes(token.dataset.wireToken);
   }
@@ -94,7 +94,11 @@ window.createWireScene = function (transmit) {
     line([-3,.2,-1],[0,.2,0]);line([3,.2,-1],[0,.2,0]);line([0,.2,0],[0,.2,3],0xffb15c);
 
     for(const id of ['ek','c'])if(!snapshot.sent.includes(id))meshes.set(id,sphere(publicPositions[id],0xffb15c,.2));
-    snapshot.sent.forEach((id,index)=>sphere([(index-(snapshot.sent.length-1)/2)*.42,.6,2.5],secretIds.includes(id)?0xff6969:0xffb15c,.12));
+    snapshot.sent.forEach((id,index)=>{
+      const x=(index-(snapshot.sent.length-1)/2)*.42;
+      sphere([x,.6,2.5],secretIds.includes(id)?0xff6969:0xffb15c,id===snapshot.focus ? .17 : .12);
+      if(id===snapshot.focus){const ring=new THREE.Mesh(new THREE.TorusGeometry(.23,.025,8,32),material(0xffffff));ring.position.set(x,.6,2.5);ring.rotation.x=Math.PI/2;root.add(ring);}
+    });
     host.setAttribute('aria-label',`${sceneDescription} ${labels.join('. ')}.`);
     overlays();draw();
   }

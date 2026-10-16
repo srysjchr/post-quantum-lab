@@ -20,3 +20,5 @@
 .wire-guide{padding:14px 18px;margin-bottom:18px;border:1px solid #304759;border-radius:10px;background:#0c1522}.wire-guide summary{cursor:pointer;color:#a6f4c5}.wire-guide li{margin:8px 0}.wire-guide p{line-height:1.6}
 
 .wire-camera-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0}.wire-camera-controls span{color:#a5b8cc;font-size:12px}
+
+.wire-inspector{padding:14px;margin:16px 0;border:1px solid #304759;border-radius:8px}.wire-inspector label{display:block;margin-bottom:10px}.wire-inspector select{max-width:100%;width:100%;padding:10px;background:#080e1c;color:#d9e7ee;border:1px solid #304759;border-radius:6px;font:inherit}#wire-inspection p{line-height:1.6;font-size:13px}

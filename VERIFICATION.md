@@ -152,3 +152,6 @@ The scene now renders every captured object and animates all newly sent objects 
 
 ## 3D continuation 3/5 — 2026-10-16
 Added 15-degree camera rotation and reset controls that preserve transmissions and reset to each newly selected participant view. Responsive projection still fits drag controls. Fixed repeated redraws appending duplicate accessible labels. Camera/guide tests and wire-3d passed with syntax and whitespace checks.
+
+## 3D continuation 4/5 — 2026-10-16
+Added capture inspection with shared object descriptions and a 3D selection ring. Inspection never sends objects, changes evidence, or stores data. Empty/reset and origin/selection checks passed with wire-3d and Teach It Back regressions; syntax and whitespace checks passed.
