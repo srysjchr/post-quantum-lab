@@ -31,6 +31,10 @@ window.createWireBuilder = function () {
     $('wire-send').disabled = queued.size===0;
     $('wire-send-ek').disabled = sent.has('ek');
     $('wire-send-c').disabled = sent.has('c');
+    const exposed = ['dk','K','traffic'].filter(id => sent.has(id));
+    $('wire-guide-status').textContent = exposed.length ? `Secret exposure: ${exposed.join(', ')}. Observe Eve, then start a fresh experiment to build a safe transcript.` : !sent.has('ek') ? 'Next: send Bob’s public ek. The guide tracks transmitted objects, not queued selections.' : !sent.has('c') ? 'Next: send Alice’s public c. Bob will decapsulate locally; K is not a packet.' : 'Compare Bob and Eve. Bob has K locally; Eve has ek and c. Use Check my wire to explain the boundary.';
+    $('wire-guide').children[0].textContent = `${sent.has('ek')?'✓ Sent':'To do'}: Bob’s public ek.`;
+    $('wire-guide').children[1].textContent = `${sent.has('c')?'✓ Sent':'To do'}: Alice’s public c.`;
     const known = knowledge();
     $('wire-knowledge').replaceChildren(...['alice', 'bob', 'eve'].map(role => {
       const article = node('article', ''); article.dataset.wireActor = role; article.className = role === observer ? 'active' : '';

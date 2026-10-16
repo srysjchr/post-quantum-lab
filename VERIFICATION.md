@@ -143,3 +143,6 @@ Verified three evidence-backed explanations; blocked checks before experiment co
 - Reviewed desktop/mobile screenshots plus initial Alice/Bob/Eve camera views. Fixed projected packet clipping at 320px and overlapping labels based on rendered evidence. Screenshots and diagnostic scripts remain outside the repository.
 - JavaScript syntax checks and Git whitespace checks passed. Used bundled Playwright/Chromium with software WebGL because the browser plugin is unavailable. No new dependency, server, authentication or stored learner data was introduced.
 - This remains a symbolic prepared-exchange model. Wire state and inference rules have a single source in wire-builder.js; wire-scene.js renders that state and forwards public-send actions. Actual ML-KEM is not executed.
+
+## 3D continuation 1/5 — 2026-10-16
+Added a live three-check guide inside Build the Wire with an Eve-view shortcut. Queued selections never count as transmissions; either order remains available. Guide, exposure/reset and the full wire-3d suite passed, plus syntax/whitespace checks.
