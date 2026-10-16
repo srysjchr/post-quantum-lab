@@ -9,6 +9,8 @@ window.createWireScene = function (transmit) {
   const THREE = window.THREE;
   const positions = {alice:[-3,0,-1], bob:[3,0,-1], eve:[0,0,3]};
   const publicPositions = {ek:[3,1,-1], c:[-3,1,-1]};
+  const origins = {...publicPositions, dk:[3,1,-1], K:[-3,1,-1], traffic:[-3,1,-1]};
+  const secretIds = ['dk','K','traffic'];
   let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false;
   let previous=new Set(), disposed=false;
   const meshes = new Map();
@@ -16,7 +18,9 @@ window.createWireScene = function (transmit) {
   function announce(data) {
     const role=data.observer;
     document.getElementById('wire-camera-label').textContent=role==='learner'?'Overview camera':`${role[0].toUpperCase()+role.slice(1)}-side camera`;
-    const captured=data.sent.filter(id=>['ek','c'].includes(id));
+    const captured=data.sent;
+    const exposed=data.sent.filter(id=>secretIds.includes(id));
+    const exposure=document.getElementById('wire-exposure');exposure.textContent=exposed.length?`EXPOSED: ${exposed.join(', ')}. Red packets are secret objects sent by mistake. Eve’s knowledge cards include any resulting inference; more public data cannot recall this capture.`:'Secret objects remain local. Orange packets are intended public objects; red packets illustrate an explicit secret exposure.';exposure.classList.toggle('incorrect',exposed.length>0);
     status.textContent=`${captured.length?'Eve captured '+captured.join(' and ')+'.':'No public objects transmitted yet.'} ${data.known.bob.includes('K')?'Bob has K locally.':'Bob has not decapsulated c yet.'} ${data.known.eve.includes('K')?'Eve knows K in this experiment.':'Eve cannot infer K from the public transcript in this model.'}`;
     host.setAttribute('aria-label',`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`);
     document.getElementById('wire-observer-knowledge').textContent=role==='learner'?'Overview: private state at both endpoints is visible.':`${role.toUpperCase()} KNOWS: ${data.known[role].join(', ')||'no exchange objects yet'} · ${data.known[role].includes('K')?'K: Known':'K: Unknown'} · ${data.known[role].includes('dk')?'dk: Known':'dk: Unknown'}`;
@@ -85,22 +89,26 @@ window.createWireScene = function (transmit) {
     }
     line([-3,.2,-1],[0,.2,0]);line([3,.2,-1],[0,.2,0]);line([0,.2,0],[0,.2,3],0xffb15c);
 
-    for(const id of ['ek','c']){
-      if(!snapshot.sent.includes(id))meshes.set(id,sphere(publicPositions[id],0xffb15c,.2));
-      else {const x=id==='ek'?-.45:.45;sphere([x,.6,2.5],0xffb15c,.12);}
-    }
+    for(const id of ['ek','c'])if(!snapshot.sent.includes(id))meshes.set(id,sphere(publicPositions[id],0xffb15c,.2));
+    snapshot.sent.forEach((id,index)=>sphere([(index-(snapshot.sent.length-1)/2)*.42,.6,2.5],secretIds.includes(id)?0xff6969:0xffb15c,.12));
     host.setAttribute('aria-label',`${host.getAttribute('aria-label')} ${labels.join('. ')}.`);
     overlays();draw();
   }
-  function animatePublic(id){
+  function animateTransmissions(ids){
     if(motion.matches||document.hidden||interrupted)return;
-    const start=new THREE.Vector3(...publicPositions[id]),end=new THREE.Vector3(...positions[id==='ek'?'alice':'bob']);end.y=1;
-    const packet=sphere(start.toArray(),0xffb15c,.15),copy=sphere(start.toArray(),0xffb15c,.12),channel=new THREE.Vector3(0,.7,0),eve=new THREE.Vector3(0,.7,2.5);
+    const channel=new THREE.Vector3(0,.7,0),eve=new THREE.Vector3(0,.7,2.5);
+    const packets=ids.map(id=>{
+      const start=new THREE.Vector3(...origins[id]),end=new THREE.Vector3(...positions[id==='ek'||id==='dk'?'alice':'bob']);end.y=1;
+      const color=secretIds.includes(id)?0xff6969:0xffb15c;
+      return {start,end,packet:sphere(start.toArray(),color,.15),copy:sphere(start.toArray(),color,.12)};
+    });
     const began=performance.now();
     function tick(now){
       const t=Math.min((now-began)/1100,1);
-      if(t<.5){packet.position.lerpVectors(start,channel,t*2);copy.position.copy(packet.position);}else{packet.position.lerpVectors(channel,end,(t-.5)*2);copy.position.lerpVectors(channel,eve,(t-.5)*2);}
-      draw();if(t<1&&!motion.matches&&!document.hidden&&!interrupted)frame=requestAnimationFrame(tick);else{packet.visible=false;copy.visible=false;frame=0;draw();}
+      for(const {start,end,packet,copy} of packets){
+        if(t<.5){packet.position.lerpVectors(start,channel,t*2);copy.position.copy(packet.position);}else{packet.position.lerpVectors(channel,end,(t-.5)*2);copy.position.lerpVectors(channel,eve,(t-.5)*2);}
+      }
+      draw();if(t<1&&!motion.matches&&!document.hidden&&!interrupted)frame=requestAnimationFrame(tick);else{packets.forEach(({packet,copy})=>{packet.visible=false;copy.visible=false;});frame=0;draw();}
     }
     frame=requestAnimationFrame(tick);
   }
@@ -140,5 +148,5 @@ window.createWireScene = function (transmit) {
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;fallback.hidden=true;if(snapshot)build();});
   window.addEventListener('pagehide',()=>{disposed=true;cancelAnimationFrame(frame);frame=0;});
   window.addEventListener('pageshow',()=>{disposed=false;if(snapshot)build();});
-  return {render(data){const fresh=data.sent.filter(id=>!previous.has(id)&&['ek','c'].includes(id));snapshot=data;previous=new Set(data.sent);drag=null;host.classList.remove('dragging');announce(data);build();if(fresh.length)animatePublic(fresh[fresh.length-1]);}};
+  return {render(data){const fresh=data.sent.filter(id=>!previous.has(id)&&origins[id]);snapshot=data;previous=new Set(data.sent);drag=null;host.classList.remove('dragging');announce(data);build();if(fresh.length)animateTransmissions(fresh);}};
 };

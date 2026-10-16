@@ -146,3 +146,6 @@ Verified three evidence-backed explanations; blocked checks before experiment co
 
 ## 3D continuation 1/5 — 2026-10-16
 Added a live three-check guide inside Build the Wire with an Eve-view shortcut. Queued selections never count as transmissions; either order remains available. Guide, exposure/reset and the full wire-3d suite passed, plus syntax/whitespace checks.
+
+## 3D continuation 2/5 — 2026-10-16
+The scene now renders every captured object and animates all newly sent objects in a batch. Secret exposures use red packets and explicit text, while intended public packets remain orange. Secret-exposure checks for dk/K/traffic, wire-3d, wire-builder, syntax and whitespace checks passed. Inference remains owned by wire-builder.js.
