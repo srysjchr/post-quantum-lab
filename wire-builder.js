@@ -12,13 +12,14 @@ window.createWireBuilder = function () {
   const sent = new Set(), queued = new Set();
   let observer = 'learner', focus = '';
   const wireScene = window.createWireScene(id => transmit([id]));
-  function knowledge() {
-    const eveK = sent.has('K') || (sent.has('dk') && sent.has('c'));
-    return {
-      alice: ['ek', 'c', 'K', 'traffic', ...(sent.has('dk') ? ['dk'] : [])],
-      bob: ['ek', 'dk', ...(sent.has('c') ? ['c', 'K', 'traffic'] : []), ...(sent.has('K') ? ['K', 'traffic'] : []), ...(sent.has('traffic') ? ['traffic'] : [])],
-      eve: [...sent, ...(sent.has('dk') ? ['ek'] : []), ...(eveK ? ['K', 'traffic'] : [])]
+  function knowledge(transcript = sent) {
+    const eveK = transcript.has('K') || (transcript.has('dk') && transcript.has('c'));
+    const result = {
+      alice: ['ek', 'c', 'K', 'traffic', ...(transcript.has('dk') ? ['dk'] : [])],
+      bob: ['ek', 'dk', ...(transcript.has('c') ? ['c', 'K', 'traffic'] : []), ...(transcript.has('K') ? ['K', 'traffic'] : []), ...(transcript.has('traffic') ? ['traffic'] : [])],
+      eve: [...transcript, ...(transcript.has('dk') ? ['ek'] : []), ...(eveK ? ['K', 'traffic'] : [])]
     };
+    return Object.fromEntries(Object.entries(result).map(([role,values])=>[role,[...new Set(values)]]));
   }
   function render() {
     $('wire-objects').replaceChildren(...objects.map(object => {
@@ -36,6 +37,15 @@ window.createWireBuilder = function () {
     $('wire-guide').children[0].textContent = `${sent.has('ek')?'✓ Sent':'To do'}: Bob’s public ek.`;
     $('wire-guide').children[1].textContent = `${sent.has('c')?'✓ Sent':'To do'}: Alice’s public c.`;
     const known = knowledge();
+    const baseline = knowledge(new Set(['ek','c']));
+    $('wire-comparison-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge. Compare the Known/Unknown cells; reset starts a different exchange and cannot recall a real leak.':!sent.has('ek')||!sent.has('c')?'Incomplete public transcript. The reference includes both ek and c; an empty capture does not establish a working exchange.':'Same object knowledge as the public-only reference in this model. This alone does not prove a complete protocol secure.';
+    $('wire-comparison').querySelector('tbody').replaceChildren(...objects.map(object=>{
+      const row=document.createElement('tr');row.dataset.compareObject=object.id;
+      const name=node('th',object.id==='traffic'?'Traffic key':object.id);name.scope='row';row.append(name);
+      for(const [kind,values] of [['baseline',baseline.eve],['actual',known.eve]]){const cell=node('td',values.includes(object.id)?'Known':'Unknown');cell.dataset.compare=kind;row.append(cell);}
+      if(baseline.eve.includes(object.id)!==known.eve.includes(object.id))row.className='comparison-difference';
+      return row;
+    }));
     $('wire-knowledge').replaceChildren(...['alice', 'bob', 'eve'].map(role => {
       const article = node('article', ''); article.dataset.wireActor = role; article.className = role === observer ? 'active' : '';
       article.append(node('h4', role.toUpperCase()));

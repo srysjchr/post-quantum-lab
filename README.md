@@ -150,3 +150,14 @@ Drag the orange ek or c marker into the public channel, click a marker, or use t
 This shares Build the Wire's existing symbolic rules, transcript, knowledge cards, reflection evidence and completion history. Alice starts with authenticated ek and a prepared (K, c); sending c illustrates Bob's local decapsulation. K has no public trajectory. Transmitting dk, K or a traffic key through the existing object list updates the same 3D knowledge view, including compromise inference. Unknown labels represent unavailable knowledge rather than missing protocol roles. These are teaching models, not real ML-KEM operations or browser-side security boundaries.
 
 `wire-scene.js` only renders the model and forwards send actions to `wire-builder.js`; it does not implement parallel cryptographic rules. Without WebGL, the Send controls and knowledge cards retain the complete experiment. No new dependencies or saved data are introduced. Run `node tests/wire-3d.cjs` with the existing Playwright setup; optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repo.
+
+
+## Continue exploring the 3D wire
+
+The live three-check guide follows transmitted objects and offers a shortcut to Eve's view; it leaves free exploration and either sending order available. Red packets illustrate explicit dk/K/traffic-key exposure, while orange packets represent intended public ek/c. Every object in a multi-object transmission is animated and retained in Eve's capture.
+
+Rotate left/right inspects the scene in 15-degree steps. Reset camera preserves the experiment; changing participant restores that participant's preset. The capture inspector uses the existing object's origin and explanation and highlights it in 3D without transmitting again or changing evidence. Camera and inspection choices are not stored.
+
+Expand **Compare with a public-only exchange** to compare Eve's current object knowledge with an ek+c reference using the same inference function. Incomplete transcripts are labelled incomplete. A matching table is not a proof of protocol security; identity binding, AEAD, freshness and implementation security remain separate requirements. A fresh experiment clears the illustrative capture rather than recalling a real secret leak.
+
+Run `node tests/wire-learning.cjs` for guide, exposure, camera, inspection, reference-comparison and responsive checks. The full browser suite also covers the existing learning history, exercises and crypto demonstrations.

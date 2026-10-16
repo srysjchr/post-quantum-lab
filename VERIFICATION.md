@@ -155,3 +155,8 @@ Added 15-degree camera rotation and reset controls that preserve transmissions a
 
 ## 3D continuation 4/5 — 2026-10-16
 Added capture inspection with shared object descriptions and a 3D selection ring. Inspection never sends objects, changes evidence, or stores data. Empty/reset and origin/selection checks passed with wire-3d and Teach It Back regressions; syntax and whitespace checks passed.
+
+## 3D continuation 5/5 — 2026-10-16
+Added an expandable reference/current comparison of Eve’s knowledge using the same inference function for both inputs. Incomplete transcripts, public-only matches, dk+c compromise and traffic-key-only exposure have distinct, accurate outcomes. The table does not claim complete protocol security. Deduplicated knowledge lists when capture and inference produce the same object; verified the previously repeated ek label is removed.
+
+All thirteen browser suites passed in the final complete run, plus JavaScript syntax and whitespace checks. Earlier default-preview runs had intermittent initialization timeouts; the complete final run used a local threaded preview with a larger connection queue on port 8766. No timeout or assertion was relaxed. Reviewed final desktop/mobile 3D captures, inspection UI and comparison table screenshots outside the repository. All new interface text is English; no dependencies or persisted learner data were added.
