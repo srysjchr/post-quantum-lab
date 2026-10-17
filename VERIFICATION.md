@@ -166,3 +166,6 @@ Added a live unsent-selection summary and Clear unsent selections. Clearing neve
 
 ## Small 3D polish 2/8 — 2026-10-17
 Added capture totals split into public/secret objects and an explicit empty state. Counts follow transmissions and reset, never queued selections. wire-polish, syntax and whitespace checks passed.
+
+## Small 3D polish 3/8 — 2026-10-17
+Added previous/next capture browsing with correct empty and endpoint states. Inspection preserves transmission counts and evidence. wire-polish and wire-learning passed with syntax/whitespace checks.
