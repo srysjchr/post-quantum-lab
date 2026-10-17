@@ -37,6 +37,8 @@ window.createWireBuilder = function () {
     $('wire-send-ek').disabled = sent.has('ek');
     $('wire-send-c').disabled = sent.has('c');
     const exposed = ['dk','K','traffic'].filter(id => sent.has(id));
+    $('wire-capture-count').textContent=`${sent.size} captured · ${sent.size-exposed.length} public · ${exposed.length} secret`;
+    $('wire-capture-empty').hidden=sent.size>0;
     $('wire-guide-status').textContent = exposed.length ? `Secret exposure: ${exposed.join(', ')}. Observe Eve, then start a fresh experiment to build a safe transcript.` : !sent.has('ek') ? 'Next: send Bob’s public ek. The guide tracks transmitted objects, not queued selections.' : !sent.has('c') ? 'Next: send Alice’s public c. Bob will decapsulate locally; K is not a packet.' : 'Compare Bob and Eve. Bob has K locally; Eve has ek and c. Use Check my wire to explain the boundary.';
     $('wire-guide').children[0].textContent = `${sent.has('ek')?'✓ Sent':'To do'}: Bob’s public ek.`;
     $('wire-guide').children[1].textContent = `${sent.has('c')?'✓ Sent':'To do'}: Alice’s public c.`;

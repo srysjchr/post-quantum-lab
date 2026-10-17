@@ -163,3 +163,6 @@ All thirteen browser suites passed in the final complete run, plus JavaScript sy
 
 ## Small 3D polish 1/8 — 2026-10-17
 Added a live unsent-selection summary and Clear unsent selections. Clearing never recalls a capture or resets an experiment. wire-polish and wire-builder passed; syntax and whitespace checks passed.
+
+## Small 3D polish 2/8 — 2026-10-17
+Added capture totals split into public/secret objects and an explicit empty state. Counts follow transmissions and reset, never queued selections. wire-polish, syntax and whitespace checks passed.
