@@ -189,3 +189,6 @@ All fourteen browser suites passed in the final complete run, including wire-pol
 
 ## Small refinements 1/8 — 2026-10-18
 Fixed the inference narration for mixed exposure: when K is sent along with dk+c, it now describes both paths instead of claiming K was never sent. Both transmission orders and inference-only dk+c passed, with wire-builder regression and source checks.
+
+## Small refinements 2/8 — 2026-10-18
+Baseline differences now distinguish direct capture from inference using the actual sent set. Tested dk+c recovery, direct K capture and derived traffic knowledge without changing inference rules. wire-refinements and source checks passed.

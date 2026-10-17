@@ -54,7 +54,7 @@ window.createWireBuilder = function () {
       const row=document.createElement('tr');row.dataset.compareObject=object.id;
       const name=node('th',object.id==='traffic'?'Traffic key':object.id);name.scope='row';row.append(name);
       for(const [kind,values] of [['baseline',baseline.eve],['actual',known.eve]]){const cell=node('td',values.includes(object.id)?'Known':'Unknown');cell.dataset.compare=kind;row.append(cell);}
-      if(baseline.eve.includes(object.id)!==known.eve.includes(object.id)){row.className='comparison-difference';differences.push(node('li',`${object.id==='traffic'?'Traffic key':object.id}: ${known.eve.includes(object.id)?'additional knowledge in your experiment, captured or inferred.':'not yet known in your experiment; the reference includes a complete public transcript.'}`));}
+      if(baseline.eve.includes(object.id)!==known.eve.includes(object.id)){row.className='comparison-difference';differences.push(node('li',`${object.id==='traffic'?'Traffic key':object.id}: ${known.eve.includes(object.id)?`additional knowledge in your experiment, ${sent.has(object.id)?'captured directly':'inferred from captured objects'}.`:'not yet known in your experiment; the reference includes a complete public transcript.'}`));}
       return row;
     }));
     $('wire-comparison-differences').textContent=`${differences.length} of ${objects.length} objects differ from the public-only baseline. Missing public objects indicate an incomplete capture, not stronger protection.`;
