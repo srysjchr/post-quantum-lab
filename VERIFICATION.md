@@ -181,3 +181,8 @@ Added an on-demand symbol/color glossary beside the scene, distinguishing KEM c 
 
 ## Small 3D polish 7/8 — 2026-10-17
 Added textual baseline difference counts and object-by-object explanations. Missing public capture and additional attacker knowledge have different descriptions; color is supplementary. wire-polish and wire-learning passed across safe/incomplete/compromised cases with syntax/whitespace checks.
+
+## Small 3D polish 8/8 — 2026-10-17
+Added an evidence-aware handoff to the matching public-transcript or private-key-exposure Teach It Back topic. The link appears only when the current wire supports that topic; opening it preserves captures and optional notes without awarding completion. Existing topic-change behavior resets the other topic’s selected claims.
+
+All fourteen browser suites passed in the final complete run, including wire-polish, wire-3d, wire-learning, original wire/explanation exercises, navigation, progress, crypto demonstrations and fallback cases. JavaScript syntax and whitespace checks passed. Reviewed final desktop and 320px-mobile controls/inspector/comparison/handoff screenshots outside the repository. New interface text remains English; no dependencies or persistent settings were introduced.

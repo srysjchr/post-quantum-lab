@@ -10,7 +10,7 @@ window.createWireBuilder = function () {
     { id: 'traffic', name: 'Traffic key · Alice’s derived key', direction: 'Alice → public channel (mistake)', explanation: 'Exposure gives Eve the message-protection key directly. It does not by itself reveal dk or the input K.' }
   ];
   const sent = new Set(), queued = new Set();
-  let observer = 'learner', focus = '';
+  let observer = 'learner', focus = '', reflectionTopic=null;
   const wireScene = window.createWireScene(id => transmit([id]));
   function knowledge(transcript = sent) {
     const eveK = transcript.has('K') || (transcript.has('dk') && transcript.has('c'));
@@ -42,6 +42,10 @@ window.createWireBuilder = function () {
     $('wire-guide-status').textContent = exposed.length ? `Secret exposure: ${exposed.join(', ')}. Observe Eve, then start a fresh experiment to build a safe transcript.` : !sent.has('ek') ? 'Next: send Bob’s public ek. The guide tracks transmitted objects, not queued selections.' : !sent.has('c') ? 'Next: send Alice’s public c. Bob will decapsulate locally; K is not a packet.' : 'Compare Bob and Eve. Bob has K locally; Eve has ek and c. Use Check my wire to explain the boundary.';
     $('wire-guide').children[0].textContent = `${sent.has('ek')?'✓ Sent':'To do'}: Bob’s public ek.`;
     $('wire-guide').children[1].textContent = `${sent.has('c')?'✓ Sent':'To do'}: Alice’s public c.`;
+    reflectionTopic=sent.has('dk')&&sent.has('c')?1:sent.has('ek')&&sent.has('c')&&!exposed.length?0:null;
+    $('wire-reflect').hidden=reflectionTopic===null;
+    $('wire-reflect').textContent=reflectionTopic===1?'Explain private-key exposure in Teach It Back →':'Explain the public transcript in Teach It Back →';
+    $('wire-next-step').textContent=reflectionTopic===null?'Next: prepare a public-only ek + c transcript, or a dk + c exposure, for a matching explanation exercise.':reflectionTopic===0?'Evidence ready: explain why copying public ek and c does not reveal K under this model’s assumptions.':'Evidence ready: explain how captured dk and matching c allow recovery of K and derivation of the traffic key.';
     const known = knowledge();
     const baseline = knowledge(new Set(['ek','c']));
     $('wire-comparison-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge. Compare the Known/Unknown cells; reset starts a different exchange and cannot recall a real leak.':!sent.has('ek')||!sent.has('c')?'Incomplete public transcript. The reference includes both ek and c; an empty capture does not establish a working exchange.':'Same object knowledge as the public-only reference in this model. This alone does not prove a complete protocol secure.';
@@ -90,6 +94,7 @@ window.createWireBuilder = function () {
     render();
     window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
+  $('wire-reflect').onclick=()=>{if(reflectionTopic===null)return;const select=$('teach-topic');if(select.value!==String(reflectionTopic)){select.value=String(reflectionTopic);select.dispatchEvent(new Event('change',{bubbles:true}));}};
   function moveInspection(delta){const ids=[...sent],index=ids.indexOf(focus);if(ids[index+delta]){focus=ids[index+delta];render();}}
   $('wire-inspect-prev').onclick=()=>moveInspection(-1);$('wire-inspect-next').onclick=()=>moveInspection(1);
   $('wire-clear-queued').onclick=()=>{queued.clear();render();};

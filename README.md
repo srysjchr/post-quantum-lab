@@ -161,3 +161,12 @@ Rotate left/right inspects the scene in 15-degree steps. Reset camera preserves 
 Expand **Compare with a public-only exchange** to compare Eve's current object knowledge with an ek+c reference using the same inference function. Incomplete transcripts are labelled incomplete. A matching table is not a proof of protocol security; identity binding, AEAD, freshness and implementation security remain separate requirements. A fresh experiment clears the illustrative capture rather than recalling a real secret leak.
 
 Run `node tests/wire-learning.cjs` for guide, exposure, camera, inspection, reference-comparison and responsive checks. The full browser suite also covers the existing learning history, exercises and crypto demonstrations.
+
+
+## Small wire usability improvements
+
+The unsent-selection summary and clear action affect only queued selections, while capture totals distinguish public and exposed secret objects. Previous/next inspection follows capture order without sending again. Focus the 3D view to rotate with Left/Right and restore the participant camera with Home; form controls retain their native keys.
+
+**Animate packet paths** can disable travel animations for the page session; system reduced motion takes precedence. Transmission, inference and evidence work identically with animation off or without WebGL. The on-demand glossary explains all five object symbols and the visual markers. Baseline differences have explicit text as well as color.
+
+When the current transcript supports a public-only or private-key-exposure explanation, a link opens the matching Teach It Back topic. Switching topics clears the other topic's selected claims as usual, while retaining optional notes and the wire experiment. A visit never completes a milestone. Run `node tests/wire-polish.cjs` for the complete usability flow, including keyboard, motion preference changes, preserved notes/evidence and four responsive widths.
