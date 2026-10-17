@@ -35,6 +35,7 @@ window.createWireScene = function (transmit) {
     camera=new THREE.PerspectiveCamera(43,1,.1,60);
   } catch {
     for(const id of ['wire-turn-left','wire-turn-right','wire-camera-reset'])document.getElementById(id).disabled=true;
+    host.removeAttribute('aria-keyshortcuts');
     host.classList.add('unavailable');fallback.textContent='3D is unavailable. Use the Send buttons and participant knowledge cards below; the same experiment still works.';
     return {render:announce};
   }
@@ -123,7 +124,12 @@ window.createWireScene = function (transmit) {
   function turn(delta){cancelDrag();yaw=((yaw+delta+540)%360)-180;if(snapshot)build();}
   document.getElementById('wire-turn-left').onclick=()=>turn(-15);
   document.getElementById('wire-turn-right').onclick=()=>turn(15);
-  document.getElementById('wire-camera-reset').onclick=()=>{cancelDrag();yaw=0;if(snapshot)build();};
+  function resetCamera(){cancelDrag();yaw=0;if(snapshot)build();}
+  document.getElementById('wire-camera-reset').onclick=resetCamera;
+  host.addEventListener('keydown',event=>{
+    if(event.target!==host||!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;
+    event.preventDefault();if(event.key==='Home')resetCamera();else turn(event.key==='ArrowLeft'?-15:15);
+  });
   function cancelDrag(){
     if(!drag)return;const {token,pointer}=drag;drag=null;host.classList.remove('dragging');
     if(token.hasPointerCapture?.(pointer))token.releasePointerCapture(pointer);

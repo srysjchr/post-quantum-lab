@@ -169,3 +169,6 @@ Added capture totals split into public/secret objects and an explicit empty stat
 
 ## Small 3D polish 3/8 — 2026-10-17
 Added previous/next capture browsing with correct empty and endpoint states. Inspection preserves transmission counts and evidence. wire-polish and wire-learning passed with syntax/whitespace checks.
+
+## Small 3D polish 4/8 — 2026-10-17
+The 3D view is keyboard focusable: Left/Right rotate and Home restores the participant camera. Shortcuts are scoped to the view itself, preserving native input/select behavior. wire-polish, syntax and whitespace checks passed.
