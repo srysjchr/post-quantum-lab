@@ -32,7 +32,10 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   function open(section,updateUrl=true){
     if(!reveal(section))return;
     if(updateUrl&&location.hash!==`#${section}`)history.pushState(null,'',`#${section}`);
-    const target=$(section);target.scrollIntoView({block:'start'});target.setAttribute('tabindex','-1');target.focus({preventScroll:true});
+    const target=$(section);target.scrollIntoView({block:'start'});
+    const focusTarget=target.matches(':disabled')?target.closest('section')||target:target;
+    if(focusTarget.tabIndex<0&&!focusTarget.hasAttribute('tabindex'))focusTarget.setAttribute('tabindex','-1');
+    focusTarget.focus({preventScroll:true});
   }
   exercises.forEach(([id,title,description],index)=>{
     const section=$(id),wrapper=node('details'),summary=node('summary'),heading=node('span',`${index+1}. ${title}`),hint=node('span',description);

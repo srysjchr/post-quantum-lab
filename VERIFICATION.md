@@ -201,3 +201,6 @@ Added an accessible capture-position description next to inspection navigation. 
 
 ## Small refinements 5/8 — 2026-10-18
 The main 3D scene suspends its animation loop outside the viewport and resumes when visible, preserving pause/reduced-motion settings. A measured regression confirmed the previous offscreen frame activity and verified suspension, resumption and manual pause. render-visibility and the six-chapter browser suite passed with source checks.
+
+## Small refinements 6/8 — 2026-10-18
+Deep links preserve native and explicit tab order instead of assigning -1 to every target. Disabled controls hand focus to their containing section. Tested scene/button/disabled destinations and the navigation regression; source checks passed.
