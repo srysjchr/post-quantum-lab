@@ -12,7 +12,9 @@ window.createWireScene = function (transmit) {
   const origins = {...publicPositions, dk:[3,1,-1], K:[-3,1,-1], traffic:[-3,1,-1]};
   const secretIds = ['dk','K','traffic'];
   let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false;
-  let previous=new Set(), disposed=false, yaw=0, sceneDescription='';
+  let previous=new Set(), disposed=false, yaw=0, sceneDescription='', userMotion=true;
+  const motionControl=document.getElementById('wire-animate');
+  function syncMotion(){motionControl.disabled=motion.matches;motionControl.checked=userMotion&&!motion.matches;document.getElementById('wire-motion-note').textContent=motion.matches?'System reduced motion is active. Packets update without animated travel.':userMotion?'Packet travel is animated; final knowledge updates immediately.':'Packet travel is off; transmission and knowledge rules are unchanged.';}
   const meshes = new Map();
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   function announce(data) {
@@ -35,6 +37,7 @@ window.createWireScene = function (transmit) {
     camera=new THREE.PerspectiveCamera(43,1,.1,60);
   } catch {
     for(const id of ['wire-turn-left','wire-turn-right','wire-camera-reset'])document.getElementById(id).disabled=true;
+    motionControl.disabled=true;document.getElementById('wire-motion-note').textContent='3D motion is unavailable; the experiment controls still work.';
     host.removeAttribute('aria-keyshortcuts');
     host.classList.add('unavailable');fallback.textContent='3D is unavailable. Use the Send buttons and participant knowledge cards below; the same experiment still works.';
     return {render:announce};
@@ -104,7 +107,7 @@ window.createWireScene = function (transmit) {
     overlays();draw();
   }
   function animateTransmissions(ids){
-    if(motion.matches||document.hidden||interrupted)return;
+    if(!userMotion||motion.matches||document.hidden||interrupted)return;
     const channel=new THREE.Vector3(0,.7,0),eve=new THREE.Vector3(0,.7,2.5);
     const packets=ids.map(id=>{
       const start=new THREE.Vector3(...origins[id]),end=new THREE.Vector3(...positions[id==='ek'||id==='dk'?'alice':'bob']);end.y=1;
@@ -117,7 +120,7 @@ window.createWireScene = function (transmit) {
       for(const {start,end,packet,copy} of packets){
         if(t<.5){packet.position.lerpVectors(start,channel,t*2);copy.position.copy(packet.position);}else{packet.position.lerpVectors(channel,end,(t-.5)*2);copy.position.lerpVectors(channel,eve,(t-.5)*2);}
       }
-      draw();if(t<1&&!motion.matches&&!document.hidden&&!interrupted)frame=requestAnimationFrame(tick);else{packets.forEach(({packet,copy})=>{packet.visible=false;copy.visible=false;});frame=0;draw();}
+      draw();if(t<1&&userMotion&&!motion.matches&&!document.hidden&&!interrupted)frame=requestAnimationFrame(tick);else{packets.forEach(({packet,copy})=>{packet.visible=false;copy.visible=false;});frame=0;draw();}
     }
     frame=requestAnimationFrame(tick);
   }
@@ -160,7 +163,8 @@ window.createWireScene = function (transmit) {
     token.addEventListener('keydown',event=>{if(event.key==='Escape'){suppressClick=true;cancelDrag();}});
   }
   new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;if(snapshot)setCamera(snapshot.observer);camera.updateProjectionMatrix();renderer.setSize(w,h,false);overlays();draw();}).observe(host);
-  motion.addEventListener('change',()=>{if(snapshot)build();});
+  syncMotion();motionControl.onchange=()=>{userMotion=motionControl.checked;syncMotion();if(snapshot)build();};
+  motion.addEventListener('change',()=>{syncMotion();if(snapshot)build();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;cancelDrag();}else if(snapshot)build();});
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;cancelAnimationFrame(frame);frame=0;cancelDrag();fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;fallback.hidden=true;if(snapshot)build();});

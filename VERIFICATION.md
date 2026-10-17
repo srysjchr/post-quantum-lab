@@ -172,3 +172,6 @@ Added previous/next capture browsing with correct empty and endpoint states. Ins
 
 ## Small 3D polish 4/8 — 2026-10-17
 The 3D view is keyboard focusable: Left/Right rotate and Home restores the participant camera. Shortcuts are scoped to the view itself, preserving native input/select behavior. wire-polish, syntax and whitespace checks passed.
+
+## Small 3D polish 5/8 — 2026-10-17
+Added a packet-animation toggle. System reduced motion takes precedence; the manual page-session choice survives changes back to no-preference. Disabling motion preserves all transmissions and knowledge outcomes. wire-polish and wire-3d passed, including motion resets and WebGL fallback, plus syntax/whitespace checks.

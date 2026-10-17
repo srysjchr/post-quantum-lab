@@ -24,3 +24,5 @@
 .wire-inspector{padding:14px;margin:16px 0;border:1px solid #304759;border-radius:8px}.wire-inspector label{display:block;margin-bottom:10px}.wire-inspector select{max-width:100%;width:100%;padding:10px;background:#080e1c;color:#d9e7ee;border:1px solid #304759;border-radius:6px;font:inherit}#wire-inspection p{line-height:1.6;font-size:13px}
 
 #wire-comparison{width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px}#wire-comparison caption{padding:10px 0;text-align:left;color:#a5b8cc}#wire-comparison th,#wire-comparison td{padding:10px 6px;text-align:left;border-bottom:1px solid #304759;overflow-wrap:anywhere}#wire-comparison th{color:#c5d6e7}.comparison-difference{background:#3d2d1d}@media(max-width:760px){#wire-comparison{font-size:12px}#wire-comparison th,#wire-comparison td{padding:8px 3px}}
+
+.wire-motion{display:flex;align-items:center;gap:10px;min-height:44px;margin-top:10px}.wire-motion input{width:18px;height:18px;accent-color:#a6f4c5}
