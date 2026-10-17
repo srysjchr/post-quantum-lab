@@ -60,8 +60,13 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
     const link=event.target.closest('a[href^="#"]');if(!link)return;const section=link.getAttribute('href').slice(1);
     if($(section)?.closest('[data-exercise-panel]')){event.preventDefault();open(section);}
   });
-  function openHash(){let section;try{section=decodeURIComponent(location.hash.slice(1));}catch{return;}if(section)open(section,false);else{wrappers.forEach(wrapper=>{wrapper.open=false;});active=null;sync();}}
-  window.addEventListener('hashchange',openHash);
+  function openHash(restoreMenu=false){
+    let section;try{section=decodeURIComponent(location.hash.slice(1));}catch{return;}
+    if(section){open(section,false);return;}
+    wrappers.forEach(wrapper=>{wrapper.open=false;});active=null;sync();
+    if(restoreMenu){$('exercise-navigation').scrollIntoView({block:'start'});$('exercise-picker').focus({preventScroll:true});}
+  }
+  window.addEventListener('hashchange',()=>openHash(true));
   window.revealLearningSection=reveal;
   sync();
   function chapterChanged(index, remember) {

@@ -204,3 +204,6 @@ The main 3D scene suspends its animation loop outside the viewport and resumes w
 
 ## Small refinements 6/8 — 2026-10-18
 Deep links preserve native and explicit tab order instead of assigning -1 to every target. Disabled controls hand focus to their containing section. Tested scene/button/disabled destinations and the navigation regression; source checks passed.
+
+## Small refinements 7/8 — 2026-10-18
+Browser Back to the empty exercise route now returns focus to the exercise picker. Initial page loading does not steal focus; Forward reopens/focuses the exercise. wire-refinements and source checks passed.
