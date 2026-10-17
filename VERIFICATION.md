@@ -186,3 +186,6 @@ Added textual baseline difference counts and object-by-object explanations. Miss
 Added an evidence-aware handoff to the matching public-transcript or private-key-exposure Teach It Back topic. The link appears only when the current wire supports that topic; opening it preserves captures and optional notes without awarding completion. Existing topic-change behavior resets the other topic’s selected claims.
 
 All fourteen browser suites passed in the final complete run, including wire-polish, wire-3d, wire-learning, original wire/explanation exercises, navigation, progress, crypto demonstrations and fallback cases. JavaScript syntax and whitespace checks passed. Reviewed final desktop and 320px-mobile controls/inspector/comparison/handoff screenshots outside the repository. New interface text remains English; no dependencies or persistent settings were introduced.
+
+## Small refinements 1/8 — 2026-10-18
+Fixed the inference narration for mixed exposure: when K is sent along with dk+c, it now describes both paths instead of claiming K was never sent. Both transmission orders and inference-only dk+c passed, with wire-builder regression and source checks.
