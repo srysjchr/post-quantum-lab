@@ -45,13 +45,16 @@ window.createWireBuilder = function () {
     const known = knowledge();
     const baseline = knowledge(new Set(['ek','c']));
     $('wire-comparison-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge. Compare the Known/Unknown cells; reset starts a different exchange and cannot recall a real leak.':!sent.has('ek')||!sent.has('c')?'Incomplete public transcript. The reference includes both ek and c; an empty capture does not establish a working exchange.':'Same object knowledge as the public-only reference in this model. This alone does not prove a complete protocol secure.';
+    const differences=[];
     $('wire-comparison').querySelector('tbody').replaceChildren(...objects.map(object=>{
       const row=document.createElement('tr');row.dataset.compareObject=object.id;
       const name=node('th',object.id==='traffic'?'Traffic key':object.id);name.scope='row';row.append(name);
       for(const [kind,values] of [['baseline',baseline.eve],['actual',known.eve]]){const cell=node('td',values.includes(object.id)?'Known':'Unknown');cell.dataset.compare=kind;row.append(cell);}
-      if(baseline.eve.includes(object.id)!==known.eve.includes(object.id))row.className='comparison-difference';
+      if(baseline.eve.includes(object.id)!==known.eve.includes(object.id)){row.className='comparison-difference';differences.push(node('li',`${object.id==='traffic'?'Traffic key':object.id}: ${known.eve.includes(object.id)?'additional knowledge in your experiment, captured or inferred.':'not yet known in your experiment; the reference includes a complete public transcript.'}`));}
       return row;
     }));
+    $('wire-comparison-differences').textContent=`${differences.length} of ${objects.length} objects differ from the public-only baseline. Missing public objects indicate an incomplete capture, not stronger protection.`;
+    $('wire-comparison-changes').replaceChildren(...differences);
     $('wire-knowledge').replaceChildren(...['alice', 'bob', 'eve'].map(role => {
       const article = node('article', ''); article.dataset.wireActor = role; article.className = role === observer ? 'active' : '';
       article.append(node('h4', role.toUpperCase()));

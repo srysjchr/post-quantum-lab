@@ -178,3 +178,6 @@ Added a packet-animation toggle. System reduced motion takes precedence; the man
 
 ## Small 3D polish 6/8 — 2026-10-17
 Added an on-demand symbol/color glossary beside the scene, distinguishing KEM c from AEAD-protected application messages and explaining local secret state. Keyboard open/close and unchanged capture state passed in wire-polish; whitespace checks passed.
+
+## Small 3D polish 7/8 — 2026-10-17
+Added textual baseline difference counts and object-by-object explanations. Missing public capture and additional attacker knowledge have different descriptions; color is supplementary. wire-polish and wire-learning passed across safe/incomplete/compromised cases with syntax/whitespace checks.
