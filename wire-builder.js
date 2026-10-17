@@ -22,8 +22,11 @@ window.createWireBuilder = function () {
     return Object.fromEntries(Object.entries(result).map(([role,values])=>[role,[...new Set(values)]]));
   }
   function renderQueued() {
+    const privateSelection=['dk','K','traffic'].filter(id=>queued.has(id));
+    $('wire-queued-privacy').hidden=privateSelection.length===0;
+    $('wire-queued-privacy').textContent=privateSelection.length?`Private objects selected: ${privateSelection.join(', ')}. They are still local. Sending these selections exposes them to Eve; direct public Send buttons send only their named object.`:'';
     $('wire-send').disabled=queued.size===0;$('wire-clear-queued').disabled=queued.size===0;
-    $('wire-queued-summary').textContent=queued.size?`${queued.size} selected: ${[...queued].join(', ')}. Nothing is transmitted until you send it.`:'No unsent selections. Clearing selections does not recall captured data.';
+    $('wire-queued-summary').textContent=queued.size?`${queued.size} selected: ${[...queued].join(', ')}. These selections remain local until you send them.`:'No unsent selections. Clearing selections does not recall captured data.';
   }
   function render() {
     $('wire-objects').replaceChildren(...objects.map(object => {

@@ -192,3 +192,6 @@ Fixed the inference narration for mixed exposure: when K is sent along with dk+c
 
 ## Small refinements 2/8 — 2026-10-18
 Baseline differences now distinguish direct capture from inference using the actual sent set. Tested dk+c recovery, direct K capture and derived traffic knowledge without changing inference rules. wire-refinements and source checks passed.
+
+## Small refinements 3/8 — 2026-10-18
+Private queued selections now have an explicit still-local explanation; public direct-send actions remain separate. Tested selecting K, sending only ek, and clearing the queue without recalling the capture. wire-refinements and source checks passed.
