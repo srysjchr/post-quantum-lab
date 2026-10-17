@@ -195,3 +195,6 @@ Baseline differences now distinguish direct capture from inference using the act
 
 ## Small refinements 3/8 — 2026-10-18
 Private queued selections now have an explicit still-local explanation; public direct-send actions remain separate. Tested selecting K, sending only ek, and clearing the queue without recalling the capture. wire-refinements and source checks passed.
+
+## Small refinements 4/8 — 2026-10-18
+Added an accessible capture-position description next to inspection navigation. Tested first/last positions, empty state and reset without retransmission. wire-refinements and source checks passed.
