@@ -175,3 +175,6 @@ The 3D view is keyboard focusable: Left/Right rotate and Home restores the parti
 
 ## Small 3D polish 5/8 — 2026-10-17
 Added a packet-animation toggle. System reduced motion takes precedence; the manual page-session choice survives changes back to no-preference. Disabling motion preserves all transmissions and knowledge outcomes. wire-polish and wire-3d passed, including motion resets and WebGL fallback, plus syntax/whitespace checks.
+
+## Small 3D polish 6/8 — 2026-10-17
+Added an on-demand symbol/color glossary beside the scene, distinguishing KEM c from AEAD-protected application messages and explaining local secret state. Keyboard open/close and unchanged capture state passed in wire-polish; whitespace checks passed.
