@@ -160,3 +160,6 @@ Added capture inspection with shared object descriptions and a 3D selection ring
 Added an expandable reference/current comparison of Eve’s knowledge using the same inference function for both inputs. Incomplete transcripts, public-only matches, dk+c compromise and traffic-key-only exposure have distinct, accurate outcomes. The table does not claim complete protocol security. Deduplicated knowledge lists when capture and inference produce the same object; verified the previously repeated ek label is removed.
 
 All thirteen browser suites passed in the final complete run, plus JavaScript syntax and whitespace checks. Earlier default-preview runs had intermittent initialization timeouts; the complete final run used a local threaded preview with a larger connection queue on port 8766. No timeout or assertion was relaxed. Reviewed final desktop/mobile 3D captures, inspection UI and comparison table screenshots outside the repository. All new interface text is English; no dependencies or persisted learner data were added.
+
+## Small 3D polish 1/8 — 2026-10-17
+Added a live unsent-selection summary and Clear unsent selections. Clearing never recalls a capture or resets an experiment. wire-polish and wire-builder passed; syntax and whitespace checks passed.

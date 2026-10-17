@@ -21,15 +21,19 @@ window.createWireBuilder = function () {
     };
     return Object.fromEntries(Object.entries(result).map(([role,values])=>[role,[...new Set(values)]]));
   }
+  function renderQueued() {
+    $('wire-send').disabled=queued.size===0;$('wire-clear-queued').disabled=queued.size===0;
+    $('wire-queued-summary').textContent=queued.size?`${queued.size} selected: ${[...queued].join(', ')}. Nothing is transmitted until you send it.`:'No unsent selections. Clearing selections does not recall captured data.';
+  }
   function render() {
     $('wire-objects').replaceChildren(...objects.map(object => {
       const label = node('label', ''), input = document.createElement('input');
       label.className = 'answer'; input.type = 'checkbox'; input.value = object.id; input.dataset.wireObject = object.id;
       input.disabled = sent.has(object.id); input.checked = queued.has(object.id);
-      input.onchange = () => { if(input.checked)queued.add(object.id);else queued.delete(object.id);$('wire-send').disabled = queued.size===0; };
+      input.onchange = () => { if(input.checked)queued.add(object.id);else queued.delete(object.id);renderQueued(); };
       label.append(input, document.createTextNode(object.name + (sent.has(object.id) ? ' · already captured' : ''))); return label;
     }));
-    $('wire-send').disabled = queued.size===0;
+    renderQueued();
     $('wire-send-ek').disabled = sent.has('ek');
     $('wire-send-c').disabled = sent.has('c');
     const exposed = ['dk','K','traffic'].filter(id => sent.has(id));
@@ -80,6 +84,7 @@ window.createWireBuilder = function () {
     render();
     window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
+  $('wire-clear-queued').onclick=()=>{queued.clear();render();};
   $('wire-inspect').onchange=()=>{focus=$('wire-inspect').value;render();};
   $('wire-send').onclick = () => transmit([...queued]);
   $('wire-send-ek').onclick = () => transmit(['ek']);
