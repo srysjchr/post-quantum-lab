@@ -25,6 +25,7 @@ window.createLearningScene = function (container, fallback) {
   let movingObject = null, observation = null, noiseLine = null, noiseArrow = null, time = 0, frame = 0, lastTime = 0, dragging = null, lost = false;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let paused = motion.matches;
+  let inViewport = typeof IntersectionObserver !== 'function';
   function material(color, opacity = 1) { return new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity }); }
   function ball(position, radius, color) {
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 12), material(color));
@@ -158,7 +159,7 @@ window.createLearningScene = function (container, fallback) {
   function draw() { if (!lost) renderer.render(scene, camera); }
   function animate(now) {
     frame = 0;
-    if (paused || document.hidden || lost) return;
+    if (paused || document.hidden || lost || !inViewport) return;
     const delta = lastTime ? Math.min((now-lastTime)/1000,0.05) : 0; lastTime = now; time += delta;
     if (!dragging && state.mode !== 'kem') root.rotation.y += delta * (state.mode === 'lattice' ? 0.06 : 0.025);
     if (movingObject) {
@@ -168,7 +169,7 @@ window.createLearningScene = function (container, fallback) {
     }
     draw(); frame = requestAnimationFrame(animate);
   }
-  function schedule() { if (!frame && !paused && !document.hidden && !lost) { lastTime = 0; frame = requestAnimationFrame(animate); } }
+  function schedule() { if (!frame && !paused && !document.hidden && !lost && inViewport) { lastTime = 0; frame = requestAnimationFrame(animate); } }
   function syncPause() { const button=document.getElementById('pause'); button.textContent=paused?'Play motion':'Pause motion'; button.setAttribute('aria-pressed',String(paused)); }
   const api = {
     select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
@@ -180,6 +181,11 @@ window.createLearningScene = function (container, fallback) {
   document.getElementById('pause').addEventListener('click',api.togglePause);
   motion.addEventListener('change',event => { paused=event.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); });
   document.addEventListener('visibilitychange',() => { if (document.hidden) { cancelAnimationFrame(frame); frame=0; } else schedule(); });
+  if (typeof IntersectionObserver === 'function') new IntersectionObserver(entries => {
+    inViewport = entries.some(entry => entry.isIntersecting);
+    if (inViewport) schedule();
+    else { cancelAnimationFrame(frame); frame=0; lastTime=0; }
+  }).observe(container);
   new ResizeObserver(() => {
     const {width,height}=container.getBoundingClientRect(); if (!width || !height) return;
     camera.aspect=width/height; camera.zoom=width<500?0.95:(state.mode==='lattice'?1.5:1.05); camera.updateProjectionMatrix(); renderer.setSize(width,height,false); draw();

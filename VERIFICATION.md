@@ -198,3 +198,6 @@ Private queued selections now have an explicit still-local explanation; public d
 
 ## Small refinements 4/8 — 2026-10-18
 Added an accessible capture-position description next to inspection navigation. Tested first/last positions, empty state and reset without retransmission. wire-refinements and source checks passed.
+
+## Small refinements 5/8 — 2026-10-18
+The main 3D scene suspends its animation loop outside the viewport and resumes when visible, preserving pause/reduced-motion settings. A measured regression confirmed the previous offscreen frame activity and verified suspension, resumption and manual pause. render-visibility and the six-chapter browser suite passed with source checks.
