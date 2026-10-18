@@ -20,6 +20,8 @@ window.createWireScene = function (transmit) {
   function announce(data) {
     const role=data.observer;
     document.getElementById('wire-camera-label').textContent=role==='learner'?'Overview camera':`${role[0].toUpperCase()+role.slice(1)}-side camera`;
+    const remaining=['ek','c'].filter(id=>!data.sent.includes(id));
+    drop.querySelector('small').textContent=remaining.length?`Drop ${remaining.join(' or ')} here`:'Both public objects sent';
     const captured=data.sent;
     const exposed=data.sent.filter(id=>secretIds.includes(id));
     const exposure=document.getElementById('wire-exposure');exposure.textContent=exposed.length?`EXPOSED: ${exposed.join(', ')}. Red packets are secret objects sent by mistake. Eve’s knowledge cards include any resulting inference; more public data cannot recall this capture.`:'Secret objects remain local. Orange packets are intended public objects; red packets illustrate an explicit secret exposure.';exposure.classList.toggle('incorrect',exposed.length>0);

@@ -227,3 +227,6 @@ Added Latest capture beside sequential inspection controls. Tested empty/single/
 
 ## Wire usability 5/8 - 2026-10-18
 Eve's 3D knowledge overlay now identifies whether K is unavailable, inferred from dk+c, or captured directly. Verified transitions, mixed exposure, observer changes and unchanged capture counts with the accumulated browser suite.
+
+## Wire usability 6/8 - 2026-10-18
+The 3D public-channel target identifies remaining public objects and confirms when both are sent, instead of continuing to ask for a drop with no public tokens left. Tested both orders, reset, and queued K staying unsent.

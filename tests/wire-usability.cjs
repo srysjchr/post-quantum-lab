@@ -53,6 +53,13 @@ const assert=require('node:assert/strict');
  await page.locator('#wire-perspectives [data-wire-observer="bob"]').click();
  assert.doesNotMatch(await page.locator('#wire-observer-knowledge').innerText(),/K source:/);
  await reset();await page.locator('#wire-perspectives [data-wire-observer="learner"]').click();
+ // The drop target names only unsent public objects and reflects completion/reset.
+ assert.match(await page.locator('#wire-drop-target small').innerText(),/Drop ek or c here/);
+ await page.check('[data-wire-object="K"]');assert.match(await page.locator('#wire-drop-target small').innerText(),/Drop ek or c here/);
+ await page.locator('#wire-send-c').click();assert.match(await page.locator('#wire-drop-target small').innerText(),/Drop ek here/);
+ await page.locator('#wire-send-ek').click();assert.match(await page.locator('#wire-drop-target small').innerText(),/Both public objects sent/);
+ assert.equal(await page.locator('[data-wire-capture="K"]').count(),0);await reset();
+ await page.locator('#wire-send-ek').click();assert.match(await page.locator('#wire-drop-target small').innerText(),/Drop c here/);await reset();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');
