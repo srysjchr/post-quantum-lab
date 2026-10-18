@@ -179,3 +179,11 @@ Mixed direct-K and dk+c exposures describe both paths accurately. Baseline diffe
 The main scene suspends animation when offscreen, resumes on visibility and preserves manual pause/reduced-motion preferences. Exercise links preserve native tab order; disabled destinations focus the containing section. Browser Back to the menu restores picker focus without taking focus during initial loading. Chapter choices update the chapter query parameter, retaining other parameters, and reload/history restores the corresponding lesson. KEM exercise routing keeps its fragment while correcting the effective chapter.
 
 Run `node tests/wire-refinements.cjs` and `node tests/render-visibility.cjs` alongside the existing suites. The animation test measures scheduled callbacks across visible/offscreen/resumed/paused states rather than requiring specific frame rates.
+
+## Attacker knowledge and capture inspection
+
+Build the Wire separates directly captured objects from additional inferred knowledge and lists the evidence for each inferred object. Eve's 3D overlay identifies whether K was captured directly, recovered from dk+c, or remains unavailable. These explanations follow the existing symbolic model; no real KEM bytes are generated.
+
+Inspect a capture from its transcript entry, use previous/next, or jump to the latest capture without transmitting again. The 3D drop target names remaining public objects. Opening an exercise from its summary keeps the picker and URL aligned; closing it clears its exercise fragment while retaining query parameters.
+
+Run `node tests/wire-usability.cjs` for knowledge provenance, non-mutating inspection, 3D guidance, pointer/keyboard summary activation, route reloads, reset behavior and four responsive widths.

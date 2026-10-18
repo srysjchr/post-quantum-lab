@@ -233,3 +233,8 @@ The 3D public-channel target identifies remaining public objects and confirms wh
 
 ## Wire usability 7/8 - 2026-10-18
 Manual summary activation now updates the exercise picker synchronously. Pointer and Enter activation passed after reproducing the previous mismatch. Delayed toggle events still cannot overwrite a separate pending menu choice.
+
+## Wire usability 8/8 - 2026-10-18
+Manual exercise summaries now use the same opening route as the menu, with aligned picker/focus and reloadable fragments. Closing a summary clears only its own exercise fragment and preserves query parameters. Keyboard, pointer, reload, close/reset and four-width regressions passed. The keyboard test explicitly enters chapter four before focusing its KEM summary, since that summary is hidden in other chapters.
+
+Final verification: all seventeen browser suites passed against the final product changes. One progress-suite run encountered Chromium ERR_INSUFFICIENT_RESOURCES during reload; its fresh-browser rerun passed all original assertions without source/test relaxation. All root JavaScript syntax and whitespace checks passed. Reviewed desktop and 320px mobile scene and evidence screenshots outside the repository. English UI, no new dependencies, no additional persisted state, and unchanged symbolic inference rules. Browser plugin not available; bundled Playwright/Chromium was used.

@@ -70,7 +70,20 @@ const assert=require('node:assert/strict');
  // A delayed toggle must not overwrite a new menu selection the learner has not opened yet.
  await page.selectOption('#exercise-picker','attack-playground');
  await page.waitForTimeout(100);assert.equal(await page.inputValue('#exercise-picker'),'attack-playground');
- // MORE_CHECKS
+ // Manual opens produce reloadable routes; closing clears only that exercise route.
+ await page.goto(root+'?chapter=1&view=compact');await page.waitForSelector('#exercise-picker');
+ await page.locator('[data-exercise-panel="scenario-lab"] > summary').click();
+ assert.equal(new URL(page.url()).hash,'#scenario-lab');assert.equal(new URL(page.url()).searchParams.get('view'),'compact');
+ await page.reload();await page.waitForFunction(()=>document.activeElement.id==='scenario-lab');
+ assert.equal(await page.locator('[data-exercise-panel][open]').getAttribute('data-exercise-panel'),'scenario-lab');
+ await page.locator('[data-chapter="3"]').click();
+ await page.locator('[data-exercise-panel="build-the-wire"] > summary').press('Enter');
+ assert.equal(new URL(page.url()).hash,'#build-the-wire');assert.equal(new URL(page.url()).searchParams.get('chapter'),'4');
+ await page.locator('[data-exercise-panel="build-the-wire"] > summary').click();
+ assert.equal(new URL(page.url()).hash,'');assert.equal(new URL(page.url()).searchParams.get('view'),'compact');
+ await page.reload();await page.waitForSelector('#exercise-picker');assert.equal(await page.locator('[data-exercise-panel][open]').count(),0);
+ for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});await page.selectOption('#exercise-picker','build-the-wire');await page.locator('#exercise-open').click();await send('dk','c');await page.locator('#wire-guide-eve').click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Overflow at ${width}`);await reset();}
+ assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');
  } finally {await browser.close();}
