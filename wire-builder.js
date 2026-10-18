@@ -51,6 +51,8 @@ window.createWireBuilder = function () {
     $('wire-reflect').textContent=reflectionTopic===1?'Explain private-key exposure in Teach It Back →':'Explain the public transcript in Teach It Back →';
     $('wire-next-step').textContent=reflectionTopic===null?'Next: prepare a public-only ek + c transcript, or a dk + c exposure, for a matching explanation exercise.':reflectionTopic===0?'Evidence ready: explain why copying public ek and c does not reveal K under this model’s assumptions.':'Evidence ready: explain how captured dk and matching c allow recovery of K and derivation of the traffic key.';
     const known = knowledge();
+    const inferred=known.eve.filter(id=>!sent.has(id));
+    $('wire-eve-sources').textContent=`Eve knows ${known.eve.length} of ${objects.length} exchange objects: ${sent.size} directly captured, ${inferred.length} inferred${inferred.length?' ('+inferred.join(', ')+')':''}. Inferred knowledge does not add packets to the capture.`;
     const baseline = knowledge(new Set(['ek','c']));
     $('wire-comparison-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge. Compare the Known/Unknown cells; reset starts a different exchange and cannot recall a real leak.':!sent.has('ek')||!sent.has('c')?'Incomplete public transcript. The reference includes both ek and c; an empty capture does not establish a working exchange.':'Same object knowledge as the public-only reference in this model. This alone does not prove a complete protocol secure.';
     const differences=[];
