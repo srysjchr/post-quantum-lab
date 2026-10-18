@@ -26,6 +26,10 @@ window.createWireScene = function (transmit) {
     status.textContent=`${captured.length?'Eve captured '+captured.join(' and ')+'.':'No public objects transmitted yet.'} ${data.known.bob.includes('K')?'Bob has K locally.':'Bob has not decapsulated c yet.'} ${data.known.eve.includes('K')?'Eve knows K in this experiment.':'Eve cannot infer K from the public transcript in this model.'}`;
     sceneDescription=`${role} participant camera. ${status.textContent} Private contents of other participants are Unknown unless known to this observer. No shared secret crosses the channel in the intended exchange.`;if(data.focus)sceneDescription+=` Inspecting captured ${data.focus}.`;host.setAttribute('aria-label',sceneDescription);
     document.getElementById('wire-observer-knowledge').textContent=role==='learner'?'Overview: private state at both endpoints is visible.':`${role.toUpperCase()} KNOWS: ${data.known[role].join(', ')||'no exchange objects yet'} · ${data.known[role].includes('K')?'K: Known':'K: Unknown'} · ${data.known[role].includes('dk')?'dk: Known':'dk: Unknown'}`;
+    if(role==='eve'){
+      const source=data.sent.includes('K')?'captured directly':data.known.eve.includes('K')?'inferred from captured dk + c':'unavailable from the current capture';
+      document.getElementById('wire-observer-knowledge').textContent+=` · K source: ${source}.`;
+    }
     for(const token of tokens) token.disabled=data.sent.includes(token.dataset.wireToken);
   }
   try {

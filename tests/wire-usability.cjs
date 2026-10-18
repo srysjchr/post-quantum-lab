@@ -44,6 +44,15 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
  assert.equal(await page.locator('#wire-transcript li').count(),5);await reset();
  assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
+ // Eve's 3D overlay explains how K is known rather than implying it travelled.
+ await page.locator('#wire-perspectives [data-wire-observer="eve"]').click();
+ assert.match(await page.locator('#wire-observer-knowledge').innerText(),/K source: unavailable from the current capture/);
+ await send('dk','c');assert.match(await page.locator('#wire-observer-knowledge').innerText(),/K source: inferred from captured dk \+ c/);
+ await send('K');assert.match(await page.locator('#wire-observer-knowledge').innerText(),/K source: captured directly/);
+ assert.equal(await page.locator('#wire-transcript li').count(),3);
+ await page.locator('#wire-perspectives [data-wire-observer="bob"]').click();
+ assert.doesNotMatch(await page.locator('#wire-observer-knowledge').innerText(),/K source:/);
+ await reset();await page.locator('#wire-perspectives [data-wire-observer="learner"]').click();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');

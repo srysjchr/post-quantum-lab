@@ -224,3 +224,6 @@ Transcript entries now offer an accessible Inspect capture button that selects a
 
 ## Wire usability 4/8 - 2026-10-18
 Added Latest capture beside sequential inspection controls. Tested empty/single/current-latest disabled states and a five-object batch jump without retransmission. Existing inspection selection remains stable when further captures arrive.
+
+## Wire usability 5/8 - 2026-10-18
+Eve's 3D knowledge overlay now identifies whether K is unavailable, inferred from dk+c, or captured directly. Verified transitions, mixed exposure, observer changes and unchanged capture counts with the accumulated browser suite.
