@@ -34,6 +34,16 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#wire-transcript li').count(),2);
  await page.locator('[data-wire-capture="ek"] button').click();assert.equal(await page.inputValue('#wire-inspect'),'ek');
  assert.equal(await captureButton.getAttribute('aria-pressed'),'false');await reset();
+ // Jump to the latest capture after a batch, preserving evidence and disable states.
+ assert.equal(await page.locator('#wire-inspect-latest').count(),1);
+ assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
+ await send('ek');assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
+ await send('c','dk','K','traffic');assert.equal(await page.locator('#wire-inspect-latest').isEnabled(),true);
+ await page.locator('#wire-inspect-latest').click();assert.equal(await page.inputValue('#wire-inspect'),'traffic');
+ assert.match(await page.locator('#wire-inspection-position').innerText(),/Capture 5 of 5/);
+ assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
+ assert.equal(await page.locator('#wire-transcript li').count(),5);await reset();
+ assert.equal(await page.locator('#wire-inspect-latest').isDisabled(),true);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');

@@ -82,6 +82,7 @@ window.createWireBuilder = function () {
     $('wire-inspect').disabled=sent.size===0;$('wire-inspect').value=focus;
     $('wire-transcript').querySelectorAll('button[data-inspect-capture]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.inspectCapture===focus)));
     const focusIndex=[...sent].indexOf(focus);$('wire-inspect-prev').disabled=focusIndex<=0;$('wire-inspect-next').disabled=focusIndex<0||focusIndex===sent.size-1;
+    $('wire-inspect-latest').disabled=focusIndex<0||focusIndex===sent.size-1;
     $('wire-inspection-position').textContent=focusIndex<0?'No capture selected':`Capture ${focusIndex+1} of ${sent.size}`;
     const inspected=objects.find(object=>object.id===focus);
     $('wire-inspection').replaceChildren(...(inspected?[node('h4',inspected.name),node('p',inspected.direction),node('p',inspected.explanation),node('p','Inspection highlights the capture without sending another object or changing evidence.')]:[node('p','Send an object to inspect its origin, purpose and effect on the public transcript.')]));
@@ -109,6 +110,7 @@ window.createWireBuilder = function () {
   $('wire-reflect').onclick=()=>{if(reflectionTopic===null)return;const select=$('teach-topic');if(select.value!==String(reflectionTopic)){select.value=String(reflectionTopic);select.dispatchEvent(new Event('change',{bubbles:true}));}};
   function moveInspection(delta){const ids=[...sent],index=ids.indexOf(focus);if(ids[index+delta]){focus=ids[index+delta];render();}}
   $('wire-inspect-prev').onclick=()=>moveInspection(-1);$('wire-inspect-next').onclick=()=>moveInspection(1);
+  $('wire-inspect-latest').onclick=()=>{if(sent.size){focus=[...sent].at(-1);render();}};
   $('wire-clear-queued').onclick=()=>{queued.clear();render();};
   $('wire-inspect').onchange=()=>{focus=$('wire-inspect').value;render();};
   $('wire-send').onclick = () => transmit([...queued]);

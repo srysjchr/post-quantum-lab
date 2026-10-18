@@ -221,3 +221,6 @@ Added explicit evidence for each additionally inferred object: compromised dk to
 
 ## Wire usability 3/8 - 2026-10-18
 Transcript entries now offer an accessible Inspect capture button that selects and focuses the existing inspector, updates its 3D highlight, and marks the selected entry. Keyboard and pointer regressions passed without adding transmissions or changing knowledge.
+
+## Wire usability 4/8 - 2026-10-18
+Added Latest capture beside sequential inspection controls. Tested empty/single/current-latest disabled states and a five-object batch jump without retransmission. Existing inspection selection remains stable when further captures arrive.
