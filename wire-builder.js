@@ -53,6 +53,8 @@ window.createWireBuilder = function () {
     const known = knowledge();
     const inferred=known.eve.filter(id=>!sent.has(id));
     $('wire-eve-sources').textContent=`Eve knows ${known.eve.length} of ${objects.length} exchange objects: ${sent.size} directly captured, ${inferred.length} inferred${inferred.length?' ('+inferred.join(', ')+')':''}. Inferred knowledge does not add packets to the capture.`;
+    const reasons={ek:'ek: obtained from compromised dk in this model.',K:'K: recovered by decapsulating captured c with captured dk.',traffic:'Traffic key: derived from known K and agreed public context.'};
+    $('wire-eve-reasons').replaceChildren(...inferred.map(id=>node('li',reasons[id])));
     const baseline = knowledge(new Set(['ek','c']));
     $('wire-comparison-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge. Compare the Known/Unknown cells; reset starts a different exchange and cannot recall a real leak.':!sent.has('ek')||!sent.has('c')?'Incomplete public transcript. The reference includes both ek and c; an empty capture does not establish a working exchange.':'Same object knowledge as the public-only reference in this model. This alone does not prove a complete protocol secure.';
     const differences=[];

@@ -16,6 +16,15 @@ const assert=require('node:assert/strict');
  await send('c');assert.match(await page.locator('#wire-eve-sources').innerText(),/2 directly captured.*3 inferred/);
  await send('K');assert.match(await page.locator('#wire-eve-sources').innerText(),/3 directly captured.*2 inferred/);
  await reset();assert.match(await page.locator('#wire-eve-sources').innerText(),/0 directly captured.*0 inferred/);
+ // Explain only additional inferred objects, using the current capture as evidence.
+ assert.equal(await page.locator('#wire-eve-reasons').count(),1);
+ assert.equal(await page.locator('#wire-eve-reasons li').count(),0);
+ await send('dk','c');
+ assert.match(await page.locator('#wire-eve-reasons').innerText(),/ek:.*dk/);
+ assert.match(await page.locator('#wire-eve-reasons').innerText(),/K:.*captured c.*captured dk/);
+ assert.match(await page.locator('#wire-eve-reasons').innerText(),/Traffic key:.*K.*public context/);
+ await send('K','traffic');assert.equal(await page.locator('#wire-eve-reasons li').count(),1);
+ await reset();await send('traffic');assert.equal(await page.locator('#wire-eve-reasons li').count(),0);await reset();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');

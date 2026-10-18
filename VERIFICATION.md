@@ -215,3 +215,6 @@ All sixteen browser suites passed against the final product changes. The progres
 
 ## Wire usability 1/8 - 2026-10-18
 Added Eve's separate direct-capture and inferred-knowledge totals. The browser regression first failed for the absent summary, then passed for empty, dk-only, dk+c, mixed direct K, and reset states. No double-counting or inference-rule changes.
+
+## Wire usability 2/8 - 2026-10-18
+Added explicit evidence for each additionally inferred object: compromised dk to ek, dk+c to K, and K+public context to traffic key. Directly captured objects are excluded from this list. Verified failing/passing regression, mixed captures, traffic-only boundary, and reset.
