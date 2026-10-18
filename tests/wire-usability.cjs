@@ -25,6 +25,15 @@ const assert=require('node:assert/strict');
  assert.match(await page.locator('#wire-eve-reasons').innerText(),/Traffic key:.*K.*public context/);
  await send('K','traffic');assert.equal(await page.locator('#wire-eve-reasons li').count(),1);
  await reset();await send('traffic');assert.equal(await page.locator('#wire-eve-reasons li').count(),0);await reset();
+ // Inspect a transcript entry without retransmission, including keyboard use.
+ await send('ek','c');
+ const captureButton=page.locator('[data-wire-capture="c"] button');
+ assert.equal(await captureButton.count(),1);await captureButton.focus();await page.keyboard.press('Enter');
+ assert.equal(await page.inputValue('#wire-inspect'),'c');assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');
+ assert.equal(await captureButton.getAttribute('aria-pressed'),'true');
+ assert.equal(await page.locator('#wire-transcript li').count(),2);
+ await page.locator('[data-wire-capture="ek"] button').click();assert.equal(await page.inputValue('#wire-inspect'),'ek');
+ assert.equal(await captureButton.getAttribute('aria-pressed'),'false');await reset();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');

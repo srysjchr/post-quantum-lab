@@ -218,3 +218,6 @@ Added Eve's separate direct-capture and inferred-knowledge totals. The browser r
 
 ## Wire usability 2/8 - 2026-10-18
 Added explicit evidence for each additionally inferred object: compromised dk to ek, dk+c to K, and K+public context to traffic key. Directly captured objects are excluded from this list. Verified failing/passing regression, mixed captures, traffic-only boundary, and reset.
+
+## Wire usability 3/8 - 2026-10-18
+Transcript entries now offer an accessible Inspect capture button that selects and focuses the existing inspector, updates its 3D highlight, and marks the selected entry. Keyboard and pointer regressions passed without adding transmissions or changing knowledge.

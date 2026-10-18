@@ -80,6 +80,7 @@ window.createWireBuilder = function () {
     if(!sent.has(focus))focus=[...sent].at(-1)||'';
     $('wire-inspect').replaceChildren(...(sent.size?[...sent].map(id=>{const option=node('option',objects.find(object=>object.id===id).name);option.value=id;return option;}):[node('option','No captured objects yet')]));
     $('wire-inspect').disabled=sent.size===0;$('wire-inspect').value=focus;
+    $('wire-transcript').querySelectorAll('button[data-inspect-capture]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.inspectCapture===focus)));
     const focusIndex=[...sent].indexOf(focus);$('wire-inspect-prev').disabled=focusIndex<=0;$('wire-inspect-next').disabled=focusIndex<0||focusIndex===sent.size-1;
     $('wire-inspection-position').textContent=focusIndex<0?'No capture selected':`Capture ${focusIndex+1} of ${sent.size}`;
     const inspected=objects.find(object=>object.id===focus);
@@ -95,7 +96,9 @@ window.createWireBuilder = function () {
     selection.forEach(id => {
       sent.add(id); const object = objects.find(item => item.id === id), entry = document.createElement('li');
       entry.dataset.wireCapture = id; entry.append(node('strong', object.name), node('p', object.direction), node('p', object.explanation));
-      $('wire-transcript').append(entry);
+      const inspect=node('button',`Inspect capture ${id}`);inspect.type='button';inspect.dataset.inspectCapture=id;
+      inspect.onclick=()=>{focus=id;render();$('wire-inspect').scrollIntoView({block:'center'});$('wire-inspect').focus({preventScroll:true});};
+      entry.append(inspect);$('wire-transcript').append(entry);
     });
     selection.forEach(id => queued.delete(id));
     $('wire-feedback').textContent = ''; $('wire-feedback').className = '';
