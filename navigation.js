@@ -67,16 +67,20 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
     if(restoreMenu){$('exercise-navigation').scrollIntoView({block:'start'});$('exercise-picker').focus({preventScroll:true});}
   }
   window.addEventListener('hashchange',()=>openHash(true));
+  window.addEventListener('popstate',()=>{
+    const requested=Number(new URLSearchParams(location.search).get('chapter'));
+    const index=Number.isInteger(requested)&&requested>=1&&requested<=6?requested-1:0;
+    if(currentChapter()!==index){routing=true;try{selectChapter(index);}finally{routing=false;}}
+    openHash(true);
+  });
   window.revealLearningSection=reveal;
   sync();
   function chapterChanged(index, remember) {
-    // A deliberate chapter change must not reload an obsolete exercise route.
-    if (remember && !routing) {
-      let target;
-      try { target = $(decodeURIComponent(location.hash.slice(1))); } catch {}
-      if (target?.closest('[data-exercise-panel]')) {
-        history.replaceState(null, '', location.pathname + location.search);
-      }
+    if (remember) {
+      const url=new URL(location.href);url.searchParams.set('chapter',String(index+1));
+      let target;try{target=$(decodeURIComponent(location.hash.slice(1)));}catch{}
+      if(!routing&&target?.closest('[data-exercise-panel]'))url.hash='';
+      if(url.href!==location.href)history.replaceState(null,'',url.href);
     }
     if (active && exercises.find(([id]) => id === active)[3] && index !== 3) {
       wrappers.get(active).open = false;

@@ -170,3 +170,12 @@ The unsent-selection summary and clear action affect only queued selections, whi
 **Animate packet paths** can disable travel animations for the page session; system reduced motion takes precedence. Transmission, inference and evidence work identically with animation off or without WebGL. The on-demand glossary explains all five object symbols and the visual markers. Baseline differences have explicit text as well as color.
 
 When the current transcript supports a public-only or private-key-exposure explanation, a link opens the matching Teach It Back topic. Switching topics clears the other topic's selected claims as usual, while retaining optional notes and the wire experiment. A visit never completes a milestone. Run `node tests/wire-polish.cjs` for the complete usability flow, including keyboard, motion preference changes, preserved notes/evidence and four responsive widths.
+
+
+## Refinement checks
+
+Mixed direct-K and dk+c exposures describe both paths accurately. Baseline differences distinguish direct captures from inference, and queued private objects are explicitly labelled still local. Inspection includes the selected capture's position.
+
+The main scene suspends animation when offscreen, resumes on visibility and preserves manual pause/reduced-motion preferences. Exercise links preserve native tab order; disabled destinations focus the containing section. Browser Back to the menu restores picker focus without taking focus during initial loading. Chapter choices update the chapter query parameter, retaining other parameters, and reload/history restores the corresponding lesson. KEM exercise routing keeps its fragment while correcting the effective chapter.
+
+Run `node tests/wire-refinements.cjs` and `node tests/render-visibility.cjs` alongside the existing suites. The animation test measures scheduled callbacks across visible/offscreen/resumed/paused states rather than requiring specific frame rates.

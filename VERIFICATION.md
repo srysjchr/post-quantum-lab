@@ -207,3 +207,8 @@ Deep links preserve native and explicit tab order instead of assigning -1 to eve
 
 ## Small refinements 7/8 — 2026-10-18
 Browser Back to the empty exercise route now returns focus to the exercise picker. Initial page loading does not steal focus; Forward reopens/focuses the exercise. wire-refinements and source checks passed.
+
+## Small refinements 8/8 - 2026-10-18
+Chapter URLs now follow lesson selection and restore the effective lesson on reload and history navigation, retaining unrelated query parameters and KEM exercise routes. Queue explanations distinguish unsent selections from knowledge Eve already inferred.
+
+All sixteen browser suites passed against the final product changes. The progress corruption fixture now begins on a query-free route while retaining its original assertions; a complementary explicit-chapter plus corrupt-storage case also passed. JavaScript syntax and whitespace checks passed. Desktop and mobile queue/provenance screenshots were reviewed. Interface text remains English; no dependencies or persisted data were added.
