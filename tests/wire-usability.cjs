@@ -60,6 +60,16 @@ const assert=require('node:assert/strict');
  await page.locator('#wire-send-ek').click();assert.match(await page.locator('#wire-drop-target small').innerText(),/Both public objects sent/);
  assert.equal(await page.locator('[data-wire-capture="K"]').count(),0);await reset();
  await page.locator('#wire-send-ek').click();assert.match(await page.locator('#wire-drop-target small').innerText(),/Drop c here/);await reset();
+ // Native summary activation must keep the exercise picker in sync.
+ await page.locator('[data-exercise-panel="scenario-lab"] > summary').click();
+ await page.waitForFunction(()=>document.querySelector('[data-exercise-panel="scenario-lab"]').open);
+ assert.equal(await page.inputValue('#exercise-picker'),'scenario-lab');
+ await page.locator('[data-exercise-panel="teach-it-back"] > summary').focus();await page.keyboard.press('Enter');
+ await page.waitForFunction(()=>document.querySelector('[data-exercise-panel="teach-it-back"]').open);
+ assert.equal(await page.inputValue('#exercise-picker'),'teach-it-back');
+ // A delayed toggle must not overwrite a new menu selection the learner has not opened yet.
+ await page.selectOption('#exercise-picker','attack-playground');
+ await page.waitForTimeout(100);assert.equal(await page.inputValue('#exercise-picker'),'attack-playground');
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: wire usability and navigation refinements; no runtime or request errors.');

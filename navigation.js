@@ -46,6 +46,7 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
     previous.onclick=()=>open(exercises[index-1][0]);next.onclick=()=>open(exercises[index+1][0]);
     menu.onclick=()=>{$('exercise-navigation').scrollIntoView({block:'start'});$('exercise-picker').focus({preventScroll:true});};
     footer.append(previous,menu,next);wrapper.append(footer);wrappers.set(id,wrapper);
+    summary.addEventListener('click',()=>{if(!wrapper.open)$('exercise-picker').value=id;});
     wrapper.addEventListener('toggle',()=>{
       if(wrapper.open){if(exercises[index][3]&&currentChapter()!==3)selectChapter(3);wrappers.forEach(other=>{if(other!==wrapper)other.open=false;});active=id;sync();}
       else if(active===id){active=null;sync();}

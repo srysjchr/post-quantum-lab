@@ -230,3 +230,6 @@ Eve's 3D knowledge overlay now identifies whether K is unavailable, inferred fro
 
 ## Wire usability 6/8 - 2026-10-18
 The 3D public-channel target identifies remaining public objects and confirms when both are sent, instead of continuing to ask for a drop with no public tokens left. Tested both orders, reset, and queued K staying unsent.
+
+## Wire usability 7/8 - 2026-10-18
+Manual summary activation now updates the exercise picker synchronously. Pointer and Enter activation passed after reproducing the previous mismatch. Delayed toggle events still cannot overwrite a separate pending menu choice.
