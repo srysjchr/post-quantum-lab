@@ -241,3 +241,6 @@ Final verification: all seventeen browser suites passed against the final produc
 
 ## Learning continuity 1/8 - 2026-10-19
 Continue learning and saved exercise milestones now replace the current URL with the exercise destination while retaining chapter/query parameters. Browser regression reproduced the missing route, then passed for session capture preservation, checklist navigation and fresh-state reload into the selected exercise.
+
+## Learning continuity 2/8 - 2026-10-19
+Checklist rendering retains the focused milestone when another tab updates progress. Verified with a real chapter quiz completion in a shared storage context, plus cross-tab clear while focus is outside the checklist. The regression failed for lost focus before the fix; completion labels and storage updates remain intact.

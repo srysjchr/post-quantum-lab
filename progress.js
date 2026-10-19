@@ -30,6 +30,7 @@ window.createLearningProgress = function (selectChapter) {
   function go(target){const location={...target};selectChapter(location.chapter);window.revealLearningSection?.(location.section,true);const element=$(location.section);if(element){element.scrollIntoView({block:'start'});element.setAttribute('tabindex','-1');element.focus({preventScroll:true});}visit(location.section,location.chapter);}
   function complete(id){if(!ids.has(id)||state.completed.includes(id))return;state.completed.push(id);save();}
   function render(){
+    const focusedEntry=$('learning-checklist').contains(document.activeElement)?document.activeElement.dataset.progressId:null;
     const chapters=state.completed.filter(id=>id.startsWith('chapter-')).length;
     $('learning-summary').textContent=`${chapters} / 6 chapters · ${state.completed.length-chapters} / ${entries.length-6} exercise milestones completed`;
     $('learning-meter').max=entries.length;$('learning-meter').value=state.completed.length;
@@ -37,6 +38,7 @@ window.createLearningProgress = function (selectChapter) {
     const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back'};
     $('learning-resume-label').textContent=`Last location: ${state.last.section==='lesson-title'?entries[state.last.chapter].label:labels[state.last.section]||'Learning exercise'}. Experiments restart with fresh state.`;
     $('learning-checklist').replaceChildren(...entries.map(entry=>{const li=document.createElement('li'),button=document.createElement('button');button.textContent=`${state.completed.includes(entry.id)?'✓ Completed':'○ Not completed'} · ${entry.label}`;button.dataset.progressId=entry.id;button.onclick=()=>go(entry);li.append(button);return li;}));
+    if(focusedEntry)[...$('learning-checklist').querySelectorAll('button')].find(button=>button.dataset.progressId===focusedEntry)?.focus({preventScroll:true});
     document.querySelectorAll('[data-chapter]').forEach(button=>{const index=Number(button.dataset.chapter),done=state.completed.includes(`chapter-${index}`);button.dataset.completed=String(done);button.setAttribute('aria-label',`${entries[index].label}${done?' · completed':''}`);});
   }
   sections.forEach(section=>{const element=$(section);if(element)element.dataset.progressSection=section;});
