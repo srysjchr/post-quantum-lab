@@ -180,15 +180,15 @@ window.createLearningScene = function (container, fallback) {
     if(container.hasPointerCapture(pointer))container.releasePointerCapture(pointer);
   }
   const api = {
-    select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
-    set(name,value) { state[name]=value; if(name==='observer'&&state.mode==='kem'){root.rotation.set(0,0,0);participantCamera();} if (name==='noise') updateNoise(); else makeModel(); draw(); },
-    reset() { root.rotation.set(0,0,0); participantCamera(); draw(); },
+    select(mode) { cancelDrag(); state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
+    set(name,value) { cancelDrag(); state[name]=value; if(name==='observer'&&state.mode==='kem'){root.rotation.set(0,0,0);participantCamera();} if (name==='noise') updateNoise(); else makeModel(); draw(); },
+    reset() { cancelDrag(); root.rotation.set(0,0,0); participantCamera(); draw(); },
     togglePause() { userPaused=!userPaused; paused=userPaused||motion.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); }
   };
   document.getElementById('reset').addEventListener('click',api.reset);
   document.getElementById('pause').addEventListener('click',api.togglePause);
   motion.addEventListener('change',event => { paused=userPaused||event.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); });
-  document.addEventListener('visibilitychange',() => { if (document.hidden) { cancelAnimationFrame(frame); frame=0; } else schedule(); });
+  document.addEventListener('visibilitychange',() => { if (document.hidden) { cancelDrag(); cancelAnimationFrame(frame); frame=0; } else schedule(); });
   if (typeof IntersectionObserver === 'function') new IntersectionObserver(entries => {
     inViewport = entries.some(entry => entry.isIntersecting);
     if (inViewport) schedule();
@@ -200,10 +200,10 @@ window.createLearningScene = function (container, fallback) {
   }).observe(container);
   container.addEventListener('pointerdown',event => { if (!event.isPrimary || event.button!==0) return; dragging={id:event.pointerId,x:event.clientX,y:event.clientY}; container.setPointerCapture(event.pointerId); });
   container.addEventListener('pointermove',event => { if (!dragging || event.pointerId!==dragging.id) return; root.rotation.y+=(event.clientX-dragging.x)*0.006; root.rotation.x=THREE.MathUtils.clamp(root.rotation.x+(event.clientY-dragging.y)*0.004,-0.7,0.7); dragging.x=event.clientX;dragging.y=event.clientY;draw(); });
-  for (const event of ['pointerup','pointercancel','lostpointercapture']) container.addEventListener(event,()=>{dragging=null;});
+  for (const event of ['pointerup','pointercancel','lostpointercapture']) container.addEventListener(event,cancelDrag);
   container.addEventListener('keydown',event => { if(event.target!==container)return; if(event.key==='Escape'){event.preventDefault();cancelDrag();return;} if(event.key==='Home'){event.preventDefault();api.reset();return;} if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); if (event.key==='ArrowLeft') root.rotation.y-=0.15; if (event.key==='ArrowRight') root.rotation.y+=0.15; if (event.key==='ArrowUp') root.rotation.x=Math.max(-0.7,root.rotation.x-0.1); if (event.key==='ArrowDown') root.rotation.x=Math.min(0.7,root.rotation.x+0.1);draw(); });
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;fallback.hidden=false;fallback.textContent='The 3D context was interrupted. The lesson remains available while the browser restores it.';});
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();lost=true;cancelDrag();cancelAnimationFrame(frame);frame=0;fallback.hidden=false;fallback.textContent='The 3D context was interrupted. The lesson remains available while the browser restores it.';});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{lost=false;fallback.hidden=true;draw();schedule();});
-  window.addEventListener('pagehide',()=>{cancelAnimationFrame(frame);frame=0;});window.addEventListener('pageshow',schedule);
+  window.addEventListener('pagehide',()=>{cancelDrag();cancelAnimationFrame(frame);frame=0;});window.addEventListener('pageshow',schedule);
   syncPause(); return api;
 };

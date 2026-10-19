@@ -74,7 +74,31 @@ const assert=require('node:assert/strict');
  await page.locator('#scene').press('Escape');await page.mouse.move(x+65,y+35);
  assert.equal(await frame(),dragged,'Pointer motion after Escape must not rotate the view');
  await page.mouse.up();await page.locator('#scene').press('Home');assert.equal(await frame(),baseline);
- // MORE_CHECKS
+ assert.equal(await page.evaluate(()=>document.getElementById('scene').getBoundingClientRect().bottom+8<=document.querySelector('.canvas-footer').getBoundingClientRect().top),true,'The scene must leave room for its controls and focus outlines');
+ // Reset, chapter replacement and context loss must terminate stale pointer ownership.
+ const startDrag=async()=>{await page.locator('#scene').scrollIntoViewIfNeeded();const r=await page.locator('#scene').boundingBox();const point={x:r.x+r.width/2,y:r.y+r.height/2};await page.mouse.move(point.x,point.y);await page.mouse.down();await page.mouse.move(point.x+20,point.y+15);return point;};
+ let point=await startDrag();await page.locator('#reset').press('Enter');
+ const resetView=await frame();assert.equal(resetView,baseline);
+ await page.mouse.move(point.x+70,point.y+45);assert.equal(await frame(),resetView,'Reset must cancel the previous drag');await page.mouse.up();
+ point=await startDrag();await page.locator('[data-chapter="1"]').press('Enter');const nextView=await frame();
+ await page.mouse.move(point.x+80,point.y+45);assert.equal(await frame(),nextView,'A new chapter must not inherit pointer dragging');await page.mouse.up();
+ await page.locator('[data-chapter="0"]').press('Enter');
+ await page.evaluate(()=>document.getElementById('scene').addEventListener('pointerdown',e=>{window.mainPointer=e.pointerId;},{once:true}));
+ point=await startDrag();
+ assert.equal(await page.evaluate(()=>{const canvas=document.querySelector('#scene canvas');const gl=canvas.getContext('webgl2')||canvas.getContext('webgl');window.mainLoss=gl.getExtension('WEBGL_lose_context');return Boolean(window.mainLoss);}),true);
+ await page.evaluate(()=>window.mainLoss.loseContext());await page.waitForSelector('#fallback:not([hidden])');
+ assert.equal(await page.evaluate(()=>document.getElementById('scene').hasPointerCapture(window.mainPointer)),false,'Context loss must release the captured pointer');
+ await page.evaluate(()=>window.mainLoss.restoreContext());await page.waitForSelector('#fallback[hidden]',{state:'attached'});
+ const restored=await frame();await page.mouse.move(point.x+80,point.y+55);assert.equal(await frame(),restored);await page.mouse.up();
+ // Variable-length hints must not overlap the model or overflow narrow viewports.
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:950});await page.locator('#scene').scrollIntoViewIfNeeded();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Overflow at ${width}`);
+  assert.equal(await page.evaluate(()=>document.getElementById('scene').getBoundingClientRect().bottom+8<=document.querySelector('.canvas-footer').getBoundingClientRect().top),true,`Control overlap at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`continuity-${width}.png`)});
+ }
+ assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);
+
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');
  } finally {await browser.close();}

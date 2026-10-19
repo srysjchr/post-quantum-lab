@@ -187,3 +187,12 @@ Build the Wire separates directly captured objects from additional inferred know
 Inspect a capture from its transcript entry, use previous/next, or jump to the latest capture without transmitting again. The 3D drop target names remaining public objects. Opening an exercise from its summary keeps the picker and URL aligned; closing it clears its exercise fragment while retaining query parameters.
 
 Run `node tests/wire-usability.cjs` for knowledge provenance, non-mutating inspection, 3D guidance, pointer/keyboard summary activation, route reloads, reset behavior and four responsive widths.
+
+
+## Learning continuity and main scene controls
+
+Continue learning and saved exercise milestones keep a reloadable exercise URL without restoring in-progress experiment data. Cross-tab progress updates retain the focused checklist entry. Page-section links close the exercise and focus their destination; browser history restores the corresponding exercise or section.
+
+The main 3D model retains manual pause independently of system reduced motion. The motion status explains why animation is stopped, and the playback control stays disabled while reduced motion is active. Focus the model to rotate with arrow keys, reset with Home, or end a drag with Escape. Reset, chapter/model changes and context interruption release stale pointer ownership. The model, controls and motion hints occupy separate rows on narrow and wide layouts.
+
+Run `node tests/learning-continuity.cjs` for real cross-tab updates, reload/history, motion-policy transitions, rendered camera comparisons, pointer cancellation/context restoration and four responsive widths. Optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repository.

@@ -28,3 +28,6 @@
 .wire-motion{display:flex;align-items:center;gap:10px;min-height:44px;margin-top:10px}.wire-motion input{width:18px;height:18px;accent-color:#a6f4c5}
 
 #wire-glossary dt{font-weight:bold;color:#a6f4c5;margin-top:12px}#wire-glossary dd{margin:5px 0 12px;line-height:1.6;color:#a5b8cc}
+
+/* Keep the model, controls and variable-length motion hints in separate rows. */
+.visual{row-gap:12px}.visual #scene{position:relative;inset:auto;flex:1 0 300px;min-height:300px}.visual #scene canvas{position:absolute;inset:0}

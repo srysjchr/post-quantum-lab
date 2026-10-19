@@ -259,3 +259,10 @@ Home now resets the focused main 3D view, matching the wire scene's keyboard con
 
 ## Learning continuity 7/8 - 2026-10-19
 Escape ends a main-scene pointer drag and releases pointer capture while retaining its current orientation. Real pointer events and rendered canvas comparisons reproduced the former continued rotation, then verified cancellation and subsequent Home reset. Keyboard hints include Escape.
+
+## Learning continuity 8/8 - 2026-10-19
+Main-scene reset, model/chapter changes, hidden-page lifecycle and WebGL interruption release stale pointer ownership through the shared drag cancellation function. Real pointer tests verified reset and chapter replacement do not inherit dragging, and context loss releases capture before restoration. Removing reset cancellation deliberately reproduced the stale-drag failure; restoring it passed.
+
+The new status hint exposed a canvas/control overlap in the old fixed inset layout. The scene now participates in the visual column's flow with space between the model, controls and variable-length hints. Verified the overlap regression and inspected 320px mobile and 1440px desktop screenshots; four viewport widths passed.
+
+Final verification: all eighteen browser suites passed in the final run, including the new learning-continuity suite and every existing lesson, KEM, wire, progress, navigation and cryptographic demonstration regression. All root JavaScript syntax checks and git diff --check passed. Interface text remains English; no dependencies or persisted settings were added. Browser plugin not available; validation used bundled Playwright/Chromium and screenshots outside the repository.
