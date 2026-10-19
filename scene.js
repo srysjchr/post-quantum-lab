@@ -149,7 +149,7 @@ window.createLearningScene = function (container, fallback) {
       label(state.hybrid ? 'a specified protocol combiner matters' : 'vulnerable public-key math remains', [0,-2,0], '#9eb0c8',0.8);
       movingObject = ball([0,0,0.1],0.16,state.hybrid ? colors.mint : colors.orange);
     }
-    container.setAttribute('aria-label', `${state.mode} educational model. ${root.children.filter(object => object.userData.text).map(object => object.userData.text).join('. ')}. Drag or use arrow keys to rotate.`);
+    container.setAttribute('aria-label', `${state.mode} educational model. ${root.children.filter(object => object.userData.text).map(object => object.userData.text).join('. ')}. Drag or use arrow keys to rotate. Home resets the view.`);
   }
   function participantCamera() {
     const presets = {learner:[6.8,4.4,8.3],alice:[-7,4.4,7],bob:[7,4.4,7],eve:[0,5.5,10]};
@@ -197,7 +197,7 @@ window.createLearningScene = function (container, fallback) {
   container.addEventListener('pointerdown',event => { if (!event.isPrimary || event.button!==0) return; dragging={id:event.pointerId,x:event.clientX,y:event.clientY}; container.setPointerCapture(event.pointerId); });
   container.addEventListener('pointermove',event => { if (!dragging || event.pointerId!==dragging.id) return; root.rotation.y+=(event.clientX-dragging.x)*0.006; root.rotation.x=THREE.MathUtils.clamp(root.rotation.x+(event.clientY-dragging.y)*0.004,-0.7,0.7); dragging.x=event.clientX;dragging.y=event.clientY;draw(); });
   for (const event of ['pointerup','pointercancel','lostpointercapture']) container.addEventListener(event,()=>{dragging=null;});
-  container.addEventListener('keydown',event => { if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); if (event.key==='ArrowLeft') root.rotation.y-=0.15; if (event.key==='ArrowRight') root.rotation.y+=0.15; if (event.key==='ArrowUp') root.rotation.x=Math.max(-0.7,root.rotation.x-0.1); if (event.key==='ArrowDown') root.rotation.x=Math.min(0.7,root.rotation.x+0.1);draw(); });
+  container.addEventListener('keydown',event => { if(event.target!==container)return; if(event.key==='Home'){event.preventDefault();api.reset();return;} if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); if (event.key==='ArrowLeft') root.rotation.y-=0.15; if (event.key==='ArrowRight') root.rotation.y+=0.15; if (event.key==='ArrowUp') root.rotation.x=Math.max(-0.7,root.rotation.x-0.1); if (event.key==='ArrowDown') root.rotation.x=Math.min(0.7,root.rotation.x+0.1);draw(); });
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();lost=true;cancelAnimationFrame(frame);frame=0;fallback.hidden=false;fallback.textContent='The 3D context was interrupted. The lesson remains available while the browser restores it.';});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{lost=false;fallback.hidden=true;draw();schedule();});
   window.addEventListener('pagehide',()=>{cancelAnimationFrame(frame);frame=0;});window.addEventListener('pageshow',schedule);

@@ -60,6 +60,13 @@ const assert=require('node:assert/strict');
  assert.match(await page.locator('#scene-motion-note').innerText(),/Motion is paused/);
  await page.locator('#pause').click();await page.emulateMedia({reducedMotion:'reduce'});
  await page.waitForFunction(()=>document.getElementById('wire-animate').disabled);
+ // Home restores the actual rendered main camera after keyboard rotation.
+ await page.locator('#reset').click();await page.locator('#scene').focus();
+ const frame=async()=>require('node:crypto').createHash('sha256').update(await page.locator('#scene canvas').screenshot()).digest('hex');
+ const baseline=await frame();await page.locator('#scene').press('ArrowRight');
+ assert.notEqual(await frame(),baseline,'Arrow rotation must change the rendered model');
+ await page.locator('#scene').press('Home');assert.equal(await frame(),baseline,'Home must restore the original rendered view');
+ assert.match(await page.locator('#scene').getAttribute('aria-keyshortcuts'),/Home/);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');

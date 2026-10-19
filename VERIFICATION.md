@@ -253,3 +253,6 @@ Main-scene manual pause is now separate from the system motion preference. Verif
 
 ## Learning continuity 5/8 - 2026-10-19
 The main scene motion control is disabled while system reduced motion is active and has an accessible status explanation. Manual pause and enabled animation states also have clear English descriptions. Verified system-policy transitions and manual control without changing lesson operations.
+
+## Learning continuity 6/8 - 2026-10-19
+Home now resets the focused main 3D view, matching the wire scene's keyboard convention. Declared shortcuts and visible/accessibility hints describe the action. Canvas screenshot hashes verified that ArrowRight changes the rendered view and Home restores the original view with motion reduced.
