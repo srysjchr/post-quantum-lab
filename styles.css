@@ -31,3 +31,5 @@
 
 /* Keep the model, controls and variable-length motion hints in separate rows. */
 .visual{row-gap:12px}.visual #scene{position:relative;inset:auto;flex:1 0 300px;min-height:300px}.visual #scene canvas{position:absolute;inset:0}
+
+#learning-filter{display:block;box-sizing:border-box;width:100%;max-width:28rem;min-height:44px;margin:10px 0;background:#080e1c;color:#d9e7ee;border:1px solid #304759;border-radius:6px;padding:10px;font:inherit}

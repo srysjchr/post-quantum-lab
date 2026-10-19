@@ -284,3 +284,6 @@ Guided Mission milestone links select the named mission using its existing selec
 
 ## Milestone navigation 6/8 - 2026-10-19
 Attack milestones configure the matching action and replay freshness policy without preparing/running it or granting evidence. Mode changes use normal packet invalidation; same-mode reopening preserves a ready packet, including policy comparison on one replay packet. Verified all five milestone destinations, packet preservation and unchanged completion.
+
+## Milestone navigation 7/8 - 2026-10-19
+Added All/Unfinished/Completed checklist filters with result count and empty state. Filters are session UI only, not new saved metadata. A real cross-tab quiz completion verifies filtered counts and moves focus to the filter when its formerly focused unfinished entry disappears; other existing focus behavior is preserved.

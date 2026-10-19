@@ -37,8 +37,12 @@ window.createLearningProgress = function (selectChapter) {
     $('learning-storage').textContent=persistent?'Saved in this browser only. No account; no messages, keys, ciphertext or notes are stored.':'Storage is unavailable. New progress is session-only until this page closes.';
     const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back'};
     $('learning-resume-label').textContent=`Last location: ${state.last.section==='lesson-title'?entries[state.last.chapter].label:labels[state.last.section]||'Learning exercise'}. Experiments restart with fresh state.`;
-    $('learning-checklist').replaceChildren(...entries.map(entry=>{const li=document.createElement('li'),button=document.createElement('button');button.textContent=`${state.completed.includes(entry.id)?'✓ Completed':'○ Not completed'} · ${entry.label}`;button.dataset.progressId=entry.id;button.onclick=()=>go(entry);li.append(button);return li;}));
-    if(focusedEntry)[...$('learning-checklist').querySelectorAll('button')].find(button=>button.dataset.progressId===focusedEntry)?.focus({preventScroll:true});
+    const filter=$('learning-filter').value;
+    const visibleEntries=entries.filter(entry=>filter==='all'||(filter==='completed')===state.completed.includes(entry.id));
+    $('learning-filter-count').textContent=`Showing ${visibleEntries.length} of ${entries.length} milestones.`;
+    $('learning-empty').hidden=visibleEntries.length>0;
+    $('learning-checklist').replaceChildren(...visibleEntries.map(entry=>{const li=document.createElement('li'),button=document.createElement('button');button.textContent=`${state.completed.includes(entry.id)?'✓ Completed':'○ Not completed'} · ${entry.label}`;button.dataset.progressId=entry.id;button.onclick=()=>go(entry);li.append(button);return li;}));
+    if(focusedEntry)([...$('learning-checklist').querySelectorAll('button')].find(button=>button.dataset.progressId===focusedEntry)||$('learning-filter')).focus({preventScroll:true});
     document.querySelectorAll('[data-chapter]').forEach(button=>{const index=Number(button.dataset.chapter),done=state.completed.includes(`chapter-${index}`);button.dataset.completed=String(done);button.setAttribute('aria-label',`${entries[index].label}${done?' · completed':''}`);});
   }
   sections.forEach(section=>{const element=$(section);if(element)element.dataset.progressSection=section;});
@@ -47,6 +51,7 @@ window.createLearningProgress = function (selectChapter) {
   window.addEventListener('pqlab:completion',event=>complete(event.detail?.id));
   window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')complete('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))complete(type);});
   window.addEventListener('storage',event=>{if(event.key===key||event.key===null){state=decode(event.newValue);render();}});
+  $('learning-filter').onchange=render;
   $('learning-continue').onclick=()=>go(state.last);
   $('learning-clear').onclick=()=>{state=empty();try{localStorage.removeItem(key);}catch{persistent=false;}render();};
   render();

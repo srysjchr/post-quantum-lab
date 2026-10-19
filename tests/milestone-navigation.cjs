@@ -3,7 +3,8 @@ const assert=require('node:assert/strict');
 (async()=>{
  const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  try{
- const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];
+ const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+ const page=await context.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>errors.push(r.url()));page.on('response',r=>{if(r.status()>=400)errors.push(r.url());});
  const root=process.env.TEST_URL||'http://127.0.0.1:8766/';
  await page.goto(root+'?chapter=4&view=compact#scenario-lab');await page.waitForSelector('#scenario-form button');
@@ -52,6 +53,20 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#attack-wire').innerText(),replayPacket);assert.equal(await page.locator('#attack-run').isEnabled(),true);
  await milestone('drop-observed');assert.equal(await page.inputValue('#attack-mode'),'drop');assert.equal(await page.locator('#attack-run').isDisabled(),true);
  await milestone('untrusted-blocked');assert.equal(await page.inputValue('#attack-mode'),'substitute');assert.deepEqual(await completed(),[]);
+ // Completion filters keep focus usable when another tab removes an unfinished item.
+ assert.equal(await page.locator('#learning-filter').count(),1);
+ await page.selectOption('#learning-filter','completed');assert.equal(await page.locator('#learning-checklist li').count(),0);
+ assert.equal(await page.locator('#learning-empty').isVisible(),true);
+ await page.selectOption('#learning-filter','unfinished');assert.equal(await page.locator('#learning-checklist li').count(),30);
+ await page.locator('[data-progress-id="chapter-0"]').focus();
+ const other=await context.newPage();await other.goto(root);await other.waitForSelector('#answers input');
+ const correct=await other.evaluate(()=>LESSONS[0].correct);await other.check(`#answers input[value="${correct}"]`);await other.locator('#quiz button').click();
+ await page.waitForFunction(()=>document.querySelector('[data-chapter="0"]').dataset.completed==='true');
+ assert.equal(await page.inputValue('#learning-filter'),'unfinished');assert.equal(await page.locator('#learning-checklist li').count(),29);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'learning-filter');await other.close();
+ await page.selectOption('#learning-filter','completed');assert.equal(await page.locator('#learning-checklist li').count(),1);
+ assert.match(await page.locator('#learning-filter-count').innerText(),/1 of 30/);
+ await page.selectOption('#learning-filter','all');assert.equal(await page.locator('#learning-checklist li').count(),30);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}
