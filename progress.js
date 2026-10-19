@@ -27,7 +27,7 @@ window.createLearningProgress = function (selectChapter) {
   try{state=decode(localStorage.getItem(key));}catch{persistent=false;}
   function save(){if(persistent)try{localStorage.setItem(key,JSON.stringify(state));}catch{persistent=false;}render();}
   function visit(section,chapter=currentChapter){if(!sections.has(section))return;if(state.last.section===section&&state.last.chapter===chapter)return;state.last={chapter,section};save();}
-  function go(target){const location={...target};selectChapter(location.chapter);window.revealLearningSection?.(location.section);const element=$(location.section);if(element){element.scrollIntoView({block:'start'});element.setAttribute('tabindex','-1');element.focus({preventScroll:true});}visit(location.section,location.chapter);}
+  function go(target){const location={...target};selectChapter(location.chapter);window.revealLearningSection?.(location.section,true);const element=$(location.section);if(element){element.scrollIntoView({block:'start'});element.setAttribute('tabindex','-1');element.focus({preventScroll:true});}visit(location.section,location.chapter);}
   function complete(id){if(!ids.has(id)||state.completed.includes(id))return;state.completed.push(id);save();}
   function render(){
     const chapters=state.completed.filter(id=>id.startsWith('chapter-')).length;

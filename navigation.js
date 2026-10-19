@@ -20,14 +20,16 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
     $('exercise-current').textContent=index<0?'Choose an exercise, or follow the recommended path.':`EXERCISE ${index+1} / ${exercises.length} · ${exercises[index][1]}`;
     $('exercise-prev').disabled=index<=0;$('exercise-next').disabled=index<0||index===exercises.length-1;
   }
-  function reveal(section){
+  function reveal(section,updateUrl=false){
     const element=$(section);if(!element)return false;
     const wrapper=element.closest('[data-exercise-panel]');if(!wrapper)return false;
     const entry=exercises.find(([id])=>id===wrapper.dataset.exercisePanel);
     if(entry[3]&&currentChapter()!==3){routing=true;try{selectChapter(3);}finally{routing=false;}}
     wrappers.forEach(other=>{other.open=other===wrapper;});
     // Only an explicit open updates the picker; delayed toggle events must not overwrite a learner's selection.
-    active=entry[0];$('exercise-picker').value=active;sync();return true;
+    active=entry[0];$('exercise-picker').value=active;sync();
+    if(updateUrl&&location.hash!==`#${section}`)history.replaceState(null,'',`#${section}`);
+    return true;
   }
   function open(section,updateUrl=true){
     if(!reveal(section))return;
