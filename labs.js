@@ -168,6 +168,10 @@ window.createPracticeLabs = function () {
     mission = Number($('mission-select').value); evidence.clear(); missionComplete = false;
     $('mission-feedback').textContent = ''; $('mission-hints').open = false; renderMission();
   };
+  window.addEventListener('pqlab:milestone-open',event=>{
+    const target=missions.findIndex((_,index)=>event.detail?.id===`mission-${index}`);
+    if(target>=0&&target!==mission){$('mission-select').value=String(target);$('mission-select').dispatchEvent(new Event('change',{bubbles:true}));}
+  });
   $('mission-restart').onclick = () => {
     evidence.clear(); missionComplete = false; $('mission-feedback').textContent = ''; renderMission();
   };

@@ -34,6 +34,14 @@ const assert=require('node:assert/strict');
  await milestone('teach-0');assert.equal(await page.inputValue('#teach-topic'),'0');assert.equal(await page.inputValue('#teach-field-0'),'');
  assert.equal(await page.inputValue('#teach-notes'),'Session reflection only');assert.match(await page.locator('#teach-evidence').innerText(),/NOT READY/);
  assert.deepEqual(await completed(),[]);
+ // Mission milestones select their mission without skipping its experiment checklist.
+ await milestone('mission-2');assert.equal(await page.inputValue('#mission-select'),'2');
+ await page.check('#mission-options input[value="0"]');await milestone('mission-2');
+ assert.equal(await page.locator('#mission-options input[value="0"]').isChecked(),true);
+ await milestone('mission-1');assert.equal(await page.inputValue('#mission-select'),'1');
+ assert.equal(await page.locator('#mission-options input:checked').count(),0);
+ await page.locator('#mission-form button').click();assert.match(await page.locator('#mission-feedback').innerText(),/Complete both experiment steps/);
+ assert.deepEqual(await completed(),[]);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}

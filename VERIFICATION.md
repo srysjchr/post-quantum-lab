@@ -278,3 +278,6 @@ Protocol repair milestones now select the corresponding defect case. Reopening t
 
 ## Milestone navigation 4/8 - 2026-10-19
 Teach It Back milestones select the matching explanation topic through its existing change behavior. Same-topic pending claims and optional session notes survive reopening; different-topic claims reset normally. Verified no evidence or completion is manufactured by a milestone visit.
+
+## Milestone navigation 5/8 - 2026-10-19
+Guided Mission milestone links select the named mission using its existing selection path. Same-mission reflection choices remain; different missions start fresh evidence as documented. Exact mission selection, pending-choice preservation and experiment-first gating passed in the browser.
