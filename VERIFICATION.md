@@ -266,3 +266,6 @@ Main-scene reset, model/chapter changes, hidden-page lifecycle and WebGL interru
 The new status hint exposed a canvas/control overlap in the old fixed inset layout. The scene now participates in the visual column's flow with space between the model, controls and variable-length hints. Verified the overlap regression and inspected 320px mobile and 1440px desktop screenshots; four viewport widths passed.
 
 Final verification: all eighteen browser suites passed in the final run, including the new learning-continuity suite and every existing lesson, KEM, wire, progress, navigation and cryptographic demonstration regression. All root JavaScript syntax checks and git diff --check passed. Interface text remains English; no dependencies or persisted settings were added. Browser plugin not available; validation used bundled Playwright/Chromium and screenshots outside the repository.
+
+## Milestone navigation 1/8 - 2026-10-19
+Saved chapter and AES milestones now align their page fragment as well as their chapter, closing any open exercise. Reproduced the stale/empty fragment, then verified chapter reload, preserved unrelated query parameters, AES destination and no completion awarded by navigation.

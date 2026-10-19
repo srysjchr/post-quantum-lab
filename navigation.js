@@ -22,7 +22,11 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   }
   function reveal(section,updateUrl=false){
     const element=$(section);if(!element)return false;
-    const wrapper=element.closest('[data-exercise-panel]');if(!wrapper)return false;
+    const wrapper=element.closest('[data-exercise-panel]');
+    if(!wrapper){
+      if(updateUrl){wrappers.forEach(panel=>{panel.open=false;});active=null;sync();if(location.hash!==`#${section}`)history.replaceState(null,'',`#${section}`);}
+      return false;
+    }
     const entry=exercises.find(([id])=>id===wrapper.dataset.exercisePanel);
     if(entry[3]&&currentChapter()!==3){routing=true;try{selectChapter(3);}finally{routing=false;}}
     wrappers.forEach(other=>{other.open=other===wrapper;});
