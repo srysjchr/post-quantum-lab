@@ -50,6 +50,16 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true');
  await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);
  assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'false','Automatic pause resumes when motion is allowed');
+ // The main motion control explains system policy and cannot start animation while reduced.
+ await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.getElementById('wire-animate').disabled);
+ assert.equal(await page.locator('#pause').isDisabled(),true);
+ assert.match(await page.locator('#scene-motion-note').innerText(),/System reduced motion is active/);
+ assert.equal(await page.locator('#pause').getAttribute('aria-describedby'),'scene-motion-note');
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);
+ assert.equal(await page.locator('#pause').isEnabled(),true);await page.locator('#pause').click();
+ assert.match(await page.locator('#scene-motion-note').innerText(),/Motion is paused/);
+ await page.locator('#pause').click();await page.emulateMedia({reducedMotion:'reduce'});
+ await page.waitForFunction(()=>document.getElementById('wire-animate').disabled);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');

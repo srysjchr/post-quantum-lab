@@ -170,7 +170,11 @@ window.createLearningScene = function (container, fallback) {
     draw(); frame = requestAnimationFrame(animate);
   }
   function schedule() { if (!frame && !paused && !document.hidden && !lost && inViewport) { lastTime = 0; frame = requestAnimationFrame(animate); } }
-  function syncPause() { const button=document.getElementById('pause'); button.textContent=paused?'Play motion':'Pause motion'; button.setAttribute('aria-pressed',String(paused)); }
+  function syncPause() {
+    const button=document.getElementById('pause');button.disabled=motion.matches;
+    button.textContent=motion.matches?'Motion reduced':paused?'Play motion':'Pause motion';button.setAttribute('aria-pressed',String(paused));
+    document.getElementById('scene-motion-note').textContent=motion.matches?'System reduced motion is active. Manual rotation and lesson controls still work.':userPaused?'Motion is paused. Manual rotation and lesson controls still work.':'Automatic motion is on. Use Pause motion to stop it.';
+  }
   const api = {
     select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
     set(name,value) { state[name]=value; if(name==='observer'&&state.mode==='kem'){root.rotation.set(0,0,0);participantCamera();} if (name==='noise') updateNoise(); else makeModel(); draw(); },
