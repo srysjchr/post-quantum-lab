@@ -34,7 +34,10 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   function open(section,updateUrl=true){
     if(!reveal(section))return;
     if(updateUrl&&location.hash!==`#${section}`)history.pushState(null,'',`#${section}`);
-    const target=$(section);target.scrollIntoView({block:'start'});
+    focusSection($(section));
+  }
+  function focusSection(target){
+    target.scrollIntoView({block:'start'});
     const focusTarget=target.matches(':disabled')?target.closest('section')||target:target;
     if(focusTarget.tabIndex<0&&!focusTarget.hasAttribute('tabindex'))focusTarget.setAttribute('tabindex','-1');
     focusTarget.focus({preventScroll:true});
@@ -71,7 +74,13 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   });
   function openHash(restoreMenu=false){
     let section;try{section=decodeURIComponent(location.hash.slice(1));}catch{return;}
-    if(section){open(section,false);return;}
+    if(section){
+      const target=$(section);if(!target)return;
+      if(target.closest('[data-exercise-panel]')){open(section,false);return;}
+      wrappers.forEach(wrapper=>{wrapper.open=false;});active=null;sync();
+      if(restoreMenu)focusSection(target);
+      return;
+    }
     wrappers.forEach(wrapper=>{wrapper.open=false;});active=null;sync();
     if(restoreMenu){$('exercise-navigation').scrollIntoView({block:'start'});$('exercise-picker').focus({preventScroll:true});}
   }

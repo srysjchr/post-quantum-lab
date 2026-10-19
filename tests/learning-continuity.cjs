@@ -29,6 +29,15 @@ const assert=require('node:assert/strict');
  await page.locator('#learning-continue').focus();await other.locator('#learning-clear').click();
  await page.waitForFunction(()=>document.querySelector('[data-chapter="0"]').dataset.completed==='false');
  assert.equal(await page.evaluate(()=>document.activeElement.id),'learning-continue');await other.close();
+ // Leaving an exercise via a page link closes its panel and focuses the destination.
+ await page.locator('header a[href="#reference"]').click();await page.waitForURL('**#reference');
+ assert.equal(await page.locator('[data-exercise-panel][open]').count(),0);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'reference');
+ assert.match(await page.locator('#exercise-current').innerText(),/Choose an exercise/);
+ await page.goBack();await page.waitForFunction(()=>document.querySelector('[data-exercise-panel="double-encapsulation"]').open);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'double-encapsulation');
+ await page.goForward();await page.waitForFunction(()=>document.activeElement.id==='reference');
+ assert.equal(await page.locator('[data-exercise-panel][open]').count(),0);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');

@@ -244,3 +244,6 @@ Continue learning and saved exercise milestones now replace the current URL with
 
 ## Learning continuity 2/8 - 2026-10-19
 Checklist rendering retains the focused milestone when another tab updates progress. Verified with a real chapter quiz completion in a shared storage context, plus cross-tab clear while focus is outside the checklist. The regression failed for lost focus before the fix; completion labels and storage updates remain intact.
+
+## Learning continuity 3/8 - 2026-10-19
+Valid page-anchor navigation now closes the active exercise, clears its path status and focuses the page destination. Reference navigation and browser Back/Forward passed after reproducing the stale panel. Initial page anchors retain browser focus behavior; malformed/unknown destinations remain ignored.
