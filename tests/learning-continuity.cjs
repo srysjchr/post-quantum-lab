@@ -38,6 +38,18 @@ const assert=require('node:assert/strict');
  assert.equal(await page.evaluate(()=>document.activeElement.id),'double-encapsulation');
  await page.goForward();await page.waitForFunction(()=>document.activeElement.id==='reference');
  assert.equal(await page.locator('[data-exercise-panel][open]').count(),0);
+ // Manual pause survives changes to the system motion preference.
+ await page.goto(root+'?chapter=1');await page.waitForSelector('#rsa-product');
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);
+ await page.locator('#pause').click();assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true');
+ await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.getElementById('wire-animate').disabled);
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);
+ assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true','System changes must retain a manual pause');
+ await page.locator('#pause').click();assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'false');
+ await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>document.getElementById('wire-animate').disabled);
+ assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true');
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);
+ assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'false','Automatic pause resumes when motion is allowed');
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');

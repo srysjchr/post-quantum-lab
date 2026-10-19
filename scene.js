@@ -24,7 +24,7 @@ window.createLearningScene = function (container, fallback) {
   const state = { mode: 'rsa', noise: 2, phase: 0, algorithm: 'shor', hybrid: true, encrypted: false, rsa: { n: 323, p: 17, q: 19, revealed: false }, observer: 'learner' };
   let movingObject = null, observation = null, noiseLine = null, noiseArrow = null, time = 0, frame = 0, lastTime = 0, dragging = null, lost = false;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  let paused = motion.matches;
+  let userPaused = false, paused = motion.matches;
   let inViewport = typeof IntersectionObserver !== 'function';
   function material(color, opacity = 1) { return new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity }); }
   function ball(position, radius, color) {
@@ -175,11 +175,11 @@ window.createLearningScene = function (container, fallback) {
     select(mode) { state.mode=mode; camera.zoom=container.clientWidth<500?0.95:(mode==='lattice'?1.5:1.05);camera.updateProjectionMatrix(); root.rotation.set(0,0,0); participantCamera(); time=0; makeModel(); draw(); schedule(); },
     set(name,value) { state[name]=value; if(name==='observer'&&state.mode==='kem'){root.rotation.set(0,0,0);participantCamera();} if (name==='noise') updateNoise(); else makeModel(); draw(); },
     reset() { root.rotation.set(0,0,0); participantCamera(); draw(); },
-    togglePause() { paused=!paused; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); }
+    togglePause() { userPaused=!userPaused; paused=userPaused||motion.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); }
   };
   document.getElementById('reset').addEventListener('click',api.reset);
   document.getElementById('pause').addEventListener('click',api.togglePause);
-  motion.addEventListener('change',event => { paused=event.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); });
+  motion.addEventListener('change',event => { paused=userPaused||event.matches; if (paused) { cancelAnimationFrame(frame); frame=0; } syncPause(); schedule(); });
   document.addEventListener('visibilitychange',() => { if (document.hidden) { cancelAnimationFrame(frame); frame=0; } else schedule(); });
   if (typeof IntersectionObserver === 'function') new IntersectionObserver(entries => {
     inViewport = entries.some(entry => entry.isIntersecting);

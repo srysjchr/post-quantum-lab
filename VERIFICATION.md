@@ -247,3 +247,6 @@ Checklist rendering retains the focused milestone when another tab updates progr
 
 ## Learning continuity 3/8 - 2026-10-19
 Valid page-anchor navigation now closes the active exercise, clears its path status and focuses the page destination. Reference navigation and browser Back/Forward passed after reproducing the stale panel. Initial page anchors retain browser focus behavior; malformed/unknown destinations remain ignored.
+
+## Learning continuity 4/8 - 2026-10-19
+Main-scene manual pause is now separate from the system motion preference. Verified that manual pause survives reduce/on-off changes, while a system-only pause resumes when motion is permitted. The browser regression reproduced the previous unwanted resume before the fix.
