@@ -45,6 +45,10 @@ window.createTeachBack = function (readWire) {
     $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true; evidence();
   }
   $('teach-topic').onchange = () => { topic = Number($('teach-topic').value); render(); };
+  window.addEventListener('pqlab:milestone-open',event=>{
+    const target=topics.findIndex((_,index)=>event.detail?.id===`teach-${index}`);
+    if(target>=0&&target!==topic){$('teach-topic').value=String(target);$('teach-topic').dispatchEvent(new Event('change',{bubbles:true}));}
+  });
   $('teach-form').onchange = () => { $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true; };
   $('teach-form').onsubmit = event => {
     event.preventDefault();

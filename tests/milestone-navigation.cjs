@@ -27,6 +27,13 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('[data-repair-control="kem"]').isChecked(),true);
  await milestone('repair-1');assert.match(await page.locator('#repair-count').innerText(),/CASE 2 \/ 4/);
  assert.equal(await page.locator('#repair-options input:checked').count(),0);assert.deepEqual(await completed(),[]);
+ // Teach It Back milestones open their topic and keep optional notes local.
+ await milestone('teach-2');assert.equal(await page.inputValue('#teach-topic'),'2');
+ await page.fill('#teach-notes','Session reflection only');await page.selectOption('#teach-field-0','valid');
+ await milestone('teach-2');assert.equal(await page.inputValue('#teach-field-0'),'valid');
+ await milestone('teach-0');assert.equal(await page.inputValue('#teach-topic'),'0');assert.equal(await page.inputValue('#teach-field-0'),'');
+ assert.equal(await page.inputValue('#teach-notes'),'Session reflection only');assert.match(await page.locator('#teach-evidence').innerText(),/NOT READY/);
+ assert.deepEqual(await completed(),[]);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}

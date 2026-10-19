@@ -275,3 +275,6 @@ Scenario checklist entries open their exact scenario through a validated milesto
 
 ## Milestone navigation 3/8 - 2026-10-19
 Protocol repair milestones now select the corresponding defect case. Reopening the same case keeps its patch selection; changing cases uses the normal fresh configuration. Browser regression reproduced the old Case 1 default and verified exact destinations with no solved/completion credit from navigation.
+
+## Milestone navigation 4/8 - 2026-10-19
+Teach It Back milestones select the matching explanation topic through its existing change behavior. Same-topic pending claims and optional session notes survive reopening; different-topic claims reset normally. Verified no evidence or completion is manufactured by a milestone visit.
