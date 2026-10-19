@@ -56,5 +56,9 @@ window.createProtocolRepair = function () {
   $('repair-prev').onclick = () => { index--; render(); };
   $('repair-next').onclick = () => { index++; render(); };
   $('repair-reset').onclick = () => { index = 0; solved.clear(); render(); };
+  window.addEventListener('pqlab:milestone-open',event=>{
+    const target=cases.findIndex((_,caseIndex)=>event.detail?.id===`repair-${caseIndex}`);
+    if(target>=0&&target!==index){index=target;render();}
+  });
   render();
 };

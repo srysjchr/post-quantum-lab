@@ -272,3 +272,6 @@ Saved chapter and AES milestones now align their page fragment as well as their 
 
 ## Milestone navigation 2/8 - 2026-10-19
 Scenario checklist entries open their exact scenario through a validated milestone-navigation event. A different scenario starts its normal fresh answer state; reopening the current scenario preserves its pending answer. Verified the previously incorrect Scenario 3 destination and that navigation awards no completion.
+
+## Milestone navigation 3/8 - 2026-10-19
+Protocol repair milestones now select the corresponding defect case. Reopening the same case keeps its patch selection; changing cases uses the normal fresh configuration. Browser regression reproduced the old Case 1 default and verified exact destinations with no solved/completion credit from navigation.

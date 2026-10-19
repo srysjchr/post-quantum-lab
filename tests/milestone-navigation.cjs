@@ -21,6 +21,12 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#scenario-options input[value="2"]').isChecked(),true);
  await milestone('scenario-0');assert.match(await page.locator('#scenario-count').innerText(),/SCENARIO 1 \/ 3/);
  assert.equal(await page.locator('#scenario-options input:checked').count(),0);assert.deepEqual(await completed(),[]);
+ // Protocol repair milestones select their case without awarding a patch.
+ await milestone('repair-3');assert.match(await page.locator('#repair-count').innerText(),/CASE 4 \/ 4/);
+ await page.check('[data-repair-control="kem"]');await milestone('repair-3');
+ assert.equal(await page.locator('[data-repair-control="kem"]').isChecked(),true);
+ await milestone('repair-1');assert.match(await page.locator('#repair-count').innerText(),/CASE 2 \/ 4/);
+ assert.equal(await page.locator('#repair-options input:checked').count(),0);assert.deepEqual(await completed(),[]);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}
