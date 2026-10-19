@@ -15,6 +15,12 @@ const assert=require('node:assert/strict');
  await page.reload();await page.waitForSelector('[data-chapter="2"][aria-pressed="true"]');
  await milestone('aes');assert.equal(new URL(page.url()).hash,'#interaction');assert.equal(new URL(page.url()).searchParams.get('chapter'),'5');
  assert.equal(await page.locator('#message').isVisible(),true);assert.deepEqual(await completed(),[]);
+ // Scenario milestones select the named scenario; revisiting it retains a pending answer.
+ await milestone('scenario-2');assert.match(await page.locator('#scenario-count').innerText(),/SCENARIO 3 \/ 3/);
+ await page.check('#scenario-options input[value="2"]');await milestone('scenario-2');
+ assert.equal(await page.locator('#scenario-options input[value="2"]').isChecked(),true);
+ await milestone('scenario-0');assert.match(await page.locator('#scenario-count').innerText(),/SCENARIO 1 \/ 3/);
+ assert.equal(await page.locator('#scenario-options input:checked').count(),0);assert.deepEqual(await completed(),[]);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}

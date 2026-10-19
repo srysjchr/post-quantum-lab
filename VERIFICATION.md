@@ -269,3 +269,6 @@ Final verification: all eighteen browser suites passed in the final run, includi
 
 ## Milestone navigation 1/8 - 2026-10-19
 Saved chapter and AES milestones now align their page fragment as well as their chapter, closing any open exercise. Reproduced the stale/empty fragment, then verified chapter reload, preserved unrelated query parameters, AES destination and no completion awarded by navigation.
+
+## Milestone navigation 2/8 - 2026-10-19
+Scenario checklist entries open their exact scenario through a validated milestone-navigation event. A different scenario starts its normal fresh answer state; reopening the current scenario preserves its pending answer. Verified the previously incorrect Scenario 3 destination and that navigation awards no completion.

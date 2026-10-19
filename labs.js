@@ -45,6 +45,10 @@ window.createPracticeLabs = function () {
   $('scenario-prev').onclick = () => { scenario--; renderScenario(); };
   $('scenario-next').onclick = () => { scenario++; renderScenario(); };
   $('scenario-reset').onclick = () => { scenario = 0; solved.clear(); renderScenario(); };
+  window.addEventListener('pqlab:milestone-open',event=>{
+    const target=scenarios.findIndex((_,index)=>event.detail?.id===`scenario-${index}`);
+    if(target>=0&&target!==scenario){scenario=target;renderScenario();}
+  });
   renderScenario();
 
   const attacks = {
