@@ -287,3 +287,8 @@ Attack milestones configure the matching action and replay freshness policy with
 
 ## Milestone navigation 7/8 - 2026-10-19
 Added All/Unfinished/Completed checklist filters with result count and empty state. Filters are session UI only, not new saved metadata. A real cross-tab quiz completion verifies filtered counts and moves focus to the filter when its formerly focused unfinished entry disappears; other existing focus behavior is preserved.
+
+## Milestone navigation 8/8 - 2026-10-19
+Added Open next unfinished step using the existing checklist order and completion metadata, independent of its display filter. Real quiz completions advanced through chapters, then a real scenario completion advanced to the matching next scenario. A valid all-completed profile verified the disabled terminal state; clearing progress restores the next-step action. Opening a destination never completes it.
+
+Final verification: all nineteen browser suites passed in the final run, including exact milestone destinations, same-part pending work, evidence gates, real cross-tab filter focus, completion history, existing KEM/3D/cryptographic demonstrations and fallback paths. Root JavaScript syntax and whitespace checks passed. Reviewed 320px mobile and 1440px desktop progress screenshots; 320/390/768/1440 widths passed. All interface text remains English, with no new dependencies or persisted profile fields. Browser plugin not available; bundled Playwright/Chromium was used, with screenshots outside the repository.

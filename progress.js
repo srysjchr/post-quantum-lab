@@ -27,12 +27,22 @@ window.createLearningProgress = function (selectChapter) {
   try{state=decode(localStorage.getItem(key));}catch{persistent=false;}
   function save(){if(persistent)try{localStorage.setItem(key,JSON.stringify(state));}catch{persistent=false;}render();}
   function visit(section,chapter=currentChapter){if(!sections.has(section))return;if(state.last.section===section&&state.last.chapter===chapter)return;state.last={chapter,section};save();}
-  function go(target){const location={...target};selectChapter(location.chapter);window.revealLearningSection?.(location.section,true);if(ids.has(location.id))window.dispatchEvent(new CustomEvent('pqlab:milestone-open',{detail:{id:location.id}}));const element=$(location.section);if(element){element.scrollIntoView({block:'start'});element.setAttribute('tabindex','-1');element.focus({preventScroll:true});}visit(location.section,location.chapter);}
+  function go(target){
+    const destination={...target};selectChapter(destination.chapter);
+    window.revealLearningSection?.(destination.section,true);
+    if(ids.has(destination.id))window.dispatchEvent(new CustomEvent('pqlab:milestone-open',{detail:{id:destination.id}}));
+    const element=$(destination.section);
+    if(element){element.scrollIntoView({block:'start'});element.setAttribute('tabindex','-1');element.focus({preventScroll:true});}
+    visit(destination.section,destination.chapter);
+  }
+  const nextUnfinished=()=>entries.find(entry=>!state.completed.includes(entry.id));
   function complete(id){if(!ids.has(id)||state.completed.includes(id))return;state.completed.push(id);save();}
   function render(){
     const focusedEntry=$('learning-checklist').contains(document.activeElement)?document.activeElement.dataset.progressId:null;
     const chapters=state.completed.filter(id=>id.startsWith('chapter-')).length;
     $('learning-summary').textContent=`${chapters} / 6 chapters · ${state.completed.length-chapters} / ${entries.length-6} exercise milestones completed`;
+    const nextEntry=nextUnfinished();$('learning-next').disabled=!nextEntry;
+    $('learning-next-label').textContent=nextEntry?`Next unfinished: ${nextEntry.label}. Opening a step does not mark it complete.`:`All ${entries.length} milestones completed. Revisit any chapter or exercise from the checklist.`;
     $('learning-meter').max=entries.length;$('learning-meter').value=state.completed.length;
     $('learning-storage').textContent=persistent?'Saved in this browser only. No account; no messages, keys, ciphertext or notes are stored.':'Storage is unavailable. New progress is session-only until this page closes.';
     const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back'};
@@ -51,6 +61,7 @@ window.createLearningProgress = function (selectChapter) {
   window.addEventListener('pqlab:completion',event=>complete(event.detail?.id));
   window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')complete('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))complete(type);});
   window.addEventListener('storage',event=>{if(event.key===key||event.key===null){state=decode(event.newValue);render();}});
+  $('learning-next').onclick=()=>{const nextEntry=nextUnfinished();if(nextEntry)go(nextEntry);};
   $('learning-filter').onchange=render;
   $('learning-continue').onclick=()=>go(state.last);
   $('learning-clear').onclick=()=>{state=empty();try{localStorage.removeItem(key);}catch{persistent=false;}render();};

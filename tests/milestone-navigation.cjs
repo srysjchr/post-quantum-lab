@@ -67,7 +67,31 @@ const assert=require('node:assert/strict');
  await page.selectOption('#learning-filter','completed');assert.equal(await page.locator('#learning-checklist li').count(),1);
  assert.match(await page.locator('#learning-filter-count').innerText(),/1 of 30/);
  await page.selectOption('#learning-filter','all');assert.equal(await page.locator('#learning-checklist li').count(),30);
- // MORE_CHECKS
+ // Next unfinished follows completion history rather than the active filter.
+ assert.equal(await page.locator('#learning-next').count(),1);await page.locator('#learning-next').click();
+ assert.equal(await page.locator('[data-chapter="1"]').getAttribute('aria-pressed'),'true');assert.equal(new URL(page.url()).hash,'#lesson-title');
+ assert.deepEqual(await completed(),['chapter-0']);
+ for(let index=1;index<6;index++){await page.locator(`[data-chapter="${index}"]`).click();const answer=await page.evaluate(index=>LESSONS[index].correct,index);await page.check(`#answers input[value="${answer}"]`);await page.locator('#quiz button').click();}
+ await page.locator('#learning-next').click();assert.match(await page.locator('#scenario-count').innerText(),/^SCENARIO 1/);
+ await page.check('#scenario-options input[value="0"]');await page.locator('#scenario-form button').click();await page.locator('#learning-next').click();
+ assert.match(await page.locator('#scenario-count').innerText(),/^SCENARIO 2/);assert.equal((await completed()).length,7);
+ // Restore a valid all-complete profile to check the terminal state.
+ const allIds=await page.locator('#learning-checklist button').evaluateAll(buttons=>buttons.map(button=>button.dataset.progressId));
+ await page.evaluate(ids=>{const key='post-quantum-lab.progress.v1',state=JSON.parse(localStorage.getItem(key));state.completed=ids;localStorage.setItem(key,JSON.stringify(state));},allIds);
+ await page.reload();await page.waitForSelector('#learning-next');assert.equal(await page.locator('#learning-next').isDisabled(),true);
+ assert.match(await page.locator('#learning-next-label').innerText(),/All 30 milestones completed/);
+ await page.locator('#learning-clear').click();assert.equal(await page.locator('#learning-next').isEnabled(),true);
+ // Progress controls remain usable at narrow widths and save metadata only.
+ await page.locator('#learning-progress details summary').click();
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:950});await page.selectOption('#learning-filter','unfinished');
+  await page.locator('#learning-progress').scrollIntoViewIfNeeded();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Progress overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`milestones-${width}.png`)});
+ }
+ assert.doesNotMatch(await page.evaluate(()=>localStorage.getItem('post-quantum-lab.progress.v1')||''),/Session reflection only|nonce|cipher|notes/);
+ assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);
+
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

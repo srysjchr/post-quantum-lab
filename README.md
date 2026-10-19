@@ -196,3 +196,12 @@ Continue learning and saved exercise milestones keep a reloadable exercise URL w
 The main 3D model retains manual pause independently of system reduced motion. The motion status explains why animation is stopped, and the playback control stays disabled while reduced motion is active. Focus the model to rotate with arrow keys, reset with Home, or end a drag with Escape. Reset, chapter/model changes and context interruption release stale pointer ownership. The model, controls and motion hints occupy separate rows on narrow and wide layouts.
 
 Run `node tests/learning-continuity.cjs` for real cross-tab updates, reload/history, motion-policy transitions, rendered camera comparisons, pointer cancellation/context restoration and four responsive widths. Optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repository.
+
+
+## Find the next learning step
+
+The completion checklist can show all, unfinished, or completed milestones with an explicit empty state and result count. Filters apply only to the current page session. Open next unfinished step follows the existing learning order and completion history, independently of the filter; visiting a destination does not award completion. The control becomes unavailable when all milestones are completed.
+
+Individual scenario, protocol-repair, explanation and mission entries select the matching part of the exercise. Attack entries select the corresponding action and replay policy without preparing or running the attack. Reopening the same part retains pending selections; switching parts follows the exercise's normal reset/evidence rules. Notes and experiment data are still never restored from learning metadata.
+
+Run `node tests/milestone-navigation.cjs` for precise destinations, preserved same-part work, evidence boundaries, real cross-tab completion/filter focus, next unfinished steps, completed-state handling and four responsive widths. Optional EVIDENCE_DIR saves mobile/desktop screenshots outside the repository.
