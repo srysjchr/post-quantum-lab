@@ -42,6 +42,16 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#mission-options input:checked').count(),0);
  await page.locator('#mission-form button').click();assert.match(await page.locator('#mission-feedback').innerText(),/Complete both experiment steps/);
  assert.deepEqual(await completed(),[]);
+ // Attack milestones configure the intended action/policy without running an attack.
+ await milestone('tamper-rejected');assert.equal(await page.inputValue('#attack-mode'),'tamper');assert.equal(await page.locator('#attack-run').isDisabled(),true);
+ await page.locator('#attack-prepare').click();await page.waitForFunction(()=>!document.getElementById('attack-run').disabled);
+ const packet=await page.locator('#attack-wire').innerText();await milestone('tamper-rejected');assert.equal(await page.locator('#attack-wire').innerText(),packet);
+ await milestone('replay-unguarded');assert.equal(await page.inputValue('#attack-mode'),'replay');assert.equal(await page.locator('#replay-policy').isChecked(),false);
+ await page.locator('#attack-prepare').click();await page.waitForFunction(()=>!document.getElementById('attack-run').disabled);
+ const replayPacket=await page.locator('#attack-wire').innerText();await milestone('replay-guarded');assert.equal(await page.locator('#replay-policy').isChecked(),true);
+ assert.equal(await page.locator('#attack-wire').innerText(),replayPacket);assert.equal(await page.locator('#attack-run').isEnabled(),true);
+ await milestone('drop-observed');assert.equal(await page.inputValue('#attack-mode'),'drop');assert.equal(await page.locator('#attack-run').isDisabled(),true);
+ await milestone('untrusted-blocked');assert.equal(await page.inputValue('#attack-mode'),'substitute');assert.deepEqual(await completed(),[]);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: precise milestone navigation and progress controls; no runtime or request errors.');
  }finally{await browser.close();}

@@ -281,3 +281,6 @@ Teach It Back milestones select the matching explanation topic through its exist
 
 ## Milestone navigation 5/8 - 2026-10-19
 Guided Mission milestone links select the named mission using its existing selection path. Same-mission reflection choices remain; different missions start fresh evidence as documented. Exact mission selection, pending-choice preservation and experiment-first gating passed in the browser.
+
+## Milestone navigation 6/8 - 2026-10-19
+Attack milestones configure the matching action and replay freshness policy without preparing/running it or granting evidence. Mode changes use normal packet invalidation; same-mode reopening preserves a ready packet, including policy comparison on one replay packet. Verified all five milestone destinations, packet preservation and unchanged completion.

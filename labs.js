@@ -84,6 +84,16 @@ window.createPracticeLabs = function () {
   }
   $('attack-mode').onchange = () => { mode = $('attack-mode').value; clearPacket(); };
   $('attack-reset').onclick = clearPacket;
+  const attackMilestones=new Map([
+    ['untrusted-blocked',['substitute']],['tamper-rejected',['tamper']],['drop-observed',['drop']],
+    ['replay-unguarded',['replay',false]],['replay-guarded',['replay',true]]
+  ]);
+  window.addEventListener('pqlab:milestone-open',event=>{
+    const target=attackMilestones.get(event.detail?.id);if(!target)return;
+    const [nextMode,policy]=target;
+    if(mode!==nextMode||busy){mode=nextMode;$('attack-mode').value=mode;clearPacket();}
+    if(policy!==undefined&&$('replay-policy').checked!==policy){$('replay-policy').checked=policy;$('replay-policy').dispatchEvent(new Event('change',{bubbles:true}));}
+  });
   $('replay-policy').onchange = () => { $('attack-result').textContent = 'Policy changed. Run the replay experiment again to compare.'; };
   $('attack-prepare').onclick = () => execute(async () => {
     if (!window.crypto?.subtle) throw new Error('Web Crypto requires HTTPS or localhost.');
