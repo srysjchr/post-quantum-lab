@@ -67,6 +67,13 @@ const assert=require('node:assert/strict');
  assert.notEqual(await frame(),baseline,'Arrow rotation must change the rendered model');
  await page.locator('#scene').press('Home');assert.equal(await frame(),baseline,'Home must restore the original rendered view');
  assert.match(await page.locator('#scene').getAttribute('aria-keyshortcuts'),/Home/);
+ // Escape ends an active pointer drag without changing the current view.
+ const bounds=await page.locator('#scene').boundingBox(),x=bounds.x+bounds.width/2,y=bounds.y+bounds.height/2;
+ await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+30,y+20);
+ const dragged=await frame();assert.notEqual(dragged,baseline);
+ await page.locator('#scene').press('Escape');await page.mouse.move(x+65,y+35);
+ assert.equal(await frame(),dragged,'Pointer motion after Escape must not rotate the view');
+ await page.mouse.up();await page.locator('#scene').press('Home');assert.equal(await frame(),baseline);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);
  console.log('PASS: learning continuity and main-scene accessibility; no runtime or request errors.');

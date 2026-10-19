@@ -256,3 +256,6 @@ The main scene motion control is disabled while system reduced motion is active 
 
 ## Learning continuity 6/8 - 2026-10-19
 Home now resets the focused main 3D view, matching the wire scene's keyboard convention. Declared shortcuts and visible/accessibility hints describe the action. Canvas screenshot hashes verified that ArrowRight changes the rendered view and Home restores the original view with motion reduced.
+
+## Learning continuity 7/8 - 2026-10-19
+Escape ends a main-scene pointer drag and releases pointer capture while retaining its current orientation. Real pointer events and rendered canvas comparisons reproduced the former continued rotation, then verified cancellation and subsequent Home reset. Keyboard hints include Escape.
