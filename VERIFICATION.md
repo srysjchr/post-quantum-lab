@@ -295,3 +295,6 @@ Final verification: all nineteen browser suites passed in the final run, includi
 
 ## Daily polish 1/8 - 2026-10-20
 Continue/checklist navigation avoids rerendering an already selected chapter. Pending quiz choices and AES drafts now survive same-page continuation; reloading still does not restore sensitive drafts. Reproduced the lost pending answer, then verified both flows. Resume copy distinguishes continuation from reload.
+
+## Daily polish 2/8 - 2026-10-20
+Exercise deep links reveal the targeted details block and any containing details, in addition to opening the exercise. Reproduced the glossary bookmark leaving its definition list closed. Verified glossary and nested comparison bookmarks reveal content without transmitting objects.

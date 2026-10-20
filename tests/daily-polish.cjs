@@ -14,6 +14,11 @@ const assert=require('node:assert/strict');
  await page.locator('[data-chapter="4"]').click();await page.fill('#message','Keep this session draft');
  await page.locator('#learning-continue').click();assert.equal(await page.inputValue('#message'),'Keep this session draft');
  await page.reload();await page.waitForSelector('#message');assert.notEqual(await page.inputValue('#message'),'Keep this session draft','Reload must not restore sensitive drafts');
+ // A deep link reveals the nested comparison and glossary, not just their exercise.
+ await page.goto(root+'?chapter=4#wire-comparison');await page.waitForSelector('#wire-send');
+ assert.equal(await page.locator('#wire-comparison').isVisible(),true,'Comparison deep link must open its nested details');
+ await page.goto(root+'?chapter=4#wire-glossary');await page.waitForSelector('#wire-send');
+ assert.equal(await page.locator('#wire-glossary dl').isVisible(),true,'Glossary deep link must reveal its contents');
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}

@@ -30,6 +30,7 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
     const entry=exercises.find(([id])=>id===wrapper.dataset.exercisePanel);
     if(entry[3]&&currentChapter()!==3){routing=true;try{selectChapter(3);}finally{routing=false;}}
     wrappers.forEach(other=>{other.open=other===wrapper;});
+    for(let ancestor=element;ancestor&&ancestor!==wrapper;ancestor=ancestor.parentElement){if(ancestor.tagName==='DETAILS')ancestor.open=true;}
     // Only an explicit open updates the picker; delayed toggle events must not overwrite a learner's selection.
     active=entry[0];$('exercise-picker').value=active;sync();
     if(updateUrl&&location.hash!==`#${section}`)history.replaceState(null,'',`#${section}`);
