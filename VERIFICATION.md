@@ -313,3 +313,8 @@ Wire-scene context interruption disables camera/motion controls and removes unav
 
 ## Daily polish 7/8 - 2026-10-20
 Inference narration now describes mixed traffic-key/private-key and traffic-key/shared-secret exposures without reusing the traffic-only boundary. It acknowledges directly captured traffic alongside dk+c recovery and K exposure. Verified mixed captures against Eve's cards and retained the traffic-only no-reversal explanation. Knowledge rules are unchanged.
+
+## Daily polish 8/8 - 2026-10-20
+Added a visible-on-focus Skip to lesson link as the first keyboard stop. Verified Tab/Enter transfers focus to the current lesson heading without changing chapters. Reviewed mobile/desktop skip-link, mixed-exposure and explanation-error screenshots, with no horizontal overflow at 320/390/768/1440 widths.
+
+Final verification: all twenty browser suites passed in the final run, including same-chapter continuation, real modified-click new tabs, nested bookmarks, keyboard transmission focus, claim error associations, real wire WebGL loss/restoration, mixed secret captures, existing learning/crypto/3D flows and fallback cases. Root JavaScript syntax and whitespace checks passed. Interface text stays English; no dependencies, new persistent profile fields or symbolic knowledge-rule changes. Browser plugin not available; bundled Playwright/Chromium was used with screenshots outside the repository.

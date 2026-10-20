@@ -33,3 +33,5 @@
 .visual{row-gap:12px}.visual #scene{position:relative;inset:auto;flex:1 0 300px;min-height:300px}.visual #scene canvas{position:absolute;inset:0}
 
 #learning-filter{display:block;box-sizing:border-box;width:100%;max-width:28rem;min-height:44px;margin:10px 0;background:#080e1c;color:#d9e7ee;border:1px solid #304759;border-radius:6px;padding:10px;font:inherit}
+
+.skip-link{position:fixed;top:12px;left:12px;z-index:1000;transform:translateY(-200%);padding:12px 18px;border-radius:6px;background:#a6f4c5;color:#080e1c;font-weight:bold}.skip-link:focus{transform:translateY(0)}

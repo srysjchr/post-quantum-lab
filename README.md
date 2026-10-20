@@ -205,3 +205,12 @@ The completion checklist can show all, unfinished, or completed milestones with 
 Individual scenario, protocol-repair, explanation and mission entries select the matching part of the exercise. Attack entries select the corresponding action and replay policy without preparing or running the attack. Reopening the same part retains pending selections; switching parts follows the exercise's normal reset/evidence rules. Notes and experiment data are still never restored from learning metadata.
 
 Run `node tests/milestone-navigation.cjs` for precise destinations, preserved same-part work, evidence boundaries, real cross-tab completion/filter focus, next unfinished steps, completed-state handling and four responsive widths. Optional EVIDENCE_DIR saves mobile/desktop screenshots outside the repository.
+
+
+## Keyboard access and accurate current-state feedback
+
+Skip to lesson is the first keyboard stop and appears when focused, bypassing long navigation and progress sections without changing the chapter. Same-chapter Continue retains pending quiz choices and AES drafts in the current page; reload still starts fresh sensitive state. Exercise deep links open targeted/nested details, and modified link clicks retain normal browser new-tab behavior.
+
+Keyboard wire sends move focus to inspection when their active send button becomes disabled; pointer sends keep the existing viewport behavior. Teach It Back associates missing/wrong claims with their field errors and clears stale associations after edits or evidence changes. Interrupted WebGL disables unavailable wire camera/motion controls while transmission and knowledge remain usable. Mixed traffic-key/private-key/shared-secret narration follows the actual capture without changing inference rules.
+
+Run `node tests/daily-polish.cjs` for these interactions, actual new-tab/WebGL behavior and four responsive widths. Optional EVIDENCE_DIR saves skip-link, mixed-exposure and explanation screenshots outside the repository.

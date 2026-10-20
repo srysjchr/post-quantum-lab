@@ -64,7 +64,28 @@ const assert=require('node:assert/strict');
  await page.locator('#wire-reset').click();await send('dk','c','traffic');assert.match(await page.locator('#wire-inference').innerText(),/K was never sent/);assert.match(await page.locator('#wire-inference').innerText(),/traffic key was also sent directly/);
  await send('K');assert.match(await page.locator('#wire-inference').innerText(),/K was also sent directly/);
  await page.locator('#wire-reset').click();await send('traffic');assert.match(await page.locator('#wire-inference').innerText(),/does not establish knowledge of dk or K/);
- // MORE_CHECKS
+ // The first keyboard stop can bypass long navigation/progress sections.
+ await page.goto(root+'?chapter=4');await page.waitForSelector('[data-chapter="3"][aria-pressed="true"]');await page.keyboard.press('Tab');
+ assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('href')),'#lesson-title');
+ assert.match(await page.evaluate(()=>document.activeElement.textContent),/Skip to lesson/);
+ await page.keyboard.press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'lesson-title');
+ assert.equal(await page.locator('[data-chapter="3"]').getAttribute('aria-pressed'),'true');
+ // New entry/focus/error surfaces stay usable on mobile and desktop.
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:950});await page.evaluate(()=>scrollTo(0,0));await page.locator('.skip-link').focus();
+  assert.equal(await page.locator('.skip-link').evaluate(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.left>=0&&r.right<=innerWidth;}),true,`Skip link clipped at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-skip-${width}.png`)});
+  await exercise('build-the-wire');await page.locator('#wire-reset').click();await send('dk','traffic');await page.locator('#wire-inference').scrollIntoViewIfNeeded();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Wire overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-exposure-${width}.png`)});
+  await page.locator('#wire-reset').click();await send('ek','c');await exercise('teach-it-back');await page.selectOption('#teach-topic','0');
+  for(const [index,value] of ['dk','c','private-ek'].entries())await page.selectOption(`#teach-field-${index}`,value);
+  await page.locator('#teach-form button').click();await page.locator('#teach-fields').scrollIntoViewIfNeeded();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Explanation overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-errors-${width}.png`)});
+ }
+ assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);
+
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
