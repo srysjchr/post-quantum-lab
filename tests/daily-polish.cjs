@@ -44,6 +44,17 @@ const assert=require('node:assert/strict');
  await page.locator('#teach-reset').click();await page.selectOption('#teach-field-0','pair');await page.locator('#teach-form button').click();
  assert.equal(await page.locator('#teach-field-0').getAttribute('aria-invalid'),null);assert.equal(await page.locator('#teach-field-1').getAttribute('aria-invalid'),'true');
  await exercise('build-the-wire');await page.locator('#wire-reset').click();assert.equal(await page.locator('#teach-fields [aria-invalid]').count(),0);
+ // Interrupted WebGL disables only unavailable 3D controls, retaining experiment controls.
+ await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>!document.getElementById('wire-animate').disabled);await page.uncheck('#wire-animate');
+ await page.evaluate(()=>{const canvas=document.querySelector('#wire-scene canvas'),gl=canvas.getContext('webgl2')||canvas.getContext('webgl');window.wireLoss=gl.getExtension('WEBGL_lose_context');window.wireLoss.loseContext();});
+ await page.waitForSelector('#wire-scene-fallback:not([hidden])');
+ assert.equal(await page.locator('#wire-turn-left').isDisabled(),true);assert.equal(await page.locator('#wire-animate').isDisabled(),true);
+ await page.emulateMedia({reducedMotion:'reduce'});await page.emulateMedia({reducedMotion:'no-preference'});
+ assert.equal(await page.locator('#wire-animate').isDisabled(),true);await page.locator('#wire-scene').press('ArrowRight');assert.match(await page.locator('#wire-camera-angle').innerText(),/0°/);
+ await page.locator('#wire-send-ek').click();assert.equal(await page.locator('#wire-transcript li').count(),1);
+ await page.evaluate(()=>window.wireLoss.restoreContext());await page.waitForSelector('#wire-scene-fallback[hidden]',{state:'attached'});
+ assert.equal(await page.locator('#wire-turn-left').isEnabled(),true);assert.equal(await page.locator('#wire-animate').isEnabled(),true);assert.equal(await page.locator('#wire-animate').isChecked(),false);
+ await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#wire-reset').click();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}

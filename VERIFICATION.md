@@ -307,3 +307,6 @@ Keyboard activation of a wire send button hands focus to the capture inspector w
 
 ## Daily polish 5/8 - 2026-10-20
 Teach It Back missing/wrong claims expose aria-invalid and a description linked to the matching feedback. Error associations clear on edits, successful checks, topic/reset render and evidence changes. Browser checks verified three wrong claims, missing-only marking, valid completion and removal of stale error references.
+
+## Daily polish 6/8 - 2026-10-20
+Wire-scene context interruption disables camera/motion controls and removes unavailable keyboard shortcuts while leaving transmission and knowledge controls usable. Real WebGL loss/restoration verified disabled state across motion-policy changes, unchanged camera offset, continued capture, and restored manual motion preference.
