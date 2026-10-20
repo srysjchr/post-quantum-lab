@@ -28,7 +28,7 @@ window.createLearningProgress = function (selectChapter) {
   function save(){if(persistent)try{localStorage.setItem(key,JSON.stringify(state));}catch{persistent=false;}render();}
   function visit(section,chapter=currentChapter){if(!sections.has(section))return;if(state.last.section===section&&state.last.chapter===chapter)return;state.last={chapter,section};save();}
   function go(target){
-    const destination={...target};selectChapter(destination.chapter);
+    const destination={...target};if(destination.chapter!==currentChapter)selectChapter(destination.chapter);
     window.revealLearningSection?.(destination.section,true);
     if(ids.has(destination.id))window.dispatchEvent(new CustomEvent('pqlab:milestone-open',{detail:{id:destination.id}}));
     const element=$(destination.section);
@@ -46,7 +46,7 @@ window.createLearningProgress = function (selectChapter) {
     $('learning-meter').max=entries.length;$('learning-meter').value=state.completed.length;
     $('learning-storage').textContent=persistent?'Saved in this browser only. No account; no messages, keys, ciphertext or notes are stored.':'Storage is unavailable. New progress is session-only until this page closes.';
     const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back'};
-    $('learning-resume-label').textContent=`Last location: ${state.last.section==='lesson-title'?entries[state.last.chapter].label:labels[state.last.section]||'Learning exercise'}. Experiments restart with fresh state.`;
+    $('learning-resume-label').textContent=`Last location: ${state.last.section==='lesson-title'?entries[state.last.chapter].label:labels[state.last.section]||'Learning exercise'}. Reloading starts fresh experiments; continuing in this page keeps current work.`;
     const filter=$('learning-filter').value;
     const visibleEntries=entries.filter(entry=>filter==='all'||(filter==='completed')===state.completed.includes(entry.id));
     $('learning-filter-count').textContent=`Showing ${visibleEntries.length} of ${entries.length} milestones.`;
