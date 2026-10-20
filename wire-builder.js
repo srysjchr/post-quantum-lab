@@ -113,9 +113,13 @@ window.createWireBuilder = function () {
   $('wire-inspect-latest').onclick=()=>{if(sent.size){focus=[...sent].at(-1);render();}};
   $('wire-clear-queued').onclick=()=>{queued.clear();render();};
   $('wire-inspect').onchange=()=>{focus=$('wire-inspect').value;render();};
-  $('wire-send').onclick = () => transmit([...queued]);
-  $('wire-send-ek').onclick = () => transmit(['ek']);
-  $('wire-send-c').onclick = () => transmit(['c']);
+  function sendFromButton(ids,event){
+    transmit(ids);
+    if(event.detail===0&&event.currentTarget.disabled){$('wire-inspect').scrollIntoView({block:'nearest'});$('wire-inspect').focus({preventScroll:true});}
+  }
+  $('wire-send').onclick = event => sendFromButton([...queued],event);
+  $('wire-send-ek').onclick = event => sendFromButton(['ek'],event);
+  $('wire-send-c').onclick = event => sendFromButton(['c'],event);
   $('wire-check').onclick = () => {
     const leaked = ['dk', 'K', 'traffic'].filter(id => sent.has(id));
     if(!leaked.length&&sent.has('ek')&&sent.has('c'))window.completeLearning('wire');

@@ -301,3 +301,6 @@ Exercise deep links reveal the targeted details block and any containing details
 
 ## Daily polish 3/8 - 2026-10-20
 Internal exercise routing respects modified clicks and explicit browser link targets/downloads. A real Ctrl-click regression reproduced the missing new tab, then verified a fresh message-journey tab and unchanged source exercise. Ordinary in-page routing remains covered by the regression suites.
+
+## Daily polish 4/8 - 2026-10-20
+Keyboard activation of a wire send button hands focus to the capture inspector when the button becomes disabled. Reproduced focus falling to the document body, then verified batch/direct keyboard sends with exactly-once captures. Pointer sends retain their existing viewport behavior.
