@@ -304,3 +304,6 @@ Internal exercise routing respects modified clicks and explicit browser link tar
 
 ## Daily polish 4/8 - 2026-10-20
 Keyboard activation of a wire send button hands focus to the capture inspector when the button becomes disabled. Reproduced focus falling to the document body, then verified batch/direct keyboard sends with exactly-once captures. Pointer sends retain their existing viewport behavior.
+
+## Daily polish 5/8 - 2026-10-20
+Teach It Back missing/wrong claims expose aria-invalid and a description linked to the matching feedback. Error associations clear on edits, successful checks, topic/reset render and evidence changes. Browser checks verified three wrong claims, missing-only marking, valid completion and removal of stale error references.

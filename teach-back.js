@@ -32,6 +32,11 @@ window.createTeachBack = function (readWire) {
     $('teach-instructions').textContent = topics[topic].instruction;
     $('teach-action').href = topics[topic].action;
   }
+  function clearFeedback(){
+    $('teach-feedback').replaceChildren();$('teach-sentence').hidden=true;
+    $('teach-fields').querySelectorAll('select').forEach(field=>{field.removeAttribute('aria-invalid');field.removeAttribute('aria-describedby');});
+  }
+  function markInvalid(index,errorId){const field=$(`teach-field-${index}`);field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby',errorId);}
   function render() {
     const item = topics[topic];
     $('teach-title').textContent = item.title; $('teach-fields').replaceChildren();
@@ -42,23 +47,26 @@ window.createTeachBack = function (readWire) {
       options.forEach(([value,text]) => { const option = node('option',text); option.value = value; select.append(option); });
       $('teach-fields').append(label,select);
     });
-    $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true; evidence();
+    clearFeedback(); evidence();
   }
   $('teach-topic').onchange = () => { topic = Number($('teach-topic').value); render(); };
   window.addEventListener('pqlab:milestone-open',event=>{
     const target=topics.findIndex((_,index)=>event.detail?.id===`teach-${index}`);
     if(target>=0&&target!==topic){$('teach-topic').value=String(target);$('teach-topic').dispatchEvent(new Event('change',{bubbles:true}));}
   });
-  $('teach-form').onchange = () => { $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true; };
+  $('teach-form').onchange = () => { clearFeedback(); };
   $('teach-form').onsubmit = event => {
     event.preventDefault();
-    $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true;
+    clearFeedback();
     if (!ready()) { $('teach-feedback').append(node('p','Complete the experiment before checking your explanation. Open the linked exercise for guidance.')); return; }
     const item = topics[topic], values = item.fields.map((_,index) => $(`teach-field-${index}`).value);
-    if (values.some(value => !value)) { $('teach-feedback').append(node('p','Fill all three claims first.')); return; }
+    if (values.some(value => !value)) {
+      const message=node('p','Fill all three claims first.');message.id='teach-error-missing';$('teach-feedback').append(message);
+      values.forEach((value,index)=>{if(!value)markInvalid(index,message.id);});return;
+    }
     const mistakes = values.map((value,index) => value === item.answers[index] ? null : index).filter(index => index !== null);
     if (mistakes.length) {
-      mistakes.forEach(index => { const paragraph = node('p', `${item.labels[index]}: ${item.hints[index]}`); paragraph.className = 'incorrect'; $('teach-feedback').append(paragraph); }); return;
+      mistakes.forEach(index => { const paragraph = node('p', `${item.labels[index]}: ${item.hints[index]}`); paragraph.className = 'incorrect';paragraph.id=`teach-error-${index}`;markInvalid(index,paragraph.id); $('teach-feedback').append(paragraph); }); return;
     }
     window.completeLearning(`teach-${topic}`);
     const paragraph = node('p','Explanation supported by the experiment. These checks assess the selected claims; your optional notes are for your own reflection.'); paragraph.className = 'correct'; $('teach-feedback').append(paragraph);
@@ -69,7 +77,7 @@ window.createTeachBack = function (readWire) {
     const type = event.detail?.type;
     if (type === 'replay-unguarded' || type === 'replay-guarded') replay.add(type);
     else if (type !== 'wire-updated') return;
-    evidence(); $('teach-feedback').replaceChildren(); $('teach-sentence').hidden = true;
+    evidence(); clearFeedback();
   });
   $('teach-reset').onclick = () => { $('teach-notes').value = ''; render(); };
   render();

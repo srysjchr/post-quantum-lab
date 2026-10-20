@@ -33,6 +33,17 @@ const assert=require('node:assert/strict');
  await page.locator('#wire-send-c').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');assert.equal(await page.locator('#wire-transcript li').count(),2);
  await page.locator('#wire-reset').click();await page.locator('#wire-send-ek').click();
  assert.notEqual(await page.evaluate(()=>document.activeElement.id),'wire-inspect','Pointer sends must not force a scroll to inspection');
+ // Explanation errors identify the relevant claims for assistive technology.
+ await send('c');await exercise('teach-it-back');await page.selectOption('#teach-topic','0');
+ for(const [index,value] of ['dk','c','private-ek'].entries())await page.selectOption(`#teach-field-${index}`,value);
+ await page.locator('#teach-form button').click();
+ for(let index=0;index<3;index++){const field=page.locator(`#teach-field-${index}`);assert.equal(await field.getAttribute('aria-invalid'),'true');const errorId=await field.getAttribute('aria-describedby');assert.ok(errorId);assert.equal(await page.locator('#'+errorId).isVisible(),true);}
+ await page.selectOption('#teach-field-0','pair');assert.equal(await page.locator('#teach-fields [aria-invalid]').count(),0);
+ await page.selectOption('#teach-field-1','secret');await page.selectOption('#teach-field-2','resistance');await page.locator('#teach-form button').click();
+ assert.equal(await page.locator('#teach-sentence').isVisible(),true);assert.equal(await page.locator('#teach-fields [aria-describedby]').count(),0);
+ await page.locator('#teach-reset').click();await page.selectOption('#teach-field-0','pair');await page.locator('#teach-form button').click();
+ assert.equal(await page.locator('#teach-field-0').getAttribute('aria-invalid'),null);assert.equal(await page.locator('#teach-field-1').getAttribute('aria-invalid'),'true');
+ await exercise('build-the-wire');await page.locator('#wire-reset').click();assert.equal(await page.locator('#teach-fields [aria-invalid]').count(),0);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}
