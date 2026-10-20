@@ -50,11 +50,20 @@ const assert=require('node:assert/strict');
  await page.waitForSelector('#wire-scene-fallback:not([hidden])');
  assert.equal(await page.locator('#wire-turn-left').isDisabled(),true);assert.equal(await page.locator('#wire-animate').isDisabled(),true);
  await page.emulateMedia({reducedMotion:'reduce'});await page.emulateMedia({reducedMotion:'no-preference'});
- assert.equal(await page.locator('#wire-animate').isDisabled(),true);await page.locator('#wire-scene').press('ArrowRight');assert.match(await page.locator('#wire-camera-angle').innerText(),/0°/);
+ assert.equal(await page.locator('#wire-animate').isDisabled(),true);await page.locator('#wire-scene').press('ArrowRight');assert.match(await page.locator('#wire-camera-angle').innerText(),/0\u00b0/);
  await page.locator('#wire-send-ek').click();assert.equal(await page.locator('#wire-transcript li').count(),1);
  await page.evaluate(()=>window.wireLoss.restoreContext());await page.waitForSelector('#wire-scene-fallback[hidden]',{state:'attached'});
  assert.equal(await page.locator('#wire-turn-left').isEnabled(),true);assert.equal(await page.locator('#wire-animate').isEnabled(),true);assert.equal(await page.locator('#wire-animate').isChecked(),false);
  await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#wire-reset').click();
+ // Mixed secret exposures must describe the actual capture, not the traffic-only boundary.
+ await send('dk','traffic');assert.match(await page.locator('#wire-inference').innerText(),/private dk was also captured/);
+ assert.match(await page.locator('#wire-inference').innerText(),/K is not yet recovered/);
+ assert.match(await page.locator('[data-wire-actor="eve"] [data-knowledge="dk"]').innerText(),/Known/);
+ assert.match(await page.locator('[data-wire-actor="eve"] [data-knowledge="K"]').innerText(),/Not known/);
+ await page.locator('#wire-reset').click();await send('K','traffic');assert.match(await page.locator('#wire-inference').innerText(),/traffic key was also sent directly/);
+ await page.locator('#wire-reset').click();await send('dk','c','traffic');assert.match(await page.locator('#wire-inference').innerText(),/K was never sent/);assert.match(await page.locator('#wire-inference').innerText(),/traffic key was also sent directly/);
+ await send('K');assert.match(await page.locator('#wire-inference').innerText(),/K was also sent directly/);
+ await page.locator('#wire-reset').click();await send('traffic');assert.match(await page.locator('#wire-inference').innerText(),/does not establish knowledge of dk or K/);
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}

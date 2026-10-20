@@ -310,3 +310,6 @@ Teach It Back missing/wrong claims expose aria-invalid and a description linked 
 
 ## Daily polish 6/8 - 2026-10-20
 Wire-scene context interruption disables camera/motion controls and removes unavailable keyboard shortcuts while leaving transmission and knowledge controls usable. Real WebGL loss/restoration verified disabled state across motion-policy changes, unchanged camera offset, continued capture, and restored manual motion preference.
+
+## Daily polish 7/8 - 2026-10-20
+Inference narration now describes mixed traffic-key/private-key and traffic-key/shared-secret exposures without reusing the traffic-only boundary. It acknowledges directly captured traffic alongside dk+c recovery and K exposure. Verified mixed captures against Eve's cards and retained the traffic-only no-reversal explanation. Knowledge rules are unchanged.

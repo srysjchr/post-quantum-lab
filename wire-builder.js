@@ -88,7 +88,21 @@ window.createWireBuilder = function () {
     $('wire-inspection').replaceChildren(...(inspected?[node('h4',inspected.name),node('p',inspected.direction),node('p',inspected.explanation),node('p','Inspection highlights the capture without sending another object or changing evidence.')]:[node('p','Send an object to inspect its origin, purpose and effect on the public transcript.')]));
     wireScene.render({sent:[...sent], known, observer, focus});
     const eveK = known.eve.includes('K');
-    $('wire-inference').textContent = sent.has('dk') && sent.has('c') ? `EVE’S INFERENCE: captured dk + c → decapsulate K → derive traffic key using public context. ${sent.has('K')?'K was also sent directly; both exposure paths apply.':'Even though K was never sent, it is now exposed in this model.'}` : sent.has('K') ? 'EVE’S INFERENCE: K was sent directly. Eve can derive the traffic key using the agreed public context. Keeping the traffic key off the wire no longer protects it.' : sent.has('traffic') ? 'EVE’S INFERENCE: the traffic key was sent directly. Eve can use it against packets protected by that key; this does not establish knowledge of dk or K.' : sent.has('dk') ? 'EVE’S INFERENCE: dk is exposed. This exchange’s K is not yet obtained in the illustrated path, but capturing c would let Eve decapsulate it. A compromised private key is unsafe even before c arrives.' : 'EVE’S INFERENCE: public ek and c do not expose dk, K or the traffic key under the stated KEM assumptions. Timing, ordering and sizes can still be visible.';
+    let inference;
+    if(sent.has('dk')&&sent.has('c')){
+      inference=`EVE’S INFERENCE: captured dk + c → decapsulate K → derive traffic key using public context. ${sent.has('K')?'K was also sent directly; both exposure paths apply.':'Even though K was never sent, it is now exposed in this model.'}`;
+      if(sent.has('traffic'))inference+=' The traffic key was also sent directly.';
+    }else if(sent.has('K')){
+      inference='EVE’S INFERENCE: K was sent directly. Eve can derive the traffic key using the agreed public context. '+(sent.has('traffic')?'The traffic key was also sent directly.':'Keeping the traffic key off the wire no longer protects it.');
+      if(sent.has('dk'))inference+=' Bob’s private dk was also captured.';
+    }else if(sent.has('traffic')){
+      inference='EVE’S INFERENCE: the traffic key was sent directly. Eve can use it against packets protected by that key; '+(sent.has('dk')?'Bob’s private dk was also captured. K is not yet recovered on this illustrated path without the matching c.':'this does not establish knowledge of dk or K.');
+    }else if(sent.has('dk')){
+      inference='EVE’S INFERENCE: dk is exposed. This exchange’s K is not yet obtained in the illustrated path, but capturing c would let Eve decapsulate it. A compromised private key is unsafe even before c arrives.';
+    }else{
+      inference='EVE’S INFERENCE: public ek and c do not expose dk, K or the traffic key under the stated KEM assumptions. Timing, ordering and sizes can still be visible.';
+    }
+    $('wire-inference').textContent=inference;
     $('wire-view').textContent = `${observer.toUpperCase()} VIEW · Captures are cumulative within this experiment. ${eveK ? 'Eve knows K and the traffic key.' : 'Use the knowledge cards to distinguish transmitted objects from secrets inferred later.'}`;
   }
   function transmit(ids) {
