@@ -19,6 +19,13 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#wire-comparison').isVisible(),true,'Comparison deep link must open its nested details');
  await page.goto(root+'?chapter=4#wire-glossary');await page.waitForSelector('#wire-send');
  assert.equal(await page.locator('#wire-glossary dl').isVisible(),true,'Glossary deep link must reveal its contents');
+ // Modified exercise links retain the browser's normal new-tab behavior.
+ await exercise('guided-missions');
+ const popupPromise=context.waitForEvent('page',{timeout:4000}).catch(()=>null);
+ await page.locator('#mission-link').click({modifiers:['Control']});
+ const popup=await popupPromise;assert.ok(popup,'Ctrl-click must open the exercise in a new tab');
+ await popup.waitForLoadState('domcontentloaded');assert.equal(new URL(popup.url()).hash,'#message-journey');
+ assert.equal(new URL(page.url()).hash,'#guided-missions');assert.equal(await page.locator('[data-exercise-panel][open]').getAttribute('data-exercise-panel'),'guided-missions');await popup.close();
  // MORE_CHECKS
  assert.deepEqual(errors,[]);console.log('PASS: daily learning, KEM and accessibility refinements; no runtime or request errors.');
  }finally{await browser.close();}

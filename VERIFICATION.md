@@ -298,3 +298,6 @@ Continue/checklist navigation avoids rerendering an already selected chapter. Pe
 
 ## Daily polish 2/8 - 2026-10-20
 Exercise deep links reveal the targeted details block and any containing details, in addition to opening the exercise. Reproduced the glossary bookmark leaving its definition list closed. Verified glossary and nested comparison bookmarks reveal content without transmitting objects.
+
+## Daily polish 3/8 - 2026-10-20
+Internal exercise routing respects modified clicks and explicit browser link targets/downloads. A real Ctrl-click regression reproduced the missing new tab, then verified a fresh message-journey tab and unchanged source exercise. Ordinary in-page routing remains covered by the regression suites.

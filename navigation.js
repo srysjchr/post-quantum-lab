@@ -74,7 +74,8 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   $('exercise-prev').onclick=()=>{const index=exercises.findIndex(([id])=>id===active);if(index>0)open(exercises[index-1][0]);};
   $('exercise-next').onclick=()=>{const index=exercises.findIndex(([id])=>id===active);if(index>=0&&index<exercises.length-1)open(exercises[index+1][0]);};
   document.addEventListener('click',event=>{
-    const link=event.target.closest('a[href^="#"]');if(!link)return;const section=link.getAttribute('href').slice(1);
+    if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+    const link=event.target.closest('a[href^="#"]');if(!link||link.hasAttribute('download')||(link.target&&link.target!=='_self'))return;const section=link.getAttribute('href').slice(1);
     if($(section)?.closest('[data-exercise-panel]')){event.preventDefault();open(section);}
   });
   function openHash(restoreMenu=false){
