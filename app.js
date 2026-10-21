@@ -180,8 +180,9 @@
   document.querySelectorAll('[data-observer],[data-wire-observer]').forEach(button=>button.addEventListener('click',()=>{observer=button.dataset.observer||button.dataset.wireObserver;updateObserver();}));
   $('kem-eve-view').addEventListener('click',()=>{observer='eve';updateObserver();});
   document.querySelectorAll('[data-threat-mode]').forEach(button=>button.addEventListener('click',()=>{threatMode=button.dataset.threatMode;renderKemBoundary();}));
-  $('prediction-start').addEventListener('click',()=>{prediction={index:0,answer:null,revealed:false,correct:0};movePredictionTimeline();});
-  $('prediction-form').addEventListener('submit',event=>{event.preventDefault();if(!prediction||prediction.answer===null||prediction.revealed)return;if(prediction.answer===predictions[prediction.index].correct)prediction.correct++;prediction.revealed=true;if(prediction.index===2&&prediction.correct===3)window.completeLearning('predictions');movePredictionTimeline();});
-  $('prediction-next').addEventListener('click',()=>{if(!prediction||!prediction.revealed||prediction.index>=2)return;prediction={index:prediction.index+1,answer:null,revealed:false,correct:prediction.correct};movePredictionTimeline();});
+  function focusPrediction(selector){const target=document.querySelector(selector);target.scrollIntoView({block:'nearest'});target.focus({preventScroll:true});}
+  $('prediction-start').addEventListener('click',()=>{prediction={index:0,answer:null,revealed:false,correct:0};movePredictionTimeline();focusPrediction('#prediction-answers input');});
+  $('prediction-form').addEventListener('submit',event=>{event.preventDefault();if(!prediction||prediction.answer===null||prediction.revealed)return;if(prediction.answer===predictions[prediction.index].correct)prediction.correct++;prediction.revealed=true;if(prediction.index===2&&prediction.correct===3)window.completeLearning('predictions');movePredictionTimeline();focusPrediction('#prediction-feedback');});
+  $('prediction-next').addEventListener('click',()=>{if(!prediction||!prediction.revealed||prediction.index>=2)return;prediction={index:prediction.index+1,answer:null,revealed:false,correct:prediction.correct};movePredictionTimeline();focusPrediction('#prediction-answers input');});
   const initial=Number(new URLSearchParams(location.search).get('chapter'));const explicitChapter=Number.isInteger(initial)&&initial>=1&&initial<=6;select(explicitChapter?initial-1:0);initialRender=false;if(explicitChapter)learningProgress.rememberRoute(chapter);learningNavigation.openHash();
 })();

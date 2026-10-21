@@ -43,6 +43,16 @@ const assert=require('node:assert/strict');
  await page.mouse.up();await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow')));
  assert.equal(await page.locator('#wire-scene').evaluate(e=>e.classList.contains('dragging')),false);
  assert.equal(await page.locator('#wire-transcript li').count(),0);
+ // Guided predictions move keyboard focus through the question and result.
+ await exercise('kem-prediction');await page.locator('#prediction-start').press('Enter');
+ assert.equal(await page.evaluate(()=>document.activeElement.name),'kem-prediction','Starting predictions focuses an answer');
+ for(let checkpoint=0;checkpoint<3;checkpoint++){
+  await page.locator('#prediction-answers input[value="0"]').check();await page.locator('#prediction-reveal').press('Enter');
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'prediction-feedback','Revealing focuses its explanation');
+  assert.match(await page.locator('#prediction-feedback').innerText(),/Correct prediction/);
+  if(checkpoint<2){await page.locator('#prediction-next').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.name),'kem-prediction');}
+ }
+ assert.equal(await page.locator('#prediction-next').isVisible(),false);
  assert.deepEqual(errors,[]);
  console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
  }finally{await browser.close();}

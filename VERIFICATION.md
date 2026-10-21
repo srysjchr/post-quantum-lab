@@ -327,3 +327,6 @@ Projected 3D public tokens now use the existing keyboard send-focus handoff. Rep
 
 ## Daily interactions 3 - 2026-10-21
 Scene updates and page hiding cancel active drags and release pointer capture before rebuilding. Cancellation suppresses a following pointer click without swallowing an intentional keyboard activation. Reproduced held capture after observer changes and an unintended send after pagehide; verified both interruptions keep the transcript empty. Existing pointer/touch sends, Escape cancellation, camera rotation and WebGL regression checks passed.
+
+## Daily interactions 4 - 2026-10-21
+Guided prediction start/next actions focus the new answer group; reveal focuses its explanation instead of leaving focus on a disabled submit button. The group describes its actual question for assistive technology. Verified all three correct checkpoints, final completion and existing wrong-answer/restart/observer regressions in Chromium.
