@@ -333,3 +333,6 @@ Guided prediction start/next actions focus the new answer group; reveal focuses 
 
 ## Daily interactions 5 - 2026-10-21
 Main-scene WebGL interruption disables reset/motion controls, removes unavailable shortcuts, blocks rotation input and explains that lessons remain usable. Restoration restores availability and the manual pause preference. Verified real loss/restoration across system-motion changes, chapter controls during loss, plus offscreen suspension/resumption and pause regression checks.
+
+## Daily interactions 6 - 2026-10-21
+Previous/next chapter, scenario and repair-case navigation now focuses the new content heading, including when the activated navigation button becomes disabled at an endpoint. Reproduced body focus at the last chapter; verified forward/backward paths for all three flows plus existing scenario/attack/mission and repair regressions.

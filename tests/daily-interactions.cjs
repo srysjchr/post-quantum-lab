@@ -68,6 +68,33 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#reset').isEnabled(),true);assert.equal(await page.locator('#pause').isEnabled(),true);
  assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true','Restoration retains manual pause preference');
  assert.match(await page.locator('#scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);
+ // Sequential navigation announces the new lesson/case instead of losing focus at an endpoint.
+ await page.goto(root+'?chapter=5');await page.waitForSelector('#next');await page.locator('#next').press('Enter');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'lesson-title','Next chapter focuses its new heading');
+ assert.equal(await page.locator('#next').isDisabled(),true);await page.locator('#previous').press('Enter');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'lesson-title');
+ await exercise('scenario-lab');await page.locator('#scenario-reset').click();
+ for(let index=1;index<3;index++){await page.locator('#scenario-next').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'scenario-title');}
+ assert.equal(await page.locator('#scenario-next').isDisabled(),true);await page.locator('#scenario-prev').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'scenario-title');
+ await exercise('protocol-repair');await page.locator('#repair-reset').click();
+ for(let index=1;index<4;index++){await page.locator('#repair-next').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'repair-title');}
+ assert.equal(await page.locator('#repair-next').isDisabled(),true);await page.locator('#repair-prev').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'repair-title');
+ // Missing/wrong radio answers describe the feedback at the answer group.
+ await page.goto(root);await page.waitForSelector('#answers input');await page.locator('#quiz button[type="submit"]').click();
+ assert.equal(await page.locator('#answers').getAttribute('aria-invalid'),'true','Quiz errors identify the answer group');
+ assert.equal(await page.locator('#answers').getAttribute('aria-describedby'),'feedback');
+ assert.equal(await page.evaluate(()=>document.activeElement.name),'answer');
+ await page.locator('#answers input[value="0"]').check();assert.equal(await page.locator('#answers').getAttribute('aria-invalid'),null);
+ await page.locator('[data-chapter="1"]').click();assert.equal(await page.locator('#answers').getAttribute('aria-describedby'),null);
+ await exercise('scenario-lab');await page.locator('#scenario-reset').click();await page.locator('#scenario-form button').click();
+ assert.equal(await page.locator('#scenario-options').getAttribute('aria-invalid'),'true');
+ assert.equal(await page.locator('#scenario-options').getAttribute('aria-describedby'),'scenario-feedback');
+ assert.equal(await page.evaluate(()=>document.activeElement.name),'scenario-answer');
+ await page.locator('#scenario-options input[value="1"]').check();assert.equal(await page.locator('#scenario-options').getAttribute('aria-invalid'),null);
+ await page.locator('#scenario-form button').click();assert.equal(await page.locator('#scenario-options').getAttribute('aria-invalid'),'true');
+ await page.locator('#scenario-options input[value="0"]').check();assert.equal(await page.locator('#scenario-feedback').getAttribute('class'),'');
+ await page.locator('#scenario-form button').click();assert.equal(await page.locator('#scenario-options').getAttribute('aria-describedby'),null);
+ await page.locator('#scenario-next').click();assert.equal(await page.locator('#scenario-options').getAttribute('aria-invalid'),null);
  assert.deepEqual(errors,[]);
  console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
  }finally{await browser.close();}

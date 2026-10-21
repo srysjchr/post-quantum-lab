@@ -53,8 +53,9 @@ window.createProtocolRepair = function () {
       $('repair-feedback').textContent = fixes ? `The defect is addressed, but this is not the smallest patch. Other selected roles are already present or unrelated. ${item.why}` : `Patch does not address the missing role. ${item.why}`;
     }
   };
-  $('repair-prev').onclick = () => { index--; render(); };
-  $('repair-next').onclick = () => { index++; render(); };
+  function navigateCase(offset){index+=offset;render();$('repair-title').scrollIntoView({block:'nearest'});$('repair-title').focus({preventScroll:true});}
+  $('repair-prev').onclick = () => navigateCase(-1);
+  $('repair-next').onclick = () => navigateCase(1);
   $('repair-reset').onclick = () => { index = 0; solved.clear(); render(); };
   window.addEventListener('pqlab:milestone-open',event=>{
     const target=cases.findIndex((_,caseIndex)=>event.detail?.id===`repair-${caseIndex}`);

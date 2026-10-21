@@ -42,8 +42,9 @@ window.createPracticeLabs = function () {
     if (index === item.correct) { solved.add(scenario);window.completeLearning(`scenario-${scenario}`); $('scenario-count').textContent = `SCENARIO ${scenario + 1} / ${scenarios.length} · ${solved.size} solved`; }
   });
   $('scenario-form').addEventListener('change', () => { $('scenario-feedback').textContent = ''; });
-  $('scenario-prev').onclick = () => { scenario--; renderScenario(); };
-  $('scenario-next').onclick = () => { scenario++; renderScenario(); };
+  function navigateScenario(offset){scenario+=offset;renderScenario();$('scenario-title').scrollIntoView({block:'nearest'});$('scenario-title').focus({preventScroll:true});}
+  $('scenario-prev').onclick = () => navigateScenario(-1);
+  $('scenario-next').onclick = () => navigateScenario(1);
   $('scenario-reset').onclick = () => { scenario = 0; solved.clear(); renderScenario(); };
   window.addEventListener('pqlab:milestone-open',event=>{
     const target=scenarios.findIndex((_,index)=>event.detail?.id===`scenario-${index}`);

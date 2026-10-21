@@ -24,7 +24,7 @@
 <nav id="chapters" class="chapters" aria-label="Choose a chapter"></nav>
 <section class="observer-bar" aria-label="Choose a perspective"><div><strong>Who can see what?</strong><span>Change the model and its information boundary.</span></div><div class="observer-buttons"><button data-observer="learner" aria-pressed="true">Learner</button><button data-observer="alice" aria-pressed="false">Alice</button><button data-observer="bob" aria-pressed="false">Bob</button><button data-observer="eve" aria-pressed="false">Eve · attacker</button></div></section>
 <section class="explorer" aria-labelledby="lesson-title">
-<div class="explanation"><div class="chapter-count" id="chapter-count"></div><h2 id="lesson-title"></h2><div id="summary"></div><div class="formula" id="formula"></div><div id="interaction"></div><div class="lesson-nav"><button id="previous" class="text-button">← Previous</button><button id="next" class="text-button">Next chapter →</button></div></div>
+<div class="explanation"><div class="chapter-count" id="chapter-count"></div><h2 id="lesson-title" tabindex="-1"></h2><div id="summary"></div><div class="formula" id="formula"></div><div id="interaction"></div><div class="lesson-nav"><button id="previous" class="text-button">← Previous</button><button id="next" class="text-button">Next chapter →</button></div></div>
 <div class="visual"><div id="scene" tabindex="0" role="img" aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Home Escape" aria-label="Interactive educational 3D model. Drag or use arrow keys to rotate."><p id="fallback" class="fallback">Preparing the 3D model…</p></div><div class="scene-annotation" id="scene-annotation"></div><div class="canvas-footer"><div id="legend" class="legend"></div><div class="scene-controls"><button id="reset">↺ <span>Reset view</span></button><button id="pause" aria-pressed="false" aria-describedby="scene-motion-note">Pause motion</button></div></div><p id="scene-motion-note" class="scene-hint" role="status"></p><p class="scene-hint">Drag to rotate · Arrow keys rotate; Home resets; Escape ends a drag · Models are visual analogies</p></div>
 </section>
 <section id="observer-panel" class="observer-panel" aria-label="Information available to Alice, Bob, and Eve"></section>
@@ -76,7 +76,7 @@
 <section id="protocol-repair" class="kem-prediction" aria-labelledby="repair-heading">
 <div class="practice-heading"><div><span class="section-number">FIND THE MISSING PROTECTION</span><h3 id="repair-heading">Repair the protocol, not just the algorithm.</h3></div><button id="repair-reset">Reset all cases</button></div>
 <p class="micro">SYMBOLIC SIMULATION · four focused protocol defects. No real ML-KEM or attack execution in this exercise. The separate Attack Playground demonstrates actual AES-GCM behavior.</p>
-<p id="repair-count" class="micro"></p><h4 id="repair-title"></h4><p id="repair-attack"></p>
+<p id="repair-count" class="micro"></p><h4 id="repair-title" tabindex="-1"></h4><p id="repair-attack"></p>
 <div class="wire-builder-grid"><div><h4>Roles already present</h4><ul id="repair-existing"></ul><button id="repair-baseline">Run the baseline</button><p id="repair-before" role="status"></p></div><form id="repair-form"><h4>Add the smallest missing protection</h4><fieldset><legend class="sr-only">Choose a minimal protocol patch</legend><div id="repair-options"></div></fieldset><button type="submit" class="primary">Apply patch and rerun</button><p id="repair-after" role="status"></p><p id="repair-feedback" role="status"></p></form></div>
 <div class="journey-navigation"><button id="repair-prev">Previous case</button><button id="repair-next">Next case</button></div>
 <p class="micro">Each case assumes the other listed roles work as intended. A bigger key is not a substitute for identity binding, integrity checks or freshness. Real protocols also require correct implementation, nonce management, context binding and operational security. <a href="#attack-playground">Compare with Attack Playground →</a></p>
@@ -102,7 +102,7 @@
 <div class="practice-grid">
 <section class="practice-card" id="scenario-lab" aria-labelledby="scenario-heading">
 <div class="practice-heading"><h3 id="scenario-heading">Scenario Lab</h3><button id="scenario-reset">Reset scenarios</button></div>
-<p id="scenario-count" class="micro"></p><h4 id="scenario-title"></h4><p id="scenario-prompt"></p>
+<p id="scenario-count" class="micro"></p><h4 id="scenario-title" tabindex="-1"></h4><p id="scenario-prompt"></p>
 <form id="scenario-form"><fieldset id="scenario-options"></fieldset><button type="submit" class="primary">Check my choice</button></form>
 <p id="scenario-feedback" role="status"></p><div class="journey-navigation"><button id="scenario-prev">Previous scenario</button><button id="scenario-next">Next scenario</button></div>
 </section>
