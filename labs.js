@@ -15,7 +15,9 @@ window.createPracticeLabs = function () {
   ];
   let scenario = 0;
   const solved = new Set();
+  function setScenarioError(invalid){for(const [name,value] of [['aria-invalid','true'],['aria-describedby','scenario-feedback']]){if(invalid)$('scenario-options').setAttribute(name,value);else $('scenario-options').removeAttribute(name);}}
   function renderScenario() {
+    setScenarioError(false);
     const item = scenarios[scenario];
     $('scenario-count').textContent = `SCENARIO ${scenario + 1} / ${scenarios.length} · ${solved.size} solved`;
     $('scenario-title').textContent = item.title;
@@ -35,13 +37,13 @@ window.createPracticeLabs = function () {
   $('scenario-form').addEventListener('submit', event => {
     event.preventDefault();
     const answer = $('scenario-options').querySelector('input:checked');
-    if (!answer) { $('scenario-feedback').textContent = 'Choose a tool first.'; return; }
-    const index = Number(answer.value), item = scenarios[scenario];
+    if (!answer) { $('scenario-feedback').textContent = 'Choose a tool first.';setScenarioError(true);$('scenario-options').querySelector('input').focus(); return; }
+    const index = Number(answer.value), item = scenarios[scenario];setScenarioError(index!==item.correct);
     $('scenario-feedback').textContent = item.feedback[index];
     $('scenario-feedback').className = index === item.correct ? 'correct' : 'incorrect';
     if (index === item.correct) { solved.add(scenario);window.completeLearning(`scenario-${scenario}`); $('scenario-count').textContent = `SCENARIO ${scenario + 1} / ${scenarios.length} · ${solved.size} solved`; }
   });
-  $('scenario-form').addEventListener('change', () => { $('scenario-feedback').textContent = ''; });
+  $('scenario-form').addEventListener('change', () => { $('scenario-feedback').textContent = '';$('scenario-feedback').className='';setScenarioError(false); });
   function navigateScenario(offset){scenario+=offset;renderScenario();$('scenario-title').scrollIntoView({block:'nearest'});$('scenario-title').focus({preventScroll:true});}
   $('scenario-prev').onclick = () => navigateScenario(-1);
   $('scenario-next').onclick = () => navigateScenario(1);

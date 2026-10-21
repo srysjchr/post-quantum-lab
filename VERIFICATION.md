@@ -336,3 +336,6 @@ Main-scene WebGL interruption disables reset/motion controls, removes unavailabl
 
 ## Daily interactions 6 - 2026-10-21
 Previous/next chapter, scenario and repair-case navigation now focuses the new content heading, including when the activated navigation button becomes disabled at an endpoint. Reproduced body focus at the last chapter; verified forward/backward paths for all three flows plus existing scenario/attack/mission and repair regressions.
+
+## Daily interactions 7 - 2026-10-21
+Chapter quizzes and Scenario Lab associate missing/wrong-answer feedback with their answer groups and focus the first answer for an empty submission. Groups use the actual question as their accessible label. Errors and stale styles clear on edits, correct answers and navigation. Verified empty/wrong/correct flows and the existing labs regressions. The new error assertions were added during the preceding commit; this commit makes those red assertions pass.
