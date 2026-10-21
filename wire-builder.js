@@ -11,7 +11,7 @@ window.createWireBuilder = function () {
   ];
   const sent = new Set(), queued = new Set();
   let observer = 'learner', focus = '', reflectionTopic=null;
-  const wireScene = window.createWireScene(id => transmit([id]));
+  const wireScene = window.createWireScene((id,event) => event ? sendFromButton([id],event) : transmit([id]));
   function knowledge(transcript = sent) {
     const eveK = transcript.has('K') || (transcript.has('dk') && transcript.has('c'));
     const result = {

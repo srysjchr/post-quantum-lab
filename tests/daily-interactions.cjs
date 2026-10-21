@@ -16,6 +16,17 @@ const assert=require('node:assert/strict');
   await page.locator(`[data-chapter="${chapter}"]`).click();
   assert.deepEqual(await page.evaluate(()=>{const ids=[...document.querySelectorAll('[id]')].map(e=>e.id);return [...new Set(ids.filter((id,index)=>ids.indexOf(id)!==index))];}),[],`Unique document IDs in chapter ${chapter+1}`);
  }
+ // Activating a projected token with a keyboard must not drop focus to the body.
+ await exercise('build-the-wire');await page.locator('#wire-reset').click();
+ await page.locator('[data-wire-token="ek"]').press('Enter');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect','Keyboard token transmission hands focus to inspection');
+ assert.equal(await page.locator('#wire-transcript li').count(),1);
+ await page.locator('[data-wire-token="c"]').press('Space');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');
+ assert.equal(await page.locator('#wire-transcript li').count(),2);
+ await page.locator('#wire-reset').click();await page.locator('[data-wire-token="ek"]').click();
+ assert.notEqual(await page.evaluate(()=>document.activeElement.id),'wire-inspect','Pointer token transmission does not force inspection focus');
+ assert.equal(await page.locator('#wire-transcript li').count(),1);
  assert.deepEqual(errors,[]);
  console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
  }finally{await browser.close();}

@@ -168,7 +168,7 @@ window.createWireScene = function (transmit) {
       const inside=event.clientX>=rect.left&&event.clientX<=rect.right&&event.clientY>=rect.top&&event.clientY<=rect.bottom;
       cancelDrag();if(pending.moved&&inside)transmit(pending.id);else if(pending.moved)status.textContent='Nothing sent. Drop the object inside the public channel, or use a Send button.';
     });
-    token.addEventListener('click',()=>{if(!suppressClick&&!token.disabled)transmit(token.dataset.wireToken);suppressClick=false;});
+    token.addEventListener('click',event=>{if(!suppressClick&&!token.disabled)transmit(token.dataset.wireToken,event);suppressClick=false;});
     token.addEventListener('pointercancel',()=>{suppressClick=true;cancelDrag();});
     token.addEventListener('lostpointercapture',cancelDrag);
     token.addEventListener('keydown',event=>{if(event.key==='Escape'){suppressClick=true;cancelDrag();}});

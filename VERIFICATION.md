@@ -321,3 +321,6 @@ Final verification: all twenty browser suites passed in the final run, including
 
 ## Daily interactions 1 - 2026-10-21
 Separated the quantum algorithm description ID from the Attack Playground description. Reproduced the duplicate-ID failure and incorrect target update, then checked independent Grover/replay descriptions and unique IDs across all six chapters in Chromium. No cryptographic or knowledge rules changed.
+
+## Daily interactions 2 - 2026-10-21
+Projected 3D public tokens now use the existing keyboard send-focus handoff. Reproduced focus falling to body on Enter; verified Enter and Space each capture once and focus inspection, while pointer clicks retain their viewport behavior. Drag sends keep their existing path.
