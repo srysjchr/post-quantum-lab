@@ -113,7 +113,7 @@
     select.addEventListener('change',()=>{const [n,p,q]=products.find(item=>item[0]===Number(select.value));rsa={n,p,q,revealed:false};refreshRsa();});refreshRsa();
   }
   function renderQuantum(parent) {
-    const buttons=make('div',undefined,'choice-buttons');const description=make('p',undefined,'micro');description.id='attack-description';
+    const buttons=make('div',undefined,'choice-buttons');const description=make('p',undefined,'micro');description.id='quantum-description';
     const values=[['shor','Shor','Factoring and discrete logarithms: a structural threat to RSA, DH, and ECC.'],['grover','Grover','Generic search: an idealized square-root query reduction, not an instant AES break.']];
     values.forEach(([value,name,text],index)=>{const button=make('button',name);button.dataset.algorithm=value;button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>{buttons.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));description.textContent=text;setScene('algorithm',value);});buttons.append(button);});
     description.textContent=values[0][2];parent.append(buttons,description);setScene('algorithm','shor');
