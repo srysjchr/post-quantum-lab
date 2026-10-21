@@ -121,7 +121,7 @@ window.createWireBuilder = function () {
     render();
     window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
-  $('wire-reflect').onclick=()=>{if(reflectionTopic===null)return;const select=$('teach-topic');if(select.value!==String(reflectionTopic)){select.value=String(reflectionTopic);select.dispatchEvent(new Event('change',{bubbles:true}));}};
+  $('wire-reflect').onclick=event=>{const link=event.currentTarget;if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||link.hasAttribute('download')||(link.target&&link.target!=='_self')||reflectionTopic===null)return;const select=$('teach-topic');if(select.value!==String(reflectionTopic)){select.value=String(reflectionTopic);select.dispatchEvent(new Event('change',{bubbles:true}));}};
   function moveInspection(delta){const ids=[...sent],index=ids.indexOf(focus);if(ids[index+delta]){focus=ids[index+delta];render();}}
   $('wire-inspect-prev').onclick=()=>moveInspection(-1);$('wire-inspect-next').onclick=()=>moveInspection(1);
   $('wire-inspect-latest').onclick=()=>{if(sent.size){focus=[...sent].at(-1);render();}};

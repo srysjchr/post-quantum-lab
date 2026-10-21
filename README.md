@@ -214,3 +214,12 @@ Skip to lesson is the first keyboard stop and appears when focused, bypassing lo
 Keyboard wire sends move focus to inspection when their active send button becomes disabled; pointer sends keep the existing viewport behavior. Teach It Back associates missing/wrong claims with their field errors and clears stale associations after edits or evidence changes. Interrupted WebGL disables unavailable wire camera/motion controls while transmission and knowledge remain usable. Mixed traffic-key/private-key/shared-secret narration follows the actual capture without changing inference rules.
 
 Run `node tests/daily-polish.cjs` for these interactions, actual new-tab/WebGL behavior and four responsive widths. Optional EVIDENCE_DIR saves skip-link, mixed-exposure and explanation screenshots outside the repository.
+
+
+## Interaction reliability and keyboard continuity
+
+Quantum algorithm explanations and Attack Playground descriptions have independent targets across all six chapters. Keyboard transmission through projected public tokens moves focus to capture inspection; interrupted drags release pointer capture and cannot become accidental sends. Main-scene WebGL loss exposes unavailable controls and preserves the manual pause preference on restoration.
+
+Guided predictions focus the next answer or revealed explanation. Previous/next lesson, scenario and repair navigation focuses the new heading, including at disabled endpoints. Quiz and scenario errors describe their answer groups and clear on edits or navigation. Modified reflection links open normally without changing a pending explanation in the source tab; an ordinary click still selects the matching topic.
+
+Run `node tests/daily-interactions.cjs` with the existing Playwright configuration for these regressions, real WebGL loss/restoration, real Ctrl-click new tabs and 320/390/768/1440 viewport checks. Optional `EVIDENCE_DIR` saves wire and scenario screenshots outside the repository. These changes add no dependencies or stored learning data.

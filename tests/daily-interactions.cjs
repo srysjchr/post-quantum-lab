@@ -95,7 +95,34 @@ const assert=require('node:assert/strict');
  await page.locator('#scenario-options input[value="0"]').check();assert.equal(await page.locator('#scenario-feedback').getAttribute('class'),'');
  await page.locator('#scenario-form button').click();assert.equal(await page.locator('#scenario-options').getAttribute('aria-describedby'),null);
  await page.locator('#scenario-next').click();assert.equal(await page.locator('#scenario-options').getAttribute('aria-invalid'),null);
+ // Opening a reflection in a new tab must not reset a pending explanation here.
+ await exercise('teach-it-back');await page.selectOption('#teach-topic','0');await page.selectOption('#teach-field-0','pair');
+ await exercise('build-the-wire');await page.locator('#wire-reset').click();
+ for(const id of ['dk','c'])await page.check(`[data-wire-object="${id}"]`);await page.locator('#wire-send').click();
+ const popupPromise=page.context().waitForEvent('page');await page.locator('#wire-reflect').click({modifiers:['Control']});const popup=await popupPromise;
+ await popup.waitForLoadState('domcontentloaded');assert.equal(new URL(popup.url()).hash,'#teach-it-back');await popup.close();
+ assert.equal(await page.inputValue('#teach-topic'),'0','Ctrl-click must not change the source explanation topic');
+ assert.equal(await page.inputValue('#teach-field-0'),'pair','Ctrl-click must preserve pending source claims');
+ assert.equal(new URL(page.url()).hash,'#build-the-wire');
+ await page.locator('#wire-reflect').click();assert.equal(await page.inputValue('#teach-topic'),'1');assert.equal(new URL(page.url()).hash,'#teach-it-back');
+ assert.equal(await page.locator('#wire-transcript li').count(),2);
+ // Changed surfaces remain usable without horizontal overflow at narrow widths.
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:950});await page.emulateMedia({reducedMotion:'reduce'});
+  await exercise('build-the-wire');await page.locator('#wire-reset').click();await page.locator('#wire-perspectives [data-wire-observer="eve"]').click();
+  await page.locator('#wire-scene').scrollIntoViewIfNeeded();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Wire overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-interactions-wire-${width}.png`)});
+  await page.locator('[data-wire-token="ek"]').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');
+  await exercise('scenario-lab');await page.locator('#scenario-reset').click();await page.locator('#scenario-form button').click();
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Scenario overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width))await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-interactions-error-${width}.png`)});
+  await exercise('kem-prediction');await page.locator('#prediction-start').press('Enter');
+  assert.equal(await page.evaluate(()=>document.activeElement.name),'kem-prediction');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Prediction overflow at ${width}`);
+  assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false,'UI stays English');
+ }
  assert.deepEqual(errors,[]);
- console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
+ console.log('PASS: independent descriptions and unique IDs; keyboard token/prediction/navigation focus; interrupted drag release without sends; real main WebGL loss/restoration; accessible answer validation; modified reflection links; 320/390/768/1440 layouts; English; no runtime or HTTP errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
