@@ -324,3 +324,6 @@ Separated the quantum algorithm description ID from the Attack Playground descri
 
 ## Daily interactions 2 - 2026-10-21
 Projected 3D public tokens now use the existing keyboard send-focus handoff. Reproduced focus falling to body on Enter; verified Enter and Space each capture once and focus inspection, while pointer clicks retain their viewport behavior. Drag sends keep their existing path.
+
+## Daily interactions 3 - 2026-10-21
+Scene updates and page hiding cancel active drags and release pointer capture before rebuilding. Cancellation suppresses a following pointer click without swallowing an intentional keyboard activation. Reproduced held capture after observer changes and an unintended send after pagehide; verified both interruptions keep the transcript empty. Existing pointer/touch sends, Escape cancellation, camera rotation and WebGL regression checks passed.

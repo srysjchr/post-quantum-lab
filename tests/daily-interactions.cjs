@@ -27,6 +27,22 @@ const assert=require('node:assert/strict');
  await page.locator('#wire-reset').click();await page.locator('[data-wire-token="ek"]').click();
  assert.notEqual(await page.evaluate(()=>document.activeElement.id),'wire-inspect','Pointer token transmission does not force inspection focus');
  assert.equal(await page.locator('#wire-transcript li').count(),1);
+ // Rebuilding or leaving the scene releases any in-progress pointer capture.
+ await page.locator('#wire-reset').click();
+ const startDrag=async()=>{
+  const token=page.locator('[data-wire-token="c"]');await token.scrollIntoViewIfNeeded();
+  await token.evaluate(e=>e.addEventListener('pointerdown',event=>window.testPointer=event.pointerId,{once:true}));
+  const rect=await token.boundingBox();await page.mouse.move(rect.x+rect.width/2,rect.y+rect.height/2);await page.mouse.down();await page.mouse.move(rect.x+rect.width/2+20,rect.y+rect.height/2+15);
+  assert.equal(await token.evaluate(e=>e.hasPointerCapture(window.testPointer)),true);return token;
+ };
+ let dragged=await startDrag();await page.locator('#wire-perspectives [data-wire-observer="eve"]').press('Enter');
+ assert.equal(await dragged.evaluate(e=>e.hasPointerCapture(window.testPointer)),false,'Observer changes must release pointer capture');
+ await page.mouse.up();assert.equal(await page.locator('#wire-transcript li').count(),0);
+ dragged=await startDrag();await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide')));
+ assert.equal(await dragged.evaluate(e=>e.hasPointerCapture(window.testPointer)),false,'Page hiding must release pointer capture');
+ await page.mouse.up();await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow')));
+ assert.equal(await page.locator('#wire-scene').evaluate(e=>e.classList.contains('dragging')),false);
+ assert.equal(await page.locator('#wire-transcript li').count(),0);
  assert.deepEqual(errors,[]);
  console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
  }finally{await browser.close();}

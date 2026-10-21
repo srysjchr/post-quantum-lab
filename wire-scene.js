@@ -11,7 +11,7 @@ window.createWireScene = function (transmit) {
   const publicPositions = {ek:[3,1,-1], c:[-3,1,-1]};
   const origins = {...publicPositions, dk:[3,1,-1], K:[-3,1,-1], traffic:[-3,1,-1]};
   const secretIds = ['dk','K','traffic'];
-  let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false;
+  let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false, suppressClick=false;
   let previous=new Set(), disposed=false, yaw=0, sceneDescription='', userMotion=true;
   const motionControl=document.getElementById('wire-animate');
   function syncMotion(){motionControl.disabled=motion.matches||interrupted;motionControl.checked=userMotion&&!motion.matches;document.getElementById('wire-motion-note').textContent=interrupted?'3D is interrupted. Send buttons and knowledge cards still work.':motion.matches?'System reduced motion is active. Packets update without animated travel.':userMotion?'Packet travel is animated; final knowledge updates immediately.':'Packet travel is off; transmission and knowledge rules are unchanged.';}
@@ -144,13 +144,12 @@ window.createWireScene = function (transmit) {
     if(interrupted||event.target!==host||!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;
     event.preventDefault();if(event.key==='Home')resetCamera();else turn(event.key==='ArrowLeft'?-15:15);
   });
-  function cancelDrag(){
-    if(!drag)return;const {token,pointer}=drag;drag=null;host.classList.remove('dragging');
+  function cancelDrag(rebuild=true){
+    if(!drag)return;const {token,pointer}=drag;drag=null;suppressClick=true;host.classList.remove('dragging');
     if(token.hasPointerCapture?.(pointer))token.releasePointerCapture(pointer);
-    if(snapshot)build();
+    if(rebuild&&snapshot)build();
   }
   for(const token of tokens){
-    let suppressClick=false;
     token.addEventListener('pointerdown',event=>{
       if(!event.isPrimary||event.button!==0||token.disabled)return;
       drag={token,id:token.dataset.wireToken,pointer:event.pointerId,x:event.clientX,y:event.clientY,moved:false};suppressClick=false;token.setPointerCapture(event.pointerId);host.classList.add('dragging');
@@ -166,9 +165,9 @@ window.createWireScene = function (transmit) {
       if(!drag||drag.pointer!==event.pointerId)return;
       const pending=drag,rect=drop.getBoundingClientRect();suppressClick=pending.moved;
       const inside=event.clientX>=rect.left&&event.clientX<=rect.right&&event.clientY>=rect.top&&event.clientY<=rect.bottom;
-      cancelDrag();if(pending.moved&&inside)transmit(pending.id);else if(pending.moved)status.textContent='Nothing sent. Drop the object inside the public channel, or use a Send button.';
+      cancelDrag();suppressClick=pending.moved;if(pending.moved&&inside)transmit(pending.id);else if(pending.moved)status.textContent='Nothing sent. Drop the object inside the public channel, or use a Send button.';
     });
-    token.addEventListener('click',event=>{if(!suppressClick&&!token.disabled)transmit(token.dataset.wireToken,event);suppressClick=false;});
+    token.addEventListener('click',event=>{if((event.detail===0||!suppressClick)&&!token.disabled)transmit(token.dataset.wireToken,event);suppressClick=false;});
     token.addEventListener('pointercancel',()=>{suppressClick=true;cancelDrag();});
     token.addEventListener('lostpointercapture',cancelDrag);
     token.addEventListener('keydown',event=>{if(event.key==='Escape'){suppressClick=true;cancelDrag();}});
@@ -179,7 +178,7 @@ window.createWireScene = function (transmit) {
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;cancelDrag();}else if(snapshot)build();});
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;syncControls();cancelAnimationFrame(frame);frame=0;cancelDrag();fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;syncControls();fallback.hidden=true;if(snapshot)build();});
-  window.addEventListener('pagehide',()=>{disposed=true;cancelAnimationFrame(frame);frame=0;});
+  window.addEventListener('pagehide',()=>{cancelDrag(false);disposed=true;cancelAnimationFrame(frame);frame=0;});
   window.addEventListener('pageshow',()=>{disposed=false;if(snapshot)build();});
-  return {render(data){if(snapshot&&snapshot.observer!==data.observer)yaw=0;const fresh=data.sent.filter(id=>!previous.has(id)&&origins[id]);snapshot=data;previous=new Set(data.sent);drag=null;host.classList.remove('dragging');announce(data);build();if(fresh.length)animateTransmissions(fresh);}};
+  return {render(data){cancelDrag(false);if(snapshot&&snapshot.observer!==data.observer)yaw=0;const fresh=data.sent.filter(id=>!previous.has(id)&&origins[id]);snapshot=data;previous=new Set(data.sent);announce(data);build();if(fresh.length)animateTransmissions(fresh);}};
 };
