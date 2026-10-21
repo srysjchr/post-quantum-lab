@@ -53,6 +53,21 @@ const assert=require('node:assert/strict');
   if(checkpoint<2){await page.locator('#prediction-next').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.name),'kem-prediction');}
  }
  assert.equal(await page.locator('#prediction-next').isVisible(),false);
+ // Main-scene context loss must also expose unavailable controls accurately.
+ await page.goto(root);await page.waitForSelector('#scene canvas');await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.locator('#pause').click();assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true');
+ await page.evaluate(()=>{window.mainLoss=document.querySelector('#scene canvas').getContext('webgl2').getExtension('WEBGL_lose_context');window.mainLoss.loseContext();});
+ await page.waitForSelector('#fallback:not([hidden])');
+ assert.equal(await page.locator('#reset').isDisabled(),true,'Interrupted main camera reset must be disabled');
+ assert.equal(await page.locator('#pause').isDisabled(),true);assert.equal(await page.locator('#scene').getAttribute('aria-keyshortcuts'),null);
+ assert.match(await page.locator('#scene-motion-note').innerText(),/interrupted/);
+ await page.emulateMedia({reducedMotion:'reduce'});await page.emulateMedia({reducedMotion:'no-preference'});
+ assert.equal(await page.locator('#pause').isDisabled(),true);
+ await page.locator('[data-chapter="3"]').click();assert.equal(await page.locator('[data-phase="1"]').isEnabled(),true);
+ await page.evaluate(()=>window.mainLoss.restoreContext());await page.waitForSelector('#fallback[hidden]',{state:'attached'});
+ assert.equal(await page.locator('#reset').isEnabled(),true);assert.equal(await page.locator('#pause').isEnabled(),true);
+ assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true','Restoration retains manual pause preference');
+ assert.match(await page.locator('#scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);
  assert.deepEqual(errors,[]);
  console.log('PASS: independent quantum/attack descriptions; unique document IDs across six chapters; no runtime or HTTP errors.');
  }finally{await browser.close();}

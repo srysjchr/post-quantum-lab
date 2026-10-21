@@ -330,3 +330,6 @@ Scene updates and page hiding cancel active drags and release pointer capture be
 
 ## Daily interactions 4 - 2026-10-21
 Guided prediction start/next actions focus the new answer group; reveal focuses its explanation instead of leaving focus on a disabled submit button. The group describes its actual question for assistive technology. Verified all three correct checkpoints, final completion and existing wrong-answer/restart/observer regressions in Chromium.
+
+## Daily interactions 5 - 2026-10-21
+Main-scene WebGL interruption disables reset/motion controls, removes unavailable shortcuts, blocks rotation input and explains that lessons remain usable. Restoration restores availability and the manual pause preference. Verified real loss/restoration across system-motion changes, chapter controls during loss, plus offscreen suspension/resumption and pause regression checks.

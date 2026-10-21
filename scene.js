@@ -171,9 +171,11 @@ window.createLearningScene = function (container, fallback) {
   }
   function schedule() { if (!frame && !paused && !document.hidden && !lost && inViewport) { lastTime = 0; frame = requestAnimationFrame(animate); } }
   function syncPause() {
-    const button=document.getElementById('pause');button.disabled=motion.matches;
-    button.textContent=motion.matches?'Motion reduced':paused?'Play motion':'Pause motion';button.setAttribute('aria-pressed',String(paused));
-    document.getElementById('scene-motion-note').textContent=motion.matches?'System reduced motion is active. Manual rotation and lesson controls still work.':userPaused?'Motion is paused. Manual rotation and lesson controls still work.':'Automatic motion is on. Use Pause motion to stop it.';
+    const button=document.getElementById('pause');button.disabled=motion.matches||lost;
+    document.getElementById('reset').disabled=lost;
+    if(lost)container.removeAttribute('aria-keyshortcuts');else container.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight ArrowUp ArrowDown Home Escape');
+    button.textContent=lost?'3D interrupted':motion.matches?'Motion reduced':paused?'Play motion':'Pause motion';button.setAttribute('aria-pressed',String(paused));
+    document.getElementById('scene-motion-note').textContent=lost?'3D is interrupted. Lesson controls and exercises still work.':motion.matches?'System reduced motion is active. Manual rotation and lesson controls still work.':userPaused?'Motion is paused. Manual rotation and lesson controls still work.':'Automatic motion is on. Use Pause motion to stop it.';
   }
   function cancelDrag(){
     if(!dragging)return;const pointer=dragging.id;dragging=null;
@@ -198,12 +200,12 @@ window.createLearningScene = function (container, fallback) {
     const {width,height}=container.getBoundingClientRect(); if (!width || !height) return;
     camera.aspect=width/height; camera.zoom=width<500?0.95:(state.mode==='lattice'?1.5:1.05); camera.updateProjectionMatrix(); renderer.setSize(width,height,false); draw();
   }).observe(container);
-  container.addEventListener('pointerdown',event => { if (!event.isPrimary || event.button!==0) return; dragging={id:event.pointerId,x:event.clientX,y:event.clientY}; container.setPointerCapture(event.pointerId); });
+  container.addEventListener('pointerdown',event => { if (lost || !event.isPrimary || event.button!==0) return; dragging={id:event.pointerId,x:event.clientX,y:event.clientY}; container.setPointerCapture(event.pointerId); });
   container.addEventListener('pointermove',event => { if (!dragging || event.pointerId!==dragging.id) return; root.rotation.y+=(event.clientX-dragging.x)*0.006; root.rotation.x=THREE.MathUtils.clamp(root.rotation.x+(event.clientY-dragging.y)*0.004,-0.7,0.7); dragging.x=event.clientX;dragging.y=event.clientY;draw(); });
   for (const event of ['pointerup','pointercancel','lostpointercapture']) container.addEventListener(event,cancelDrag);
-  container.addEventListener('keydown',event => { if(event.target!==container)return; if(event.key==='Escape'){event.preventDefault();cancelDrag();return;} if(event.key==='Home'){event.preventDefault();api.reset();return;} if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); if (event.key==='ArrowLeft') root.rotation.y-=0.15; if (event.key==='ArrowRight') root.rotation.y+=0.15; if (event.key==='ArrowUp') root.rotation.x=Math.max(-0.7,root.rotation.x-0.1); if (event.key==='ArrowDown') root.rotation.x=Math.min(0.7,root.rotation.x+0.1);draw(); });
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();lost=true;cancelDrag();cancelAnimationFrame(frame);frame=0;fallback.hidden=false;fallback.textContent='The 3D context was interrupted. The lesson remains available while the browser restores it.';});
-  renderer.domElement.addEventListener('webglcontextrestored',()=>{lost=false;fallback.hidden=true;draw();schedule();});
+  container.addEventListener('keydown',event => { if(lost||event.target!==container)return; if(event.key==='Escape'){event.preventDefault();cancelDrag();return;} if(event.key==='Home'){event.preventDefault();api.reset();return;} if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return; event.preventDefault(); if (event.key==='ArrowLeft') root.rotation.y-=0.15; if (event.key==='ArrowRight') root.rotation.y+=0.15; if (event.key==='ArrowUp') root.rotation.x=Math.max(-0.7,root.rotation.x-0.1); if (event.key==='ArrowDown') root.rotation.x=Math.min(0.7,root.rotation.x+0.1);draw(); });
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();lost=true;syncPause();cancelDrag();cancelAnimationFrame(frame);frame=0;fallback.hidden=false;fallback.textContent='The 3D context was interrupted. The lesson remains available while the browser restores it.';});
+  renderer.domElement.addEventListener('webglcontextrestored',()=>{lost=false;syncPause();fallback.hidden=true;draw();schedule();});
   window.addEventListener('pagehide',()=>{cancelDrag();cancelAnimationFrame(frame);frame=0;});window.addEventListener('pageshow',schedule);
   syncPause(); return api;
 };
