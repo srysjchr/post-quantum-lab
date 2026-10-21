@@ -8,7 +8,8 @@ window.createWireScene = function (transmit) {
   const tokens = [...host.querySelectorAll('[data-wire-token]')];
   const THREE = window.THREE;
   const positions = {alice:[-3,0,-1], bob:[3,0,-1], eve:[0,0,3]};
-  const publicPositions = {ek:[3,1,-1], c:[-3,1,-1]};
+  const publicPositions = {ek:[3,2.35,-1], c:[-3,2.35,-1]};
+  const actorColors={alice:0x78c9ff,bob:0xa6f4c5,eve:0xffb15c};
   const origins = {...publicPositions, dk:[3,1,-1], K:[-3,1,-1], traffic:[-3,1,-1]};
   const secretIds = ['dk','K','traffic'];
   let renderer, scene, camera, root, snapshot, drag=null, frame=0, interrupted=false, suppressClick=false;
@@ -37,6 +38,13 @@ window.createWireScene = function (transmit) {
       const source=data.sent.includes('K')?'captured directly':data.known.eve.includes('K')?'inferred from captured dk + c':'unavailable from the current capture';
       document.getElementById('wire-observer-knowledge').textContent+=` · K source: ${source}.`;
     }
+    for(const card of document.querySelectorAll('[data-wire-participant]')){
+      const actor=card.dataset.wireParticipant;card.classList.toggle('active',role===actor);
+      const lines=actor==='bob'?[privateLabel(actor,'dk',data),privateLabel(actor,'K',data)]:[privateLabel(actor,'K',data)];
+      if(actor==='eve')lines.push(`Captured: ${data.sent.join(', ')||'nothing yet'}`);
+      card.querySelector('[data-participant-state]').textContent=lines.join('\n');
+    }
+    renderRoute(data);
     for(const token of tokens) token.disabled=data.sent.includes(token.dataset.wireToken);
   }
   try {
@@ -56,11 +64,58 @@ window.createWireScene = function (transmit) {
   function material(color,opacity=1){return new THREE.MeshBasicMaterial({color,transparent:opacity<1,opacity});}
   function sphere(position,color,radius=.16){const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,16,12),material(color));mesh.position.set(...position);root.add(mesh);return mesh;}
   function text(value,position,color='#d9e7ee',scale=1){
-    const canvas=document.createElement('canvas');canvas.width=384;canvas.height=100;
-    const ctx=canvas.getContext('2d');ctx.font='bold 48px Arial';ctx.textAlign='center';ctx.fillStyle=color;ctx.fillText(value,192,62);
-    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthWrite:false,depthTest:false}));sprite.position.set(...position);sprite.scale.set(3.6*scale,.94*scale,1);sprite.userData.label=value;root.add(sprite);
+    const canvas=document.createElement('canvas');canvas.width=192;canvas.height=96;
+    const ctx=canvas.getContext('2d');ctx.font='bold 64px Arial';ctx.textAlign='center';ctx.fillStyle=color;ctx.fillText(value,96,70);
+    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),depthWrite:false,depthTest:false}));sprite.position.set(...position);sprite.scale.set(1.8*scale,.9*scale,1);root.add(sprite);
   }
-  function line(from,to,color=0x88a8ce){root.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...from),new THREE.Vector3(...to)]),new THREE.LineBasicMaterial({color,transparent:true,opacity:.6})));}
+  // Each symbolic object keeps its shape in local state, in flight and in capture.
+  function objectShape(id,position,scale=1,color=0xffb15c,zone='local'){
+    const group=new THREE.Group();group.position.set(...position);group.scale.setScalar(scale);group.userData={object:id,zone};
+    const add=(geometry,x=0,y=0,z=0,tint=color)=>{const mesh=new THREE.Mesh(geometry,material(tint));mesh.position.set(x,y,z);group.add(mesh);return mesh;};
+    if(id==='ek'){
+      add(new THREE.TorusGeometry(.18,.055,8,20),-.2);
+      add(new THREE.BoxGeometry(.42,.09,.09),.15);
+      add(new THREE.BoxGeometry(.09,.17,.09),.27,-.06);
+      add(new THREE.BoxGeometry(.09,.13,.09),.11,-.04);
+    }else if(id==='c'){
+      const body=add(new THREE.CylinderGeometry(.13,.13,.38,16));body.rotation.z=Math.PI/2;
+      add(new THREE.SphereGeometry(.13,12,8),-.19);add(new THREE.SphereGeometry(.13,12,8),.19);
+      const seal=add(new THREE.TorusGeometry(.137,.022,6,16),0,0,0,0x18232d);seal.rotation.y=Math.PI/2;
+    }else if(id==='dk'){
+      add(new THREE.BoxGeometry(.48,.44,.3));
+      add(new THREE.BoxGeometry(.39,.35,.035),0,0,.17,0x18313c);
+      add(new THREE.TorusGeometry(.09,.026,6,16),0,0,.2);
+      add(new THREE.BoxGeometry(.025,.15,.025),0,0,.21);
+    }else if(id==='K'){
+      add(new THREE.OctahedronGeometry(.27));
+    }else{
+      add(new THREE.BoxGeometry(.48,.32,.055));
+      for(const y of [-.07,.02,.1])add(new THREE.BoxGeometry(.32,.025,.015),0,y,.04,0x18313c);
+    }
+    root.add(group);return group;
+  }
+  function line(from,to,color=0x88a8ce,dashed=false){
+    const geometry=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...from),new THREE.Vector3(...to)]);
+    const stroke=dashed?new THREE.LineDashedMaterial({color,dashSize:.13,gapSize:.09,transparent:true,opacity:.75}):new THREE.LineBasicMaterial({color,transparent:true,opacity:.7});
+    const segment=new THREE.Line(geometry,stroke);if(dashed)segment.computeLineDistances();root.add(segment);
+  }
+  function arrow(from,to,color=0xffb15c,dashed=false){
+    if(dashed)line(from,to,color,true);
+    const origin=new THREE.Vector3(...from),direction=new THREE.Vector3(...to).sub(origin),length=direction.length();direction.normalize();
+    const helper=new THREE.ArrowHelper(direction,origin,length,color,.22,.12);if(dashed)helper.line.visible=false;root.add(helper);
+  }
+  function renderRoute(data){
+    const delivered=data.sent.includes('c'),published=data.sent.includes('ek');
+    for(const [step,done] of [['ek',published],['c',delivered],['decaps',delivered],['capture',data.sent.length>0]]){
+      const item=document.querySelector(`[data-route-step="${step}"]`);item.dataset.state=done?'complete':'pending';item.removeAttribute('aria-current');
+    }
+    document.getElementById('wire-packet-route').dataset.stage='settled';
+    document.querySelector('[data-route-step="decaps"] span').textContent=delivered?'Complete: Decaps(dk, c) runs inside Bob. K stays local.':data.sent.includes('K')?'No c delivered yet. Bob knows K through the explicit secret exposure.':'Waiting for c. Bob will compute Decaps(dk, c) locally.';
+    document.querySelector('[data-route-step="capture"] span').textContent=data.sent.length?`Captured: ${data.sent.join(', ')}. ${data.known.eve.includes('K')?'Eve knows K after secret exposure in this experiment.':'Public copies do not reveal K under this model’s assumptions.'}`:'No captures yet. Eve receives copies when objects are sent.';
+    const exposed=data.sent.filter(id=>secretIds.includes(id));
+    document.getElementById('wire-flight-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge.':delivered?'c delivered · Bob computed K locally.':published?'ek delivered · send public c next.':'Public ek and c travel. K stays inside the endpoints.';
+    document.getElementById('wire-path-caption').textContent=exposed.length?`Secret exposure: ${exposed.join(', ')}. Red objects travelled by mistake; this is not the intended public-only exchange.`:delivered?'Public c travels Alice → Bob, with a copy to Eve. Bob computes Decaps(dk, c) locally; K never travels with c.':published?'Public ek travels Bob → Alice, with a copy to Eve. Next, send Alice’s public capsule c.':'Prepared exchange: Alice already holds authenticated ek and has created (K, c). Send ek or c to trace a public object. Arrows show delivery; dashed branches show Eve’s recorded copy.';
+  }
   function clear(){
     cancelAnimationFrame(frame);frame=0;meshes.clear();
     const geometries=new Set(),materials=new Set(),textures=new Set();
@@ -83,55 +138,85 @@ window.createWireScene = function (transmit) {
 
     // Reserve screen space for the 54px drag controls, including narrow side views.
     const extent=Math.max(...Object.values(publicPositions).map(p=>Math.abs(new THREE.Vector3(...p).project(camera).x)));
-    const safe=Math.max(.3,1-72/Math.max(host.clientWidth,1));
+    const safe=Math.max(.3,1-82/Math.max(host.clientWidth,1));
     if(extent>safe){camera.zoom*=safe/extent;camera.updateProjectionMatrix();}
+    const vertical=Math.max(...Object.values(publicPositions).map(p=>Math.abs(new THREE.Vector3(...p).project(camera).y)));
+    const safeY=1-88/Math.max(host.clientHeight,100);
+    if(vertical>safeY){camera.zoom*=safeY/vertical;camera.updateProjectionMatrix();}
+    // Keep every endpoint zone in view when a side camera is rotated.
+    const corners=Object.values(positions).flatMap(([x,y,z])=>[-1.05,1.05].flatMap(dx=>[-1.05,1.05].flatMap(dz=>[-.8,1].map(dy=>new THREE.Vector3(x+dx,y+dy,z+dz).project(camera)))));
+    const actorExtent=Math.max(...corners.map(v=>Math.max(Math.abs(v.x),Math.abs(v.y))));
+    if(actorExtent>.94){camera.zoom*=.94/actorExtent;camera.updateProjectionMatrix();}
+
 
   }
-  function privateLabel(role,key){
-    if(!snapshot.known[role].includes(key))return `${key}: not yet`;
-    const observer=snapshot.observer;
-    if(observer==='learner'||observer===role||snapshot.known[observer]?.includes(key))return `${key}: ${snapshot.known.eve.includes(key)?'exposed':'private'}`;
+  function privateLabel(role,key,data=snapshot){
+    if(!data.known[role].includes(key))return `${key}: ${role==='eve'?'Unknown':'not yet'}`;
+    const observer=data.observer;
+    if(observer==='learner'||observer===role||data.known[observer]?.includes(key))return `${key}: ${data.known.eve.includes(key)?'exposed':'private'}`;
     return `${key}: Unknown`;
   }
   function build(){
-    clear();setCamera(snapshot.observer);
-    const platform=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.07,48),material(0x18313c,.65));platform.position.y=-.6;root.add(platform);
+    clear();renderRoute(snapshot);setCamera(snapshot.observer);
+    const platform=new THREE.Mesh(new THREE.CylinderGeometry(4.8,4.8,.07,48),material(0x132c38,.85));platform.position.y=-.6;root.add(platform);
     const labels=[];
     for(const role of ['alice','bob','eve']){
-      const [x,y,z]=positions[role],active=snapshot.observer===role;
-      const body=new THREE.Mesh(new THREE.CylinderGeometry(.33,.5,.75,16),material(role==='eve'?0xffb15c:active?0xa6f4c5:0x88a8ce,.65));body.position.set(x,y,z);root.add(body);sphere([x,.65,z],role==='eve'?0xffb15c:0xa6f4c5,.23);
-      text(role.toUpperCase(),[x,-.85,z],role==='eve'?'#ffb15c':'#a6f4c5',.8);
-      const key=privateLabel(role,'K');labels.push(`${role} ${key}`);if(role!=='eve')text(key,[x,1.7,z],key.includes('Unknown')?'#a5b8cc':'#a6f4c5',.68);
-      if(role==='bob'){const dk=privateLabel(role,'dk');labels.push(`bob ${dk}`);text(dk,[x,2.15,z],'#a5b8cc',.6);}
-      // The marker stays inside the participant area; it never follows a public packet.
-      if(snapshot.known[role].includes('K'))sphere([x+.48,.3,z],key.includes('Unknown')?0x526577:0xa6f4c5,.12);
+      const [x,y,z]=positions[role],color=actorColors[role],active=snapshot.observer===role;
+      const zone=new THREE.Mesh(new THREE.CylinderGeometry(1,1,.06,32),material(color,active ? .18 : .08));zone.position.set(x,-.47,z);root.add(zone);
+      const rim=new THREE.Mesh(new THREE.TorusGeometry(1,.018,6,40),material(color,.65));rim.rotation.x=Math.PI/2;rim.position.set(x,-.42,z);root.add(rim);
+      const body=new THREE.Mesh(new THREE.CylinderGeometry(.3,.43,.7,16),material(color,.85));body.position.set(x,y,z);body.userData.participant=role;root.add(body);sphere([x,.64,z],color,.22);
+      text(role[0].toUpperCase(),[x,-.7,z+.6],`#${color.toString(16)}`,1);
+      const key=privateLabel(role,'K');labels.push(`${role} ${key}`);
+      if(role==='bob'){
+        labels.push(`bob ${privateLabel(role,'dk')}`);
+        objectShape('dk',[x-.7,.1,z],1.1,privateLabel(role,'dk').includes('Unknown')?0x526577:color);
+      }
+      if(snapshot.known[role].includes('K'))objectShape('K',[x+.65,.2,z],1,key.includes('Unknown')?0x526577:color).userData.actor=role;
+      if(snapshot.known[role].includes('traffic'))objectShape('traffic',[x+.65,.05,z+.5],.8,key.includes('Unknown')?0x526577:color).userData.actor=role;
     }
-    line([-3,.2,-1],[0,.2,0]);line([3,.2,-1],[0,.2,0]);line([0,.2,0],[0,.2,3],0xffb15c);
-
-    for(const id of ['ek','c'])if(!snapshot.sent.includes(id))meshes.set(id,sphere(publicPositions[id],0xffb15c,.2));
+    const route=secretIds.includes(snapshot.focus)?snapshot.focus:snapshot.sent.includes('c')?'c':'ek';
+    const origin=origins[route],channel=[0,.9,0],destination=[...positions[route==='ek'||route==='dk'?'alice':'bob']];destination[1]=.9;
+    const color=secretIds.includes(route)?0xff6969:0xffb15c;
+    arrow(origin,channel,color);arrow(channel,destination,color);arrow(channel,[0,.6,2.35],color,true);
+    for(const id of ['ek','c'])if(!snapshot.sent.includes(id))meshes.set(id,objectShape(id,publicPositions[id],1.2,0xffb15c,'public'));
     snapshot.sent.forEach((id,index)=>{
-      const x=(index-(snapshot.sent.length-1)/2)*.42;
-      sphere([x,.6,2.5],secretIds.includes(id)?0xff6969:0xffb15c,id===snapshot.focus ? .17 : .12);
-      if(id===snapshot.focus){const ring=new THREE.Mesh(new THREE.TorusGeometry(.23,.025,8,32),material(0xffffff));ring.position.set(x,.6,2.5);ring.rotation.x=Math.PI/2;root.add(ring);}
+      const x=(index-(snapshot.sent.length-1)/2)*.56;
+      objectShape(id,[x,.55,2.35],snapshot.focus===id ? .75 : .58,secretIds.includes(id)?0xff6969:0xffb15c,'capture');
+      if(id===snapshot.focus){const ring=new THREE.Mesh(new THREE.TorusGeometry(.27,.025,8,32),material(0xffffff));ring.position.set(x,.55,2.35);ring.rotation.x=Math.PI/2;root.add(ring);}
     });
-    host.setAttribute('aria-label',`${sceneDescription} ${labels.join('. ')}.`);
+    host.setAttribute('aria-label',`${sceneDescription} ${labels.join('. ')}. Key shape: ek. Capsule: c. Vault: dk. Diamond: K. Solid arrows show delivery; dashed arrows show Eve’s copy.`);
     overlays();draw();
   }
   function animateTransmissions(ids){
-    if(!userMotion||motion.matches||document.hidden||interrupted)return;
-    const channel=new THREE.Vector3(0,.7,0),eve=new THREE.Vector3(0,.7,2.5);
+    if(!userMotion||motion.matches||document.hidden||interrupted||disposed)return;
+    const channel=new THREE.Vector3(0,.9,0),eve=new THREE.Vector3(0,.6,2.35);
     const packets=ids.map(id=>{
-      const start=new THREE.Vector3(...origins[id]),end=new THREE.Vector3(...positions[id==='ek'||id==='dk'?'alice':'bob']);end.y=1;
+      const start=new THREE.Vector3(...origins[id]),end=new THREE.Vector3(...positions[id==='ek'||id==='dk'?'alice':'bob']);end.y=.9;
       const color=secretIds.includes(id)?0xff6969:0xffb15c;
-      return {start,end,packet:sphere(start.toArray(),color,.15),copy:sphere(start.toArray(),color,.12)};
+      return {id,start,end,packet:objectShape(id,start.toArray(),.9,color,'packet'),copy:objectShape(id,start.toArray(),.7,color,'packet-copy')};
     });
-    const began=performance.now();
+    const hasC=ids.includes('c'),publicOnly=ids.every(id=>!secretIds.includes(id));
+    let pulse=null,lastStage='';
+    if(hasC){pulse=new THREE.Mesh(new THREE.TorusGeometry(.85,.045,8,32),material(0xa6f4c5));pulse.rotation.x=Math.PI/2;pulse.position.set(3,-.38,-1);pulse.visible=false;root.add(pulse);}
+    const began=performance.now(),duration=hasC?1900:1400;
     function tick(now){
-      const t=Math.min((now-began)/1100,1);
+      const t=Math.min((now-began)/duration,1),travel=Math.min(t/.72,1);
       for(const {start,end,packet,copy} of packets){
-        if(t<.5){packet.position.lerpVectors(start,channel,t*2);copy.position.copy(packet.position);}else{packet.position.lerpVectors(channel,end,(t-.5)*2);copy.position.lerpVectors(channel,eve,(t-.5)*2);}
+        if(travel<.45){packet.position.lerpVectors(start,channel,travel/.45);copy.position.copy(packet.position);}else{packet.position.lerpVectors(channel,end,(travel-.45)/.55);copy.position.lerpVectors(channel,eve,(travel-.45)/.55);}
+        packet.visible=travel<1;copy.visible=travel<1;
       }
-      draw();if(t<1&&userMotion&&!motion.matches&&!document.hidden&&!interrupted)frame=requestAnimationFrame(tick);else{packets.forEach(({packet,copy})=>{packet.visible=false;copy.visible=false;});frame=0;draw();}
+      const stage=travel<1?'delivery':hasC?'decaps':'capture';
+      if(stage!==lastStage){
+        lastStage=stage;document.getElementById('wire-packet-route').dataset.stage=stage;
+        for(const item of document.querySelectorAll('[data-route-step]'))item.removeAttribute('aria-current');
+        const current=stage==='delivery'?(hasC?'c':'ek'):stage;document.querySelector(`[data-route-step="${current}"]`)?.setAttribute('aria-current','step');
+        document.getElementById('wire-flight-status').textContent=stage==='decaps'?'Bob: Decaps(dk, c) locally.':publicOnly?(hasC?'c → Bob · public copy → Eve.':'ek → Alice · public copy → Eve.'):'Secret exposure · Eve records the objects.';
+        document.getElementById('wire-path-caption').textContent=stage==='decaps'?`Bob computes Decaps(dk, c) locally. The diamond K stays inside Bob’s endpoint. ${snapshot.known.eve.includes('K')?'Eve also knows K through the explicit secret exposure in this experiment.':'Eve records c, not K.'}`:publicOnly?'Orange public objects travel to their recipient. The dashed branch records Eve’s copy of the same object.':'Red objects illustrate explicit secret exposure. Eve records these objects too.';
+      }
+      if(pulse){pulse.visible=stage==='decaps';pulse.scale.setScalar(1+Math.sin((t-.72)/.28*Math.PI)*.2);}
+      draw();
+      if(t<1&&!document.hidden&&!interrupted&&!disposed)frame=requestAnimationFrame(tick);
+      else{for(const {packet,copy} of packets){packet.visible=false;copy.visible=false;}if(pulse)pulse.visible=false;frame=0;renderRoute(snapshot);draw();}
     }
     frame=requestAnimationFrame(tick);
   }
@@ -176,7 +261,7 @@ window.createWireScene = function (transmit) {
   syncControls();motionControl.onchange=()=>{userMotion=motionControl.checked;syncMotion();if(snapshot)build();};
   motion.addEventListener('change',()=>{syncMotion();if(snapshot)build();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;cancelDrag();}else if(snapshot)build();});
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;syncControls();cancelAnimationFrame(frame);frame=0;cancelDrag();fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';});
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;syncControls();cancelAnimationFrame(frame);frame=0;cancelDrag();if(snapshot)renderRoute(snapshot);fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;syncControls();fallback.hidden=true;if(snapshot)build();});
   window.addEventListener('pagehide',()=>{cancelDrag(false);disposed=true;cancelAnimationFrame(frame);frame=0;});
   window.addEventListener('pageshow',()=>{disposed=false;if(snapshot)build();});

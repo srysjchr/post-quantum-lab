@@ -223,3 +223,14 @@ Quantum algorithm explanations and Attack Playground descriptions have independe
 Guided predictions focus the next answer or revealed explanation. Previous/next lesson, scenario and repair navigation focuses the new heading, including at disabled endpoints. Quiz and scenario errors describe their answer groups and clear on edits or navigation. Modified reflection links open normally without changing a pending explanation in the source tab; an ordinary click still selects the matching topic.
 
 Run `node tests/daily-interactions.cjs` with the existing Playwright configuration for these regressions, real WebGL loss/restoration, real Ctrl-click new tabs and 320/390/768/1440 viewport checks. Optional `EVIDENCE_DIR` saves wire and scenario screenshots outside the repository. These changes add no dependencies or stored learning data.
+
+
+## Readable 3D wire graphics
+
+The Build the Wire scene gives Alice, Bob and Eve separate endpoint zones with matching A/B/E badges and readable participant cards outside the drag canvas. Public drag controls sit above the endpoint models. Camera fitting keeps the public controls and all participant zones visible across narrow screens and rotated side views.
+
+Object shapes remain consistent in the endpoint, in flight and in Eve's capture: ek is a key, c a capsule, dk a vault, K a diamond and the traffic key a card. A text-and-shape legend supplements the public/exposure colors. Unknown state stays filtered by the selected observer; shape visibility never exposes secret bytes.
+
+Solid arrows show delivery; a dashed branch shows Eve's recorded copy. The four-step route and nearby flight status connect public ek, public c, Bob's local Decaps and Eve's capture. Only the sent objects travel; Bob's K and derived traffic key stay inside his endpoint during the intended exchange. A local pulse illustrates Decaps, while the final knowledge state updates immediately as before. Reduced/manual motion and WebGL fallback retain the static explanation. Secret-exposure narration accounts for previously captured dk or K.
+
+Run `node tests/wire-graphics.cjs` with the existing Playwright environment for rendered shape geometry, animated public delivery/copy, local secret positions, all camera presets and rotated views at 320/390/768/1440 widths, motion/reset behavior, exposures and WebGL fallback. Optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repository. No dependencies or stored profile fields are added.
