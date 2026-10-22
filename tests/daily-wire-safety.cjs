@@ -44,6 +44,16 @@ const assert=require('node:assert/strict');
  assert.match(await page.locator('[data-route-step="capture"] strong').innerText(),/1 capture/);
  await page.locator('#wire-send-ek').click();assert.match(await page.locator('[data-route-step="ek"] strong').innerText(),/delivered/);
  assert.match(await page.locator('[data-route-step="capture"] strong').innerText(),/2 captures/);
+ // Disabled action endpoints hand keyboard focus to the relevant input.
+ await page.selectOption('#wire-inspect','ek');await page.locator('#wire-inspect-prev').press('Space');
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect','First capture must keep keyboard focus in inspection');
+ assert.equal(await page.inputValue('#wire-inspect'),'c');
+ await page.locator('#wire-inspect-next').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');
+ await page.selectOption('#wire-inspect','c');await page.locator('#wire-inspect-latest').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'wire-inspect');
+ await page.check('[data-wire-object="K"]');await page.locator('#wire-clear-queued').press('Space');
+ assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('data-wire-object')),'dk','Clearing a queue focuses its first available object');
+ assert.equal(await page.locator('#wire-objects input:checked').count(),0);assert.equal(await page.locator('#wire-transcript li').count(),2);
+ await page.selectOption('#wire-inspect','c');await page.locator('#wire-inspect-latest').click();assert.notEqual(await page.evaluate(()=>document.activeElement.id),'wire-inspect','Pointer browsing must not force the keyboard handoff');
  for(const width of [320,390,768,1440]){
   await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Route overflow at ${width}`);
   if(process.env.EVIDENCE_DIR&&[320,1440].includes(width)){await page.locator('#wire-packet-route').scrollIntoViewIfNeeded();await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-wire-state-${width}.png`)});}

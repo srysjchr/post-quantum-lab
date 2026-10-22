@@ -364,3 +364,6 @@ Wire resize/exercise-toggle changes cancel active drag capture and settle packet
 
 ## Daily wire reliability 3 - 2026-10-22
 Packet-route headings explicitly state Waiting/delivered/local Decaps complete and capture counts, so progress does not rely on border color. Participant cards expose a named semantic group. Reproduced the absent accessible group and verified c-first pending/delivered states, singular/plural capture counts, reset and 320/390/768/1440 layouts with screenshot evidence.
+
+## Daily wire reliability 4 - 2026-10-22
+Keyboard capture browsing hands focus to inspection when Previous/Next/Latest becomes disabled; clearing unsent selections focuses the first available checkbox. The existing keyboard send handoff shares the same small helper. Reproduced body focus at the first capture, then verified Enter/Space endpoints, unchanged captures, no accidental queue selection and unchanged pointer behavior, plus prior keyboard/usability regressions.

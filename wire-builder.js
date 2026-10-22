@@ -122,14 +122,15 @@ window.createWireBuilder = function () {
     window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type:'wire-updated'}}));
   };
   $('wire-reflect').onclick=event=>{const link=event.currentTarget;if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||link.hasAttribute('download')||(link.target&&link.target!=='_self')||reflectionTopic===null)return;const select=$('teach-topic');if(select.value!==String(reflectionTopic)){select.value=String(reflectionTopic);select.dispatchEvent(new Event('change',{bubbles:true}));}};
-  function moveInspection(delta){const ids=[...sent],index=ids.indexOf(focus);if(ids[index+delta]){focus=ids[index+delta];render();}}
-  $('wire-inspect-prev').onclick=()=>moveInspection(-1);$('wire-inspect-next').onclick=()=>moveInspection(1);
-  $('wire-inspect-latest').onclick=()=>{if(sent.size){focus=[...sent].at(-1);render();}};
-  $('wire-clear-queued').onclick=()=>{queued.clear();render();};
+  function focusAfterAction(event,target){if(event.detail===0&&event.currentTarget.disabled&&target){target.scrollIntoView({block:'nearest'});target.focus({preventScroll:true});}}
+  function moveInspection(delta,event){const ids=[...sent],index=ids.indexOf(focus);if(ids[index+delta]){focus=ids[index+delta];render();focusAfterAction(event,$('wire-inspect'));}}
+  $('wire-inspect-prev').onclick=event=>moveInspection(-1,event);$('wire-inspect-next').onclick=event=>moveInspection(1,event);
+  $('wire-inspect-latest').onclick=event=>{if(sent.size){focus=[...sent].at(-1);render();focusAfterAction(event,$('wire-inspect'));}};
+  $('wire-clear-queued').onclick=event=>{queued.clear();render();focusAfterAction(event,$('wire-objects').querySelector('input:not(:disabled)'));};
   $('wire-inspect').onchange=()=>{focus=$('wire-inspect').value;render();};
   function sendFromButton(ids,event){
     transmit(ids);
-    if(event.detail===0&&event.currentTarget.disabled){$('wire-inspect').scrollIntoView({block:'nearest'});$('wire-inspect').focus({preventScroll:true});}
+    focusAfterAction(event,$('wire-inspect'));
   }
   $('wire-send').onclick = event => sendFromButton([...queued],event);
   $('wire-send-ek').onclick = event => sendFromButton(['ek'],event);
