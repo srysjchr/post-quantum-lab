@@ -35,6 +35,19 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#wire-packet-route').getAttribute('data-stage'),'settled','A hidden exercise must not keep an active delivery stage');
  await exercise('build-the-wire');assert.equal(await page.locator('#wire-transcript li').count(),1);
  assert.equal(await page.locator('[data-route-step="decaps"]').getAttribute('data-state'),'complete');
+ // Route progress must remain understandable without green/gray borders.
+ await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#wire-reset').click();
+ assert.equal(await page.getByRole('group',{name:'Participant knowledge in the selected perspective'}).count(),1,'Participant labels need a named semantic group');
+ for(const id of ['ek','c'])assert.match(await page.locator(`[data-route-step="${id}"] strong`).innerText(),/Waiting/);
+ await page.locator('#wire-send-c').click();assert.match(await page.locator('[data-route-step="c"] strong').innerText(),/delivered/);
+ assert.match(await page.locator('[data-route-step="ek"] strong').innerText(),/Waiting/);
+ assert.match(await page.locator('[data-route-step="capture"] strong').innerText(),/1 capture/);
+ await page.locator('#wire-send-ek').click();assert.match(await page.locator('[data-route-step="ek"] strong').innerText(),/delivered/);
+ assert.match(await page.locator('[data-route-step="capture"] strong').innerText(),/2 captures/);
+ for(const width of [320,390,768,1440]){
+  await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Route overflow at ${width}`);
+  if(process.env.EVIDENCE_DIR&&[320,1440].includes(width)){await page.locator('#wire-packet-route').scrollIntoViewIfNeeded();await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-wire-state-${width}.png`)});}
+ }
  assert.deepEqual(errors,[]);console.log('PASS: capture provenance for public/traffic/dk/K/mixed exposures; secret-only route highlighting; no runtime/HTTP errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

@@ -106,8 +106,13 @@ window.createWireScene = function (transmit) {
   }
   function renderRoute(data){
     const delivered=data.sent.includes('c'),published=data.sent.includes('ek');
-    for(const [step,done] of [['ek',published],['c',delivered],['decaps',delivered],['capture',data.sent.length>0]]){
-      const item=document.querySelector(`[data-route-step="${step}"]`);item.dataset.state=done?'complete':'pending';item.removeAttribute('aria-current');
+    for(const [step,done,label] of [
+      ['ek',published,published?'1 · ek delivered':'1 · Waiting for ek'],
+      ['c',delivered,delivered?'2 · c delivered':'2 · Waiting for c'],
+      ['decaps',delivered,delivered?'3 · Local Decaps complete':'3 · Waiting to decapsulate'],
+      ['capture',data.sent.length>0,data.sent.length?`4 · Inspect ${data.sent.length} capture${data.sent.length===1?'':'s'}`:'4 · No captures yet']
+    ]){
+      const item=document.querySelector(`[data-route-step="${step}"]`);item.dataset.state=done?'complete':'pending';item.querySelector('strong').textContent=label;item.removeAttribute('aria-current');
     }
     document.getElementById('wire-packet-route').dataset.stage='settled';
     document.querySelector('[data-route-step="decaps"] span').textContent=delivered?'Complete: Decaps(dk, c) runs inside Bob. K stays local.':data.sent.includes('K')?'No c delivered yet. Bob knows K through the explicit secret exposure.':'Waiting for c. Bob will compute Decaps(dk, c) locally.';
