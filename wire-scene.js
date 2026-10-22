@@ -263,7 +263,15 @@ window.createWireScene = function (transmit) {
     token.addEventListener('lostpointercapture',cancelDrag);
     token.addEventListener('keydown',event=>{if(event.key==='Escape'){suppressClick=true;cancelDrag();}});
   }
-  new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;camera.aspect=w/h;if(snapshot)setCamera(snapshot.observer);camera.updateProjectionMatrix();renderer.setSize(w,h,false);overlays();draw();}).observe(host);
+  new ResizeObserver(()=>{
+    const w=host.clientWidth,h=host.clientHeight;
+    cancelDrag(false);cancelAnimationFrame(frame);frame=0;
+    if(!w||!h){if(snapshot)renderRoute(snapshot);return;}
+    camera.aspect=w/h;renderer.setSize(w,h,false);
+    if(snapshot)build();else{camera.updateProjectionMatrix();draw();}
+  }).observe(host);
+  const panel=host.closest('[data-exercise-panel]');
+  panel?.addEventListener('toggle',()=>{cancelDrag(false);cancelAnimationFrame(frame);frame=0;if(snapshot){renderRoute(snapshot);if(panel.open)build();}});
   syncControls();motionControl.onchange=()=>{userMotion=motionControl.checked;syncMotion();if(snapshot)build();};
   motion.addEventListener('change',()=>{syncMotion();if(snapshot)build();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;cancelDrag();}else if(snapshot)build();});

@@ -358,3 +358,6 @@ Final regression run: all 22 browser suites passed sequentially on the completed
 
 ## Daily wire reliability 1 - 2026-10-22
 Capture-route narration now distinguishes public copies, direct traffic/K exposure and compromised dk with or without matching c. Secret-only animation highlights capture instead of implying public ek was published. Reproduced traffic-only capture being described as public copies, then verified provenance, local-decapsulation graphics and exposure regressions. Knowledge rules are unchanged.
+
+## Daily wire reliability 2 - 2026-10-22
+Wire resize/exercise-toggle changes cancel active drag capture and settle packet motion. Reopening rebuilds the current experiment without stale packets. Reproduced held capture after a real desktop-to-mobile resize and motion continuing inside a collapsed native details panel; verified no send on release over the new drop position, collapse/reopen state, pointer/touch transmission, rotated bounds and motion/fallback regressions.
