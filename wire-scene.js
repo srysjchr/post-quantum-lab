@@ -111,7 +111,13 @@ window.createWireScene = function (transmit) {
     }
     document.getElementById('wire-packet-route').dataset.stage='settled';
     document.querySelector('[data-route-step="decaps"] span').textContent=delivered?'Complete: Decaps(dk, c) runs inside Bob. K stays local.':data.sent.includes('K')?'No c delivered yet. Bob knows K through the explicit secret exposure.':'Waiting for c. Bob will compute Decaps(dk, c) locally.';
-    document.querySelector('[data-route-step="capture"] span').textContent=data.sent.length?`Captured: ${data.sent.join(', ')}. ${data.known.eve.includes('K')?'Eve knows K after secret exposure in this experiment.':'Public copies do not reveal K under this model’s assumptions.'}`:'No captures yet. Eve receives copies when objects are sent.';
+    let captureReason='Public copies do not reveal K under this model’s assumptions.';
+    if(data.sent.includes('K'))captureReason='K was captured directly; Eve can derive the traffic key using agreed public context.';
+    else if(data.known.eve.includes('K'))captureReason='Eve can recover K from captured dk and matching c, then derive the traffic key.';
+    else if(data.sent.includes('dk'))captureReason='The private dk is compromised. Capturing matching c would let Eve recover K; K is not yet recovered.';
+    else if(data.sent.includes('traffic'))captureReason='The traffic key was captured directly. This does not by itself reveal K or dk.';
+    if(data.sent.includes('traffic')&&data.sent.some(id=>['dk','K'].includes(id)))captureReason+=' The traffic key was also captured directly.';
+    document.querySelector('[data-route-step="capture"] span').textContent=data.sent.length?`Captured: ${data.sent.join(', ')}. ${captureReason}`:'No captures yet. Eve receives copies when objects are sent.';
     const exposed=data.sent.filter(id=>secretIds.includes(id));
     document.getElementById('wire-flight-status').textContent=exposed.length?'Secret exposure changes Eve’s knowledge.':delivered?'c delivered · Bob computed K locally.':published?'ek delivered · send public c next.':'Public ek and c travel. K stays inside the endpoints.';
     document.getElementById('wire-path-caption').textContent=exposed.length?`Secret exposure: ${exposed.join(', ')}. Red objects travelled by mistake; this is not the intended public-only exchange.`:delivered?'Public c travels Alice → Bob, with a copy to Eve. Bob computes Decaps(dk, c) locally; K never travels with c.':published?'Public ek travels Bob → Alice, with a copy to Eve. Next, send Alice’s public capsule c.':'Prepared exchange: Alice already holds authenticated ek and has created (K, c). Send ek or c to trace a public object. Arrows show delivery; dashed branches show Eve’s recorded copy.';
@@ -209,7 +215,7 @@ window.createWireScene = function (transmit) {
       if(stage!==lastStage){
         lastStage=stage;document.getElementById('wire-packet-route').dataset.stage=stage;
         for(const item of document.querySelectorAll('[data-route-step]'))item.removeAttribute('aria-current');
-        const current=stage==='delivery'?(hasC?'c':'ek'):stage;document.querySelector(`[data-route-step="${current}"]`)?.setAttribute('aria-current','step');
+        const current=stage==='delivery'?(hasC?'c':ids.includes('ek')?'ek':'capture'):stage;document.querySelector(`[data-route-step="${current}"]`)?.setAttribute('aria-current','step');
         document.getElementById('wire-flight-status').textContent=stage==='decaps'?'Bob: Decaps(dk, c) locally.':publicOnly?(hasC?'c → Bob · public copy → Eve.':'ek → Alice · public copy → Eve.'):'Secret exposure · Eve records the objects.';
         document.getElementById('wire-path-caption').textContent=stage==='decaps'?`Bob computes Decaps(dk, c) locally. The diamond K stays inside Bob’s endpoint. ${snapshot.known.eve.includes('K')?'Eve also knows K through the explicit secret exposure in this experiment.':'Eve records c, not K.'}`:publicOnly?'Orange public objects travel to their recipient. The dashed branch records Eve’s copy of the same object.':'Red objects illustrate explicit secret exposure. Eve records these objects too.';
       }
