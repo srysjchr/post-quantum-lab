@@ -58,6 +58,6 @@ const assert=require('node:assert/strict');
   await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Route overflow at ${width}`);
   if(process.env.EVIDENCE_DIR&&[320,1440].includes(width)){await page.locator('#wire-packet-route').scrollIntoViewIfNeeded();await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`daily-wire-state-${width}.png`)});}
  }
- assert.deepEqual(errors,[]);console.log('PASS: capture provenance for public/traffic/dk/K/mixed exposures; secret-only route highlighting; no runtime/HTTP errors.');
+ assert.deepEqual(errors,[]);console.log('PASS: accurate exposure provenance and route highlighting; real resize drag cancellation; collapse/reopen settlement; semantic/textual route states; keyboard capture/queue focus; unchanged pointer behavior; four widths; no runtime/HTTP errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

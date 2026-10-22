@@ -234,3 +234,12 @@ Object shapes remain consistent in the endpoint, in flight and in Eve's capture:
 Solid arrows show delivery; a dashed branch shows Eve's recorded copy. The four-step route and nearby flight status connect public ek, public c, Bob's local Decaps and Eve's capture. Only the sent objects travel; Bob's K and derived traffic key stay inside his endpoint during the intended exchange. A local pulse illustrates Decaps, while the final knowledge state updates immediately as before. Reduced/manual motion and WebGL fallback retain the static explanation. Secret-exposure narration accounts for previously captured dk or K.
 
 Run `node tests/wire-graphics.cjs` with the existing Playwright environment for rendered shape geometry, animated public delivery/copy, local secret positions, all camera presets and rotated views at 320/390/768/1440 widths, motion/reset behavior, exposures and WebGL fallback. Optional `EVIDENCE_DIR` saves desktop/mobile screenshots outside the repository. No dependencies or stored profile fields are added.
+
+
+## Wire reliability and journey keyboard access
+
+The packet route explains direct traffic/K capture separately from compromised dk and recovery using matching c. A secret-only send highlights capture rather than public-key publication. Textual Waiting/delivered/local-computation states and capture counts supplement route colors; participant labels expose a named group. Resizing or closing the exercise cancels active drags and motion, then reopening shows the settled experiment. Keyboard capture browsing and queue clearing keep focus at a usable input when their action button becomes disabled.
+
+Message Journey retains the active dynamic control through synchronous updates and local asynchronous crypto. Disabled stage endpoints hand focus to the current heading. Completion respects a deliberate focus move and reset invalidates an old operation's pending focus request. No focus history is persisted.
+
+Run `node tests/daily-wire-safety.cjs` and `node tests/journey-keyboard.cjs` with the existing Playwright configuration. Both include 320/390/768/1440 width checks; optional `EVIDENCE_DIR` saves screenshots outside the repository.

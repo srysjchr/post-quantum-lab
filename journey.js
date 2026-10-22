@@ -4,6 +4,7 @@ window.createMessageJourney=function(){
  const names=['Authenticate','ML-KEM','Derive','AES-GCM','Verify'];
  const descriptions=['Alice checks that ek belongs to Bob. This identity binding is simulated; no certificate or signature is verified.','Bob publishes ek to Alice. Alice sends ciphertext c to Bob. Both hold K locally; K never crosses the network. This is simulated ML-KEM.','Real HKDF-SHA-256 runs independently at both endpoints using a fresh random 32-byte stand-in secret, not an ML-KEM output. Keys are non-exportable.','Alice encrypts UTF-8 text with her derived AES-256 key, a fresh 96-bit nonce, and a 128-bit tag.','Bob authenticates and decrypts with his independently derived key. Modified packets must fail authentication before any plaintext is accepted.'];
  let view='learner',stage=0,done=-1,epoch=0,busy=false,badKey=false,keys=null,salt=null,packet=null,verified=false,tampered=false,message='The future should not reveal today’s secrets.',status='';
+ let pendingFocus=null;
  const activity=type=>window.dispatchEvent(new CustomEvent('pqlab:activity',{detail:{type}}));
  const b64=v=>btoa(String.fromCharCode(...new Uint8Array(v)));
  function reset(){epoch++;stage=0;done=-1;busy=badKey=verified=tampered=false;keys=salt=packet=null;status='';activity('journey-reset');render();}
@@ -13,6 +14,9 @@ window.createMessageJourney=function(){
  $('journey-stages').replaceChildren(...names.map((text,i)=>{const li=node('li',''),b=node('button',`${i+1}. ${text}${done>=i?' ✓':''}`);b.dataset.stage=i;b.disabled=busy||i>done+1;b.setAttribute('aria-current',stage===i?'step':'false');b.onclick=()=>{stage=i;status='';render();};li.append(b);return li;}));
  }
  function render(){
+ const active=document.activeElement;
+ const focus=active===document.body?pendingFocus:$('message-journey').contains(active)?(active.id?{id:active.id}:active.dataset.stage!==undefined?{stage:active.dataset.stage}:null):null;
+ pendingFocus=null;
  renderStages();
  $('journey-kind').textContent=stage<2?'SIMULATION':'REAL WEB CRYPTO';$('journey-step-title').textContent=names[stage];$('journey-description').textContent=descriptions[stage];$('journey-status').textContent=status;$('journey-controls').replaceChildren();
  if(stage===0){const l=node('label',''),c=document.createElement('input');l.className='toggle-row';c.id='substituted-key';c.type='checkbox';c.checked=badKey;c.disabled=busy;l.append(c,document.createTextNode('Eve substitutes an untrusted public key'));c.onchange=()=>{epoch++;badKey=c.checked;done=-1;keys=salt=packet=null;verified=false;status='';render();};$('journey-controls').append(l);button('Check identity binding (simulation)','authenticate',()=>{if(badKey){done=-1;status='Blocked: the substituted key is not bound to Bob’s trusted identity.';activity('untrusted-blocked');}else{done=Math.max(done,0);status='Simulated identity binding accepted.';}render();});}
@@ -24,6 +28,12 @@ window.createMessageJourney=function(){
  $('journey-observer').textContent=view==='eve'?'EVE · Can capture ek, c, salt, nonce, ciphertext and tag. Cannot see K, private traffic keys or plaintext in this teaching view.':view==='bob'?'BOB · Holds private dk, then K and his traffic key. Accepts plaintext only after verification.':view==='alice'?'ALICE · Holds her message, then K and her traffic key. Bob’s dk remains private.':'LEARNER · Explains both endpoints. This local teaching app is not a secrecy boundary against someone inspecting its source or memory.';
  const output=$('journey-payload');output.replaceChildren();output.hidden=!salt&&!packet;if(salt)output.append(node('strong','PUBLIC HKDF SALT (BASE64)'),node('code',b64(salt)));if(packet){const bytes=new Uint8Array(packet.cipher.slice(0));if(tampered)bytes[0]^=1;output.append(node('strong','PUBLIC NONCE (BASE64)'),node('code',b64(packet.iv)),node('strong','PUBLIC CIPHERTEXT + TAG (BASE64)'),node('code',b64(bytes)));if(verified&&view!=='eve')output.append(node('strong','VERIFIED MESSAGE'),node('p',packet.plain||'(empty message)'));}
  $('journey-back').disabled=busy||stage===0;$('journey-forward').disabled=busy||stage===4||done<stage;
+ if(focus){
+  const target=focus.id?$(focus.id):$('journey-stages').querySelector(`[data-stage="${focus.stage}"]`);
+  if(target&&!target.disabled)target.focus({preventScroll:true});
+  else if(busy)pendingFocus=focus;
+  else $('journey-step-title').focus({preventScroll:true});
+ }
  }
  $('journey-reset').onclick=reset;$('journey-back').onclick=()=>{stage--;status='';render();};$('journey-forward').onclick=()=>{stage++;status='';render();};reset();return{setObserver(value){view=value;render();}};
 };
