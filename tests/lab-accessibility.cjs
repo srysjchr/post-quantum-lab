@@ -43,12 +43,32 @@ const assert=require('node:assert/strict');
  await page.check('#substitution-answers input[value="alice-eve"]');assert.equal(await page.locator('#substitution-feedback').getAttribute('class'),'');
  await page.locator('#substitution-check').click();assert.equal(await page.locator('#substitution-answers').getAttribute('aria-invalid'),null);
  await page.locator('#substitution-prev').click();assert.equal(await page.locator('#substitution-answers').getAttribute('aria-describedby'),null);
+ // Slow local crypto must return focus to its action unless the learner moved.
+ await exercise('attack-playground');await page.selectOption('#attack-mode','tamper');
+ await page.evaluate(()=>{const generate=crypto.subtle.generateKey.bind(crypto.subtle);crypto.subtle.generateKey=async(...args)=>{await new Promise(resolve=>setTimeout(resolve,300));return generate(...args);};});
+ await page.locator('#attack-prepare').press('Enter');await page.waitForFunction(()=>document.getElementById('attack-result').textContent.startsWith('Fresh packet'));
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'attack-prepare','Delayed preparation must restore keyboard focus');
+ await page.evaluate(()=>{const decrypt=crypto.subtle.decrypt.bind(crypto.subtle);crypto.subtle.decrypt=async(...args)=>{await new Promise(resolve=>setTimeout(resolve,300));return decrypt(...args);};});
+ await page.locator('#attack-run').press('Space');await page.waitForFunction(()=>document.getElementById('attack-result').textContent.startsWith('REJECTED'));
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'attack-run');
+ await page.locator('#attack-prepare').press('Enter');await page.locator('#attack-reset').focus();
+ await page.waitForFunction(()=>document.getElementById('attack-result').textContent.startsWith('Fresh packet'));assert.equal(await page.evaluate(()=>document.activeElement.id),'attack-reset','Completion must respect an intentional focus move');
+ await page.locator('#attack-prepare').press('Enter');await page.locator('#attack-reset').press('Enter');await page.waitForTimeout(400);
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'attack-reset');assert.equal(await page.locator('#attack-run').isDisabled(),true);
+ assert.match(await page.locator('#attack-result').innerText(),/Prepare a fresh/);
+ await page.locator('#attack-prepare').press('Enter');await exercise('scenario-lab');
+ await page.waitForFunction(()=>document.getElementById('attack-result').textContent.startsWith('Fresh packet'));
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'scenario-lab');assert.equal(await page.locator('[data-exercise-panel="attack-playground"]').getAttribute('open'),null);
+ await exercise('attack-playground');await page.evaluate(()=>{crypto.subtle.generateKey=async()=>{await new Promise(resolve=>setTimeout(resolve,300));throw new Error('Deliberate crypto failure');};});
+ await page.locator('#attack-prepare').press('Enter');await page.waitForFunction(()=>document.getElementById('attack-result').textContent.startsWith('Unable to run'));
+ assert.equal(await page.evaluate(()=>document.activeElement.id),'attack-prepare');assert.equal(await page.locator('#attack-prepare').isEnabled(),true);
  for(const width of [320,390,768,1440]){
   await page.setViewportSize({width,height:1000});await exercise('protocol-repair');await page.locator('#repair-reset').click();await page.locator('#repair-form button[type="submit"]').click();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`Repair overflow at ${width}`);
   assert.equal(await page.locator('#repair-feedback').isVisible(),true);
   if(process.env.EVIDENCE_DIR&&[320,1440].includes(width)){await page.locator('#repair-form').scrollIntoViewIfNeeded();await page.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`lab-validation-${width}.png`)});}
  }
- assert.deepEqual(errors,[]);console.log('PASS: key-substitution stage/button focus; first/last navigation endpoints; unchanged explanation gates; associated missing/wrong/extra answer errors and cleanup in three labs; four widths; no runtime/HTTP errors.');
+ assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false,'Interface stays English');
+ assert.deepEqual(errors,[]);console.log('PASS: key-substitution stage/button focus; first/last navigation endpoints; unchanged explanation gates; associated missing/wrong/extra answer errors and cleanup in three labs; delayed real-crypto action focus; no focus theft after reset/navigation/error; four widths; no runtime/HTTP errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

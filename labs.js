@@ -79,11 +79,15 @@ window.createPracticeLabs = function () {
   }
   async function execute(operation) {
     if (busy) return;
-    const current = generation;
+    const current = generation, trigger=document.activeElement;
     busy = true; $('attack-result').textContent = 'Working locally…'; syncAttack();
     try { const commit = await operation(); if (current === generation) commit(); }
     catch (error) { if (current === generation) $('attack-result').textContent = `Unable to run this experiment: ${error.message}`; }
-    finally { if (current === generation) { busy = false; syncAttack(); } }
+    finally { if (current === generation) {
+      busy=false;syncAttack();
+      const panel=trigger?.closest('[data-exercise-panel]');
+      if(document.activeElement===document.body&&trigger?.matches('#attack-prepare, #attack-run')&&trigger.isConnected&&!trigger.disabled&&(!panel||panel.open))trigger.focus({preventScroll:true});
+    } }
   }
   $('attack-mode').onchange = () => { mode = $('attack-mode').value; clearPacket(); };
   $('attack-reset').onclick = clearPacket;

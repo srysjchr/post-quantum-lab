@@ -243,3 +243,12 @@ The packet route explains direct traffic/K capture separately from compromised d
 Message Journey retains the active dynamic control through synchronous updates and local asynchronous crypto. Disabled stage endpoints hand focus to the current heading. Completion respects a deliberate focus move and reset invalidates an old operation's pending focus request. No focus history is persisted.
 
 Run `node tests/daily-wire-safety.cjs` and `node tests/journey-keyboard.cjs` with the existing Playwright configuration. Both include 320/390/768/1440 width checks; optional `EVIDENCE_DIR` saves screenshots outside the repository.
+
+
+## Explanation-lab accessibility
+
+Key Substitution moves focus to its current narrative when a selected stage button is replaced or a navigation endpoint becomes disabled. Protocol Repair, Two Encapsulations and Key Substitution associate missing/wrong answers with their native choice groups, clear stale errors after edits/reset/evidence changes and focus the first option for an empty answer. Their existing prerequisite and completion rules are unchanged.
+
+Attack Playground restores a disabled action's focus after local crypto only when focus remains on the document body and the same operation/exercise is still current. Deliberate focus moves, resets and exercise navigation take precedence; errors also return the action to a usable state. No focus data is persisted.
+
+Run `node tests/lab-accessibility.cjs` with the existing Playwright configuration for keyboard stage endpoints, missing/wrong/extra/correct explanations, stale-state cleanup, delayed real crypto, reset/navigation/error focus boundaries and 320/390/768/1440 widths. Optional `EVIDENCE_DIR` captures mobile/desktop validation screenshots outside the repository.
