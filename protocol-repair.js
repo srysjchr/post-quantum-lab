@@ -17,6 +17,11 @@ window.createProtocolRepair = function () {
   let index = 0;
   const solved = new Set();
   const node = (tag, text) => { const element = document.createElement(tag); element.textContent = text; return element; };
+  function clearFeedback(){
+    $('repair-feedback').textContent='';$('repair-feedback').className='';
+    $('repair-choices').removeAttribute('aria-invalid');$('repair-choices').removeAttribute('aria-describedby');
+  }
+  function answerError(){ $('repair-choices').setAttribute('aria-invalid','true');$('repair-choices').setAttribute('aria-describedby','repair-feedback'); }
   function render() {
     const item = cases[index];
     $('repair-count').textContent = `CASE ${index + 1} / ${cases.length} · ${solved.size} patched`;
@@ -30,18 +35,18 @@ window.createProtocolRepair = function () {
     });
     $('repair-before').textContent = 'Run the baseline to observe the modeled failure.';
     $('repair-after').textContent = 'Choose the smallest missing protection, then apply the patch.';
-    $('repair-feedback').textContent = ''; $('repair-feedback').className = '';
+    clearFeedback();
     $('repair-prev').disabled = index === 0; $('repair-next').disabled = index === cases.length - 1;
   }
   $('repair-baseline').onclick = () => { $('repair-before').textContent = cases[index].before; };
   $('repair-options').onchange = () => {
     $('repair-after').textContent = 'Selection changed. Apply the patch again to test this configuration.';
-    $('repair-feedback').textContent = ''; $('repair-feedback').className = '';
+    clearFeedback();
   };
   $('repair-form').onsubmit = event => {
-    event.preventDefault();
+    event.preventDefault();clearFeedback();
     const selected = [...$('repair-options').querySelectorAll('input:checked')].map(input => input.value), item = cases[index];
-    if (!selected.length) { $('repair-feedback').textContent = 'Choose a protection to add first.'; return; }
+    if (!selected.length) { $('repair-feedback').textContent = 'Choose a protection to add first.';answerError();$('repair-options').querySelector('input').focus(); return; }
     const fixes = selected.includes(item.missing);
     $('repair-before').textContent = item.before;
     $('repair-after').textContent = fixes ? item.after : `Defect still present. ${item.before}`;
@@ -49,6 +54,7 @@ window.createProtocolRepair = function () {
       solved.add(index);window.completeLearning(`repair-${index}`); $('repair-count').textContent = `CASE ${index + 1} / ${cases.length} · ${solved.size} patched`;
       $('repair-feedback').className = 'correct'; $('repair-feedback').textContent = `Minimal patch accepted. ${item.why} This fixes the modeled defect, not every possible protocol weakness.`;
     } else {
+      answerError();
       $('repair-feedback').className = 'incorrect';
       $('repair-feedback').textContent = fixes ? `The defect is addressed, but this is not the smallest patch. Other selected roles are already present or unrelated. ${item.why}` : `Patch does not address the missing role. ${item.why}`;
     }

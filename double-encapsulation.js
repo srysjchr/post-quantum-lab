@@ -26,7 +26,8 @@ window.createDoubleEncapsulation = function () {
     $('double-check').disabled = !ready;
     $('double-comparison').textContent = ready ? 'Bob recovered the corresponding secret for each ciphertext: Alice’s K for Alice’s c, Eve’s K for Eve’s c. The two independent encapsulations use the same ek but represent different secrets in this illustration.' : 'Create both pairs and let Bob decapsulate each ciphertext to compare the results.';
   }
-  function clearFeedback() { $('double-feedback').textContent = ''; $('double-feedback').className = ''; }
+  function clearFeedback() { $('double-feedback').textContent = ''; $('double-feedback').className = ''; $('double-answers').removeAttribute('aria-invalid');$('double-answers').removeAttribute('aria-describedby'); }
+  function answerError(){ $('double-answers').setAttribute('aria-invalid','true');$('double-answers').setAttribute('aria-describedby','double-feedback'); }
   ['alice', 'eve'].forEach(party => {
     $(`double-encaps-${party}`).onclick = () => {
       serial++;
@@ -49,11 +50,11 @@ window.createDoubleEncapsulation = function () {
     $('double-answers').querySelectorAll('input').forEach(input => { input.checked = false; }); clearFeedback(); render();
   };
   $('double-form').onsubmit = event => {
-    event.preventDefault();
+    event.preventDefault();clearFeedback();
     if (!pairs.alice || !pairs.eve || !recovered.alice || !recovered.eve) { $('double-feedback').textContent = 'Create and decapsulate both pairs before checking your explanation.'; return; }
     const answer = $('double-answers').querySelector('input:checked');
-    if (!answer) { $('double-feedback').textContent = 'Choose an explanation first.'; return; }
-    const correct = answer.value === 'separate';if(correct)window.completeLearning('double');
+    if (!answer) { $('double-feedback').textContent = 'Choose an explanation first.';answerError();$('double-answers').querySelector('input').focus(); return; }
+    const correct = answer.value === 'separate';if(!correct)answerError();if(correct)window.completeLearning('double');
     $('double-feedback').className = correct ? 'correct' : 'incorrect';
     $('double-feedback').textContent = correct ? 'Correct. Eve’s own Encaps gives Eve her own K. It does not recover Alice’s K from Alice’s public ciphertext. Bob can decapsulate both because both were created for his ek and he holds the matching private dk.' : 'Not quite. Sharing a public ek does not make every encapsulation share one K. Fresh encapsulation randomness creates a separate pair. Knowing Eve’s K does not give Eve Alice’s K.';
   };

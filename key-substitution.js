@@ -11,8 +11,13 @@ window.createKeySubstitutionStory = function () {
     'Eve receives c_Eve and computes Decaps(dk_Eve, c_Eve), obtaining K_AE. Alice and Eve now hold this secret. Bob was never a party to that encapsulation.'
   ];
   let step = 0, observer = 'learner';
+  function clearFeedback(){
+    $('substitution-feedback').textContent='';$('substitution-feedback').className='';
+    $('substitution-answers').removeAttribute('aria-invalid');$('substitution-answers').removeAttribute('aria-describedby');
+  }
+  function answerError(){ $('substitution-answers').setAttribute('aria-invalid','true');$('substitution-answers').setAttribute('aria-describedby','substitution-feedback'); }
   function clearAnswer() {
-    $('substitution-feedback').textContent = ''; $('substitution-feedback').className = '';
+    clearFeedback();
     $('substitution-answers').querySelectorAll('input').forEach(input => { input.checked = false; });
   }
   function move(index) {
@@ -56,14 +61,14 @@ window.createKeySubstitutionStory = function () {
   $('substitution-next').onclick = () => move(step + 1);
   $('substitution-reset').onclick = () => move(0);
   $('substitution-form').onsubmit = event => {
-    event.preventDefault();
+    event.preventDefault();clearFeedback();
     if (step !== 4) { $('substitution-feedback').textContent = 'Walk through all five steps before checking your explanation.'; return; }
     const answer = $('substitution-answers').querySelector('input:checked');
-    if (!answer) { $('substitution-feedback').textContent = 'Choose who actually holds the secret.'; return; }
-    const correct = answer.value === 'alice-eve';if(correct)window.completeLearning('substitution');
+    if (!answer) { $('substitution-feedback').textContent = 'Choose who actually holds the secret.';answerError();$('substitution-answers').querySelector('input').focus(); return; }
+    const correct = answer.value === 'alice-eve';if(!correct)answerError();if(correct)window.completeLearning('substitution');
     $('substitution-feedback').className = correct ? 'correct' : 'incorrect';
     $('substitution-feedback').textContent = correct ? 'Correct. Alice believes her peer is Bob, but Alice and Eve hold K_AE. Correct identity binding would have rejected ek_Eve before any encapsulation. A KEM does not authenticate an advertised name on its own.' : answer.value === 'alice-bob' ? 'Not quite. Alice used ek_Eve. Bob’s dk_Bob is not the matching private key for this encapsulation; Eve holds the matching dk_Eve.' : 'Not quite. A public encapsulation key does not reveal every shared secret. Eve learns this K because Alice encapsulated to Eve’s key and Eve used its matching private dk.';
   };
-  $('substitution-form').addEventListener('change', () => { $('substitution-feedback').textContent = ''; });
+  $('substitution-form').addEventListener('change', clearFeedback);
   render(); return { setObserver(value) { observer = value; render(); } };
 };

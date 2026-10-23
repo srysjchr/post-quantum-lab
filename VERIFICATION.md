@@ -375,3 +375,6 @@ Final verification for this daily round: all 24 browser suites passed sequential
 
 ## Daily lab accessibility 1 - 2026-10-23
 Key-substitution story navigation hands focus to the current narrative when the activated stage button is recreated or the Previous/Next endpoint becomes disabled. Reproduced focus remaining on an unusable final Next control; verified first/last endpoints, keyboard stage rewinding and unchanged explanation gates, plus all existing story identity/ownership regressions.
+
+## Daily lab accessibility 2 - 2026-10-23
+Protocol Repair, Two Encapsulations and Key Substitution associate missing/wrong explanation feedback with their native choice groups. Missing answers focus the first option; edits, correct answers, resets and evidence-changing navigation clear stale associations and styles. Repair also marks an extra/nonminimal patch as an invalid task answer. The two radio groups use their actual questions as accessible names. Verified missing/wrong/correct answers, extra controls, cleared state after regenerated pairs/rewinding, existing evidence gates and all three lab regression suites. Checked 320/390/768/1440 layouts and reviewed mobile error feedback. No scoring, cryptographic or knowledge rules changed.
