@@ -15,7 +15,11 @@ window.createKeySubstitutionStory = function () {
     $('substitution-feedback').textContent = ''; $('substitution-feedback').className = '';
     $('substitution-answers').querySelectorAll('input').forEach(input => { input.checked = false; });
   }
-  function move(index) { step = Math.max(0, Math.min(4, index)); clearAnswer(); render(); }
+  function move(index) {
+    const trigger=document.activeElement,inside=$('key-substitution-story').contains(trigger);
+    step=Math.max(0,Math.min(4,index));clearAnswer();render();
+    if(inside&&(!trigger.isConnected||trigger.disabled)){$('substitution-description').scrollIntoView({block:'nearest'});$('substitution-description').focus({preventScroll:true});}
+  }
   function render() {
     $('substitution-stages').replaceChildren(...names.map((text, index) => {
       const item = node('li', ''), button = node('button', `${index + 1}. ${text}`);
