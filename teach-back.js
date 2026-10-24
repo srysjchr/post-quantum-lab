@@ -62,7 +62,8 @@ window.createTeachBack = function (readWire) {
     const item = topics[topic], values = item.fields.map((_,index) => $(`teach-field-${index}`).value);
     if (values.some(value => !value)) {
       const message=node('p','Fill all three claims first.');message.id='teach-error-missing';$('teach-feedback').append(message);
-      values.forEach((value,index)=>{if(!value)markInvalid(index,message.id);});return;
+      values.forEach((value,index)=>{if(!value)markInvalid(index,message.id);});
+      $(`teach-field-${values.findIndex(value=>!value)}`).focus();return;
     }
     const mistakes = values.map((value,index) => value === item.answers[index] ? null : index).filter(index => index !== null);
     if (mistakes.length) {
