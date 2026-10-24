@@ -166,7 +166,18 @@ window.createPracticeLabs = function () {
   let mission = 0;
   const evidence = new Set();
   let missionComplete = false;
+  function clearMissionFeedback() {
+    $('mission-feedback').textContent = '';
+    $('mission-options').removeAttribute('aria-invalid');
+    $('mission-options').removeAttribute('aria-describedby');
+  }
+  function missionAnswerError(message) {
+    $('mission-feedback').textContent = message;
+    $('mission-options').setAttribute('aria-invalid','true');
+    $('mission-options').setAttribute('aria-describedby','mission-feedback');
+  }
   function renderMission() {
+    clearMissionFeedback();
     const item = missions[mission];
     $('mission-title').textContent = item.title;
     $('mission-counter').textContent = `MISSION ${mission + 1} / ${missions.length} · ${missionComplete ? 'COMPLETE' : 'IN PROGRESS'}`;
@@ -183,33 +194,33 @@ window.createPracticeLabs = function () {
   }
   $('mission-select').onchange = () => {
     mission = Number($('mission-select').value); evidence.clear(); missionComplete = false;
-    $('mission-feedback').textContent = ''; $('mission-hints').open = false; renderMission();
+    $('mission-hints').open = false; renderMission();
   };
   window.addEventListener('pqlab:milestone-open',event=>{
     const target=missions.findIndex((_,index)=>event.detail?.id===`mission-${index}`);
     if(target>=0&&target!==mission){$('mission-select').value=String(target);$('mission-select').dispatchEvent(new Event('change',{bubbles:true}));}
   });
   $('mission-restart').onclick = () => {
-    evidence.clear(); missionComplete = false; $('mission-feedback').textContent = ''; renderMission();
+    evidence.clear(); missionComplete = false; renderMission();
   };
   window.addEventListener('pqlab:activity', event => {
     const type = event.detail.type;
     if (type === 'journey-reset' && mission === 0) { evidence.clear(); missionComplete = false; }
     else if (missions[mission].requirements.some(([required]) => type === required)) evidence.add(type);
     else return;
-    $('mission-feedback').textContent = '';
     // Keep the reflection selection while updating experiment evidence.
     const selected = $('mission-options').querySelector('input:checked')?.value;
     renderMission();
     if (selected !== undefined) $('mission-options').querySelector(`input[value="${selected}"]`).checked = true;
   });
-  $('mission-form').addEventListener('change', () => { $('mission-feedback').textContent = ''; });
+  $('mission-form').addEventListener('change', () => { clearMissionFeedback(); });
   $('mission-form').onsubmit = event => {
     event.preventDefault();
+    clearMissionFeedback();
     const item = missions[mission], answer = $('mission-options').querySelector('input:checked');
     if (!item.requirements.every(([type]) => evidence.has(type))) { $('mission-feedback').textContent = 'Complete both experiment steps first. Open the hint for guidance.'; return; }
-    if (!answer) { $('mission-feedback').textContent = 'Choose an explanation for your result.'; return; }
-    if (Number(answer.value) !== item.correct) { $('mission-feedback').textContent = 'Not quite. Compare the experiment outcomes and try the explanation again.'; return; }
+    if (!answer) { missionAnswerError('Choose an explanation for your result.');$('mission-options').querySelector('input').focus();return; }
+    if (Number(answer.value) !== item.correct) { missionAnswerError('Not quite. Compare the experiment outcomes and try the explanation again.');return; }
     missionComplete = true;window.completeLearning(`mission-${mission}`);
     $('mission-counter').textContent = `MISSION ${mission + 1} / ${missions.length} · COMPLETE`;
     $('mission-feedback').textContent = 'Mission complete. You demonstrated the behavior and explained why it happened.';
