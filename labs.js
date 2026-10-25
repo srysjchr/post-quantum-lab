@@ -176,7 +176,7 @@ window.createPracticeLabs = function () {
     $('mission-options').setAttribute('aria-invalid','true');
     $('mission-options').setAttribute('aria-describedby','mission-feedback');
   }
-  function renderMission() {
+  function renderMission(preserveAnswer = false) {
     clearMissionFeedback();
     const item = missions[mission];
     $('mission-title').textContent = item.title;
@@ -185,6 +185,8 @@ window.createPracticeLabs = function () {
     $('mission-checklist').replaceChildren(...item.requirements.map(([type, text]) => node('li', `${evidence.has(type) ? '✓' : '○'} ${text}`, evidence.has(type) ? 'correct' : '')));
     $('mission-hint').textContent = item.hint;
     $('mission-question').textContent = item.question;
+    // Evidence updates keep the native answer controls and their keyboard focus.
+    if (preserveAnswer) return;
     $('mission-options').replaceChildren(node('legend', 'Explain your result', 'sr-only'));
     item.options.forEach((text, index) => {
       const label = node('label', undefined, 'answer'), input = document.createElement('input');
@@ -208,10 +210,7 @@ window.createPracticeLabs = function () {
     if (type === 'journey-reset' && mission === 0) { evidence.clear(); missionComplete = false; }
     else if (missions[mission].requirements.some(([required]) => type === required)) evidence.add(type);
     else return;
-    // Keep the reflection selection while updating experiment evidence.
-    const selected = $('mission-options').querySelector('input:checked')?.value;
-    renderMission();
-    if (selected !== undefined) $('mission-options').querySelector(`input[value="${selected}"]`).checked = true;
+    renderMission(true);
   });
   $('mission-form').addEventListener('change', () => { clearMissionFeedback(); });
   $('mission-form').onsubmit = event => {
