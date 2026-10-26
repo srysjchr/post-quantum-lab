@@ -252,3 +252,16 @@ Key Substitution moves focus to its current narrative when a selected stage butt
 Attack Playground restores a disabled action's focus after local crypto only when focus remains on the document body and the same operation/exercise is still current. Deliberate focus moves, resets and exercise navigation take precedence; errors also return the action to a usable state. No focus data is persisted.
 
 Run `node tests/lab-accessibility.cjs` with the existing Playwright configuration for keyboard stage endpoints, missing/wrong/extra/correct explanations, stale-state cleanup, delayed real crypto, reset/navigation/error focus boundaries and 320/390/768/1440 widths. Optional `EVIDENCE_DIR` captures mobile/desktop validation screenshots outside the repository.
+
+
+## Learning Check and Independent Missions
+
+Open the new links near the introduction or inside Guided Missions. Direct links `#learning-check` and `#independent-missions` expand the nested panels; the existing ten-exercise navigation remains intact.
+
+Learning Check compares six concepts: KEM purpose, public observation, local decapsulation, identity binding, private-key exposure and replay freshness. Before/after prompts differ. The first complete baseline is fixed until explicit reset; the latest after result replaces the previous after result. Per-concept changes and experiment links support remediation, including score decreases. This small self-check is not a validated assessment or certification; retest gains alone do not demonstrate independent transfer. Completing a check means submitting all six answers, not achieving a passing score.
+
+Only versioned per-concept boolean result vectors are saved in `post-quantum-lab.check.v1`; no chosen answer text, notes, messages, keys or plans are saved. Denied/quota storage falls back to session-only results. Malformed records are ignored. Reset comparison clears scores while keeping completion history; Clear saved progress clears the comparison and all history across tabs.
+
+Independent Missions has three levels: guided authentic delivery, reduced-guidance active interference, and independent replay transfer. Learners build an eight-operation fixed-flow plan using an unordered menu with distractors and undo. Checking a plan grants no experiment evidence. Only subsequent actual existing journey/attack outcomes for the active valid plan count. Role-specific claims complete the mission. Hints never auto-build a plan and mark a current run assisted; the first level is always assisted. Later levels unlock through completion history, while plans, claims, hint usage and evidence are session-only. Resetting or editing a plan requires fresh evidence. The planner describes protocol roles; it does not execute ML-KEM or implement a secure network. Message Journey verifies one authentic delivery and does not implement replay tracking; the replay experiment demonstrates that separate policy.
+
+Run `node tests/learning-coach.cjs` and `node tests/independent-missions.cjs` with the existing Playwright configuration. They cover scoring/comparison, missing answers, reload/reset/cross-tab clearing, malformed/blocked/quota storage, actual HKDF/AES journey and attacks, pre-plan evidence exclusion, actor misconceptions, progressive hints/unlocks, keyboard and 320/390/768/1440 layouts.

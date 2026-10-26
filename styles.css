@@ -77,3 +77,7 @@
 @media(max-width:380px){#wire-packet-route{grid-template-columns:1fr}}
 
 .wire-flight-status{padding:10px 12px;margin:8px 0;color:#d9e7ee;border-left:3px solid #ffb15c;background:#0c1825;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+
+.coach-entry{border-top:1px solid #365467;margin-top:24px;padding-top:16px}.coach-entry a{display:inline-block;margin:8px 22px 8px 0}.coach-panel{border:1px solid #365467;border-radius:10px;padding:18px;margin-top:20px;min-width:0}.coach-panel summary{cursor:pointer;color:#a6f4c5;font-weight:700}.coach-panel p,.coach-panel li{line-height:1.8;overflow-wrap:anywhere}.coach-panel h4{font-size:18px}.coach-fields{display:grid;gap:16px;margin:20px 0}.coach-fields label{display:block;margin-bottom:8px}.coach-fields select,.coach-panel>select{width:100%;max-width:100%;min-width:0}.coach-results{padding-left:20px}.coach-results li{padding:14px 0;border-bottom:1px solid #365467}.coach-results strong{display:block;color:#a6f4c5}#ind-plan li{padding:5px 0}#ind-hints{margin:18px 0}#ind-guide{margin:18px 0}#assessment-error,#ind-error{color:#ffcf91}select[aria-invalid="true"]{outline:2px solid #ffb15c;outline-offset:2px}@media(max-width:600px){.coach-panel{padding:12px}.coach-panel .demo-actions{display:flex;flex-direction:column;align-items:stretch}.coach-panel button{max-width:100%;white-space:normal}}
+
+.coach-choice{margin:0 0 10px;padding:10px;border-left:2px solid #a6f4c5;background:#14232d;color:#d9e7ee;font-size:13px;overflow-wrap:anywhere}

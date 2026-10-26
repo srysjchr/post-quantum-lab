@@ -11,8 +11,10 @@ window.createLearningProgress = function (selectChapter) {
   add('predictions','Three correct KEM predictions','kem-prediction');add('double','Explain independent encapsulations','double-encapsulation');add('substitution','Explain key substitution','key-substitution-story');add('wire','Build a public-only wire','build-the-wire');
   for(let i=0;i<4;i++)add(`repair-${i}`,`Protocol repair ${i+1}`,'protocol-repair');
   for(let i=0;i<3;i++)add(`teach-${i}`,`Teach It Back ${i+1}`,'teach-it-back');
+  add('check-before','Submit the before learning check','learning-check');add('check-after','Submit the after learning check','learning-check');
+  for(let i=0;i<3;i++)add(`independent-${i}`,`Independent mission ${i+1}`,'independent-missions');
   const ids = new Set(entries.map(entry=>entry.id)), sections = new Set(entries.map(entry=>entry.section));
-  const scoped = new Set(['kem-prediction','double-encapsulation','key-substitution-story','build-the-wire','protocol-repair','teach-it-back']);
+  const scoped = new Set(['kem-prediction','double-encapsulation','key-substitution-story','build-the-wire','protocol-repair','teach-it-back','learning-check','independent-missions']);
   const empty = () => ({version:1,completed:[],last:{chapter:0,section:'lesson-title'}});
   let state=empty(),persistent=true,currentChapter=0;
   function decode(raw) {
@@ -45,7 +47,7 @@ window.createLearningProgress = function (selectChapter) {
     $('learning-next-label').textContent=nextEntry?`Next unfinished: ${nextEntry.label}. Opening a step does not mark it complete.`:`All ${entries.length} milestones completed. Revisit any chapter or exercise from the checklist.`;
     $('learning-meter').max=entries.length;$('learning-meter').value=state.completed.length;
     $('learning-storage').textContent=persistent?'Saved in this browser only. No account; no messages, keys, ciphertext or notes are stored.':'Storage is unavailable. New progress is session-only until this page closes.';
-    const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back'};
+    const labels={'scenario-lab':'Scenario Lab','guided-missions':'Guided Missions','attack-playground':'Attack Playground','message-journey':'Message Journey','interaction':'AES-GCM demo','kem-prediction':'Predict Before Reveal','double-encapsulation':'Two Encapsulations','key-substitution-story':'Key Substitution Story','build-the-wire':'Build the Wire','protocol-repair':'Find the Missing Protection','teach-it-back':'Teach It Back','learning-check':'Learning Check','independent-missions':'Independent Missions'};
     $('learning-resume-label').textContent=`Last location: ${state.last.section==='lesson-title'?entries[state.last.chapter].label:labels[state.last.section]||'Learning exercise'}. Reloading starts fresh experiments; continuing in this page keeps current work.`;
     const filter=$('learning-filter').value;
     const visibleEntries=entries.filter(entry=>filter==='all'||(filter==='completed')===state.completed.includes(entry.id));
@@ -60,11 +62,11 @@ window.createLearningProgress = function (selectChapter) {
   document.addEventListener('focusin',event=>{const section=event.target.closest('[data-progress-section]')?.dataset.progressSection;if(section)visit(section==='interaction'&&currentChapter!==4?'lesson-title':section);});
   window.addEventListener('pqlab:completion',event=>complete(event.detail?.id));
   window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')complete('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))complete(type);});
-  window.addEventListener('storage',event=>{if(event.key===key||event.key===null){state=decode(event.newValue);render();}});
+  window.addEventListener('storage',event=>{if(event.key===key||event.key===null){state=decode(event.newValue);if(event.newValue===null)window.dispatchEvent(new Event('pqlab:progress-cleared'));render();}});
   $('learning-next').onclick=()=>{const nextEntry=nextUnfinished();if(nextEntry)go(nextEntry);};
   $('learning-filter').onchange=render;
   $('learning-continue').onclick=()=>go(state.last);
-  $('learning-clear').onclick=()=>{state=empty();try{localStorage.removeItem(key);}catch{persistent=false;}render();};
+  $('learning-clear').onclick=()=>{state=empty();try{localStorage.removeItem(key);}catch{persistent=false;}window.dispatchEvent(new Event('pqlab:progress-cleared'));render();};
   render();
   return {chapterChanged(index,remember=true){currentChapter=index;if(remember)visit('lesson-title',index);else render();},rememberRoute(index){if(state.last.chapter!==index)visit('lesson-title',index);}};
 };

@@ -1,0 +1,8 @@
+# Learning checks and independent missions
+
+User-authorized implementation: all-English, no account, no new runtime dependency. Extend Guided Missions with nested deep-linkable panels to preserve the existing ten-exercise navigation.
+
+1. Add paired six-concept before/after checks with different prompts. Freeze the first baseline until explicit comparison reset; show descriptive per-concept changes and targeted experiment links, not certification claims. Store only validated boolean result vectors in a separate local key; handle denied/quota/malformed storage and global progress clearing.
+2. Add three progressively less scaffolded missions. Learners build an eight-operation fixed-flow plan with undo/restart and plausible distractors. Only a checked valid plan starts evidence collection. Require actual existing journey/attack events plus three role-specific explanations; never fabricate cryptographic outcomes or auto-complete from plan alone. Hints are optional and disclosed in the current-run result. Plans/evidence are session-only.
+3. Integrate five named milestones without replacing existing progress. Keep historical completion distinct from current-run evidence. Nested links and checklist open the correct panel/level.
+4. Browser tests: missing/incorrect/correct checks, paired scoring, reload and storage failures, plan ordering, premature completion, real HKDF/AES journey and attack evidence, actor explanations, hints, reset, direct links, keyboard and four viewport widths. Run existing full regression and inspect desktop/mobile screenshots. Commit coherent changes; push only after validation and verify remote SHA.

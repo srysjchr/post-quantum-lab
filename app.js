@@ -15,6 +15,8 @@
   const wireBuilder=window.createWireBuilder();
   window.createProtocolRepair();
   window.createTeachBack(()=>wireBuilder.snapshot());
+  window.createLearningCheck();
+  window.createIndependentMissions();
   let refreshAes=()=>{};
   function updateObserver(){
     document.querySelectorAll('[data-observer],[data-wire-observer]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.observer||b.dataset.wireObserver)===observer)));
