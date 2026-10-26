@@ -76,8 +76,10 @@ window.createTeachBack = function (readWire) {
   };
   window.addEventListener('pqlab:activity', event => {
     const type = event.detail?.type;
-    if (type === 'replay-unguarded' || type === 'replay-guarded') replay.add(type);
-    else if (type !== 'wire-updated') return;
+    if (type === 'replay-unguarded' || type === 'replay-guarded') {
+      replay.add(type);
+      if (topic !== 2) return;
+    } else if (type !== 'wire-updated' || topic === 2) return;
     evidence(); clearFeedback();
   });
   $('teach-reset').onclick = () => { $('teach-notes').value = ''; render(); };
