@@ -24,7 +24,7 @@ const assert=require('node:assert/strict');
  const popupPromise=context.waitForEvent('page',{timeout:4000}).catch(()=>null);
  await page.locator('#mission-link').click({modifiers:['Control']});
  const popup=await popupPromise;assert.ok(popup,'Ctrl-click must open the exercise in a new tab');
- await popup.waitForLoadState('domcontentloaded');assert.equal(new URL(popup.url()).hash,'#message-journey');
+ await popup.waitForURL(url=>url.hash==='#message-journey');await popup.waitForLoadState('domcontentloaded');assert.equal(new URL(popup.url()).hash,'#message-journey');
  assert.equal(new URL(page.url()).hash,'#guided-missions');assert.equal(await page.locator('[data-exercise-panel][open]').getAttribute('data-exercise-panel'),'guided-missions');await popup.close();
  // Keyboard transmission hands focus to inspection when its send button becomes disabled.
  await exercise('build-the-wire');await page.locator('#wire-reset').click();await page.check('[data-wire-object="ek"]');
