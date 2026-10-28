@@ -62,7 +62,7 @@ window.createLearningProgress = function (selectChapter) {
   document.addEventListener('focusin',event=>{const section=event.target.closest('[data-progress-section]')?.dataset.progressSection;if(section)visit(section==='interaction'&&currentChapter!==4?'lesson-title':section);});
   window.addEventListener('pqlab:completion',event=>complete(event.detail?.id));
   window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')complete('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))complete(type);});
-  window.addEventListener('storage',event=>{if(event.key===key||event.key===null){state=decode(event.newValue);if(event.newValue===null)window.dispatchEvent(new Event('pqlab:progress-cleared'));render();}});
+  window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key===key||event.key===null){state=decode(event.newValue);if(event.newValue===null)window.dispatchEvent(new Event('pqlab:progress-cleared'));render();}});
   $('learning-next').onclick=()=>{const nextEntry=nextUnfinished();if(nextEntry)go(nextEntry);};
   $('learning-filter').onchange=render;
   $('learning-continue').onclick=()=>go(state.last);

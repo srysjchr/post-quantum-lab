@@ -13,6 +13,13 @@ const progressKey='post-quantum-lab.progress.v1';
    await p.waitForFunction(()=>document.getElementById('assessment-phase').value==='before');
    assert.match(await p.locator('label[for="assessment-answer-0"]').innerText(),/What does Encaps produce/,'Reset must restore before questions, not retain after prompts');
    assert.equal(await p.inputValue('#assessment-answer-0'),'');assert.equal(await p.locator('#assessment-choice-0').isVisible(),false);assert.equal(await p.locator('#assessment-fields [aria-invalid]').count(),0);
+  },
+  async 'storage-scope'(context,p){
+   await p.goto(root);await p.waitForSelector('#answers input');await p.check('#answers input[value="1"]');await p.locator('#quiz button').click();
+   const before=await p.locator('#learning-summary').innerText();assert.match(before,/1 \/ 6 chapters/);
+   await p.evaluate(()=>{sessionStorage.setItem('unrelated','value');window.addEventListener('storage',e=>{if(e.storageArea===sessionStorage&&e.key===null)window.sessionClearObserved=true;});const iframe=document.createElement('iframe');iframe.srcdoc='<script>sessionStorage.clear()</script>';document.body.append(iframe);});
+   await p.waitForFunction(()=>window.sessionClearObserved===true);
+   assert.equal(await p.locator('#learning-summary').innerText(),before,'Session storage clear must not reset local learning progress');
   }
  };
  let failed=0;
