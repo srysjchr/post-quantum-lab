@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const lessons = window.LESSONS;
   const scene = window.createLearningScene($('scene'), $('fallback'));
-  if (!scene) { $('pause').disabled=true; $('reset').disabled=true; }
+  if (!scene) { $('pause').disabled=true; $('reset').disabled=true; $('scene').removeAttribute('aria-keyshortcuts'); $('scene-motion-note').textContent='3D is unavailable. Lesson controls and exercises still work.'; $('scene-controls-help').textContent='Use the lesson text, protocol summaries and knowledge tables to explore the same concepts.'; }
   let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive', prediction=null;
   const learningNavigation=window.createLearningNavigation(index=>select(index),()=>chapter);
   const learningProgress=window.createLearningProgress(index=>select(index));
@@ -168,7 +168,7 @@
     chapter=Math.max(0,Math.min(lessons.length-1,index));renderVersion++;refreshAes=()=>{};const lesson=lessons[chapter];
     document.querySelectorAll('[data-chapter]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.chapter)===chapter)));
     $('chapter-count').textContent=`CHAPTER ${String(chapter+1).padStart(2,'0')} / 06`;$('lesson-title').textContent=lesson.title;$('summary').replaceChildren(...lesson.summary.map(text=>make('p',text)));$('formula').textContent=lesson.formula;
-    $('scene').setAttribute('aria-label',`${lesson.name}: ${lesson.title} Illustrative 3D model. Drag or use arrow keys to rotate.`);$('scene-annotation').textContent=lesson.annotation;
+    $('scene').setAttribute('aria-label',`${lesson.name}: ${lesson.title} ${scene?'Illustrative 3D model. Drag or use arrow keys to rotate.':'3D is unavailable. Use the lesson text and controls.'}`);$('scene-annotation').textContent=lesson.annotation;
     $('legend').replaceChildren(...lesson.legend.map((text,index)=>{const item=make('span',undefined,'legend-item');item.append(make('span','','dot'+(index?' orange':'')),document.createTextNode(text));return item;}));
     scene?.select(lesson.scene);$('interaction').replaceChildren();renderers[lesson.interaction]($('interaction'),renderVersion);
     $('deep-dive').replaceChildren(...lesson.deep.map(([title,text],index)=>{const article=make('article',undefined,'deep-item');const heading=make('h3');const icon=make('span',['◇','≋','△'][index],'deep-icon');icon.setAttribute('aria-hidden','true');heading.append(icon,document.createTextNode(title));article.append(heading,make('p',text));return article;}));

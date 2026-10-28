@@ -28,6 +28,14 @@ const progressKey='post-quantum-lab.progress.v1';
    await p.waitForFunction(()=>document.querySelector('#ind-level option[value="2"]').disabled);
    assert.equal(await p.inputValue('#ind-level'),'0','A revoked prerequisite must leave the now-locked mission');
    assert.match(await p.locator('#ind-goal').innerText(),/one authentic confidential delivery/);
+  },
+  async 'scene-fallback'(context,p){
+   await p.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return /^webgl|^experimental-webgl/.test(type)?null:original.call(this,type,...args);};});
+   await p.goto(root+'?chapter=4');await p.waitForSelector('#answers input');
+   assert.equal(await p.locator('#scene').getAttribute('aria-keyshortcuts'),null,'Unavailable 3D must not advertise working keyboard shortcuts');
+   assert.match(await p.locator('#scene-motion-note').innerText(),/unavailable/);
+   assert.equal(await p.locator('#pause').isDisabled(),true);assert.equal(await p.locator('#reset').isDisabled(),true);
+   await p.check('#answers input[value="1"]');await p.locator('#quiz button').click();assert.match(await p.locator('#feedback').innerText(),/Correct/);
   }
  };
  let failed=0;
