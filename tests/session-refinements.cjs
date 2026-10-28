@@ -20,6 +20,14 @@ const progressKey='post-quantum-lab.progress.v1';
    await p.evaluate(()=>{sessionStorage.setItem('unrelated','value');window.addEventListener('storage',e=>{if(e.storageArea===sessionStorage&&e.key===null)window.sessionClearObserved=true;});const iframe=document.createElement('iframe');iframe.srcdoc='<script>sessionStorage.clear()</script>';document.body.append(iframe);});
    await p.waitForFunction(()=>window.sessionClearObserved===true);
    assert.equal(await p.locator('#learning-summary').innerText(),before,'Session storage clear must not reset local learning progress');
+  },
+  async 'mission-locks'(context,p){
+   await p.addInitScript(key=>localStorage.setItem(key,JSON.stringify({version:1,completed:['independent-0','independent-1'],last:{chapter:3,section:'independent-missions'}})),progressKey);
+   await p.goto(root+'?chapter=4#independent-missions');await p.waitForSelector('#ind-level');await p.selectOption('#ind-level','2');
+   const other=await context.newPage();await other.goto(root);await other.evaluate(key=>localStorage.setItem(key,JSON.stringify({version:1,completed:[],last:{chapter:0,section:'lesson-title'}})),progressKey);
+   await p.waitForFunction(()=>document.querySelector('#ind-level option[value="2"]').disabled);
+   assert.equal(await p.inputValue('#ind-level'),'0','A revoked prerequisite must leave the now-locked mission');
+   assert.match(await p.locator('#ind-goal').innerText(),/one authentic confidential delivery/);
   }
  };
  let failed=0;
