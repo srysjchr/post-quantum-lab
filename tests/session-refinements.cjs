@@ -64,6 +64,19 @@ const progressKey='post-quantum-lab.progress.v1';
      assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     }
    }
+  },
+  async 'mission-add-availability'(context,p){
+   await p.goto(root+'?chapter=4#independent-missions');await p.waitForSelector('#ind-operation');
+   for(const width of [1440,390]){
+    await p.setViewportSize({width,height:900});await p.locator('#ind-reset').click();
+    assert.equal(await p.locator('#ind-add').isDisabled(),true,'Adding an operation requires a selection');
+    await p.selectOption('#ind-operation','bind');assert.equal(await p.locator('#ind-add').isEnabled(),true);
+    await p.selectOption('#ind-operation','');assert.equal(await p.locator('#ind-add').isDisabled(),true);
+    await p.selectOption('#ind-operation','bind');await p.locator('#ind-add').press('Enter');assert.equal(await p.locator('#ind-plan li').count(),1);
+    assert.equal(await p.inputValue('#ind-operation'),'');assert.equal(await p.locator('#ind-add').isDisabled(),true);
+    await p.locator('#ind-undo').click();assert.equal(await p.locator('#ind-plan li').count(),0);assert.equal(await p.locator('#ind-add').isDisabled(),true);
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   }
   }
  };
  let failed=0;

@@ -26,7 +26,7 @@ window.createIndependentMissions = function () {
   $('ind-operation').replaceChildren();const blank=node('option','Choose the next operation…');blank.value='';$('ind-operation').append(blank);
   // Deliberately not a correct-order menu: the learner constructs the route.
   [5,2,8,0,6,4,9,3,7,1,10].forEach(i=>{const [id,text]=operations[i],o=node('option',text);o.value=id;o.disabled=s.plan.includes(id);$('ind-operation').append(o);});
-  $('ind-operation-text').hidden=true;$('ind-operation-text').textContent='';$('ind-add').disabled=s.plan.length>=8;$('ind-undo').disabled=!s.plan.length;status();
+  $('ind-operation-text').hidden=true;$('ind-operation-text').textContent='';$('ind-add').disabled=!$('ind-operation').value||s.plan.length>=8;$('ind-undo').disabled=!s.plan.length;status();
  }
  function render(){clearError();const l=levels[level],s=states[level];$('ind-goal').textContent=l.goal;$('ind-link').href=l.link;$('ind-link').textContent=l.action+' →';$('ind-hint-text').textContent=l.hint;$('ind-hints').open=false;$('ind-guide').hidden=level!==0;
   $('ind-claims').replaceChildren();l.claims.forEach(([prompt,correct,a,b],i)=>{const label=node('label',prompt),select=node('select');select.id=`ind-claim-${i}`;label.htmlFor=select.id;
@@ -34,7 +34,7 @@ window.createIndependentMissions = function () {
   });renderPlan();
  }
  function edit(){const s=states[level];s.valid=false;s.complete=false;s.evidence.clear();clearError();}
- $('ind-operation').onchange=()=>{const e=$('ind-operation');$('ind-operation-text').textContent=e.value?e.selectedOptions[0].textContent:'';$('ind-operation-text').hidden=!e.value;};
+ $('ind-operation').onchange=()=>{const e=$('ind-operation');$('ind-add').disabled=!e.value||states[level].plan.length>=8;$('ind-operation-text').textContent=e.value?e.selectedOptions[0].textContent:'';$('ind-operation-text').hidden=!e.value;};
  $('ind-add').onclick=()=>{const value=$('ind-operation').value;if(!value||states[level].plan.length>=8)return;edit();states[level].plan.push(value);renderPlan();$('ind-operation').focus({preventScroll:true});};
  $('ind-undo').onclick=()=>{edit();states[level].plan.pop();renderPlan();$('ind-operation').focus({preventScroll:true});};
  $('ind-check-plan').onclick=()=>{clearError();const s=states[level];if(s.plan.length!==8){$('ind-error').textContent='Build eight operations for this fixed flow. Undo a step to revise the route.';return;}
