@@ -51,6 +51,19 @@ const progressKey='post-quantum-lab.progress.v1';
     assert.equal(await p.locator('#encrypt').isDisabled(),true);assert.equal(await p.inputValue('#message'),'');assert.doesNotMatch(await p.locator('#aes-output').innerText(),/RECOVERED MESSAGE/);
     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    }
+  },
+  async 'mission-history-version'(context,p){
+   await p.goto(root+'?chapter=4#independent-missions');await p.waitForSelector('#ind-level');
+   for(const width of [1440,390]){
+    await p.setViewportSize({width,height:900});
+    for(const [saved,restored] of [[{version:2,completed:['independent-0']},false],[{completed:['independent-0']},false],[{version:1,completed:['independent-0']},true]]){
+     await p.evaluate(({key,saved})=>localStorage.setItem(key,JSON.stringify(saved)),{key:progressKey,saved});await p.reload();await p.waitForSelector('#ind-level');
+     assert.equal(await p.locator('#ind-level option[value="1"]').isDisabled(),!restored,'Only supported progress versions may unlock the next mission');
+     assert.match(await p.locator('#ind-current').innerText(),restored?/Previously completed/:/Current run not complete/);
+     assert.equal(await p.locator('#ind-plan li').count(),0);assert.match(await p.locator('#ind-evidence').innerText(),/0 \/ 1/);
+     assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+    }
+   }
   }
  };
  let failed=0;

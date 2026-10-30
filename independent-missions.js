@@ -15,7 +15,7 @@ window.createIndependentMissions = function () {
  ];
  const fresh=()=>({plan:[],valid:false,evidence:new Set(),hints:false,answers:['','',''],complete:false});
  let states=levels.map(fresh),level=0,history=new Set();
- try{const x=JSON.parse(localStorage.getItem('post-quantum-lab.progress.v1'));if(Array.isArray(x?.completed))for(let i=0;i<3;i++)if(x.completed.includes(`independent-${i}`))history.add(i);}catch{}
+ try{const x=JSON.parse(localStorage.getItem('post-quantum-lab.progress.v1'));if(x?.version===1&&Array.isArray(x.completed))for(let i=0;i<3;i++)if(x.completed.includes(`independent-${i}`))history.add(i);}catch{}
  function clearError(){$('ind-error').textContent='';$('ind-claims').querySelectorAll('select').forEach(e=>{e.removeAttribute('aria-invalid');e.removeAttribute('aria-describedby');});}
  function status(){const s=states[level],l=levels[level];
   $('ind-evidence').textContent=`Current-run evidence: ${l.events.filter(e=>s.evidence.has(e)).length} / ${l.events.length}. ${!s.valid?'Check a valid plan before collecting evidence.':l.events.every(e=>s.evidence.has(e))?'Required outcomes observed. Explain the actor claims below.':'Collect the required outcomes in the linked experiment.'}`;
