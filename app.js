@@ -137,11 +137,11 @@
     const actions=make('div',undefined,'demo-actions');const encrypt=make('button','Encrypt & decrypt','primary');encrypt.id='encrypt';const tamper=make('button','Test a modified ciphertext');tamper.id='tamper';tamper.hidden=true;actions.append(encrypt,tamper);
     const note=make('p','Real AES-256-GCM · fresh random key + 96-bit nonce · local only · no ML-KEM','micro');note.id='aes-note';const status=make('p','','micro');status.id='aes-status';status.setAttribute('role','status');const output=make('div',undefined,'demo-output');output.id='aes-output';output.hidden=true;
     parent.append(label,input,actions,note,status,output);
-    let result=null,attempt=0,draft=input.value;
-    refreshAes=()=>{input.disabled=observer==='eve';input.value=observer==='eve'?'':draft;if(result){output.replaceChildren(make('span','PUBLIC CIPHERTEXT + TAG (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...new Uint8Array(result.cipher)))),make('span','PUBLIC NONCE (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...result.iv))));if(observer!=='eve')output.append(make('span','RECOVERED MESSAGE'),document.createTextNode(result.plain||'(empty message)'));}encrypt.disabled=observer==='eve';};
+    let result=null,attempt=0,draft=input.value,busy=false;
+    refreshAes=()=>{input.disabled=observer==='eve';input.value=observer==='eve'?'':draft;if(result){output.replaceChildren(make('span','PUBLIC CIPHERTEXT + TAG (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...new Uint8Array(result.cipher)))),make('span','PUBLIC NONCE (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...result.iv))));if(observer!=='eve')output.append(make('span','RECOVERED MESSAGE'),document.createTextNode(result.plain||'(empty message)'));}encrypt.disabled=busy||observer==='eve';};
     input.addEventListener('input',()=>{draft=input.value;attempt++;result=null;tamper.hidden=true;output.hidden=true;status.textContent='';setScene('encrypted',false);});
     encrypt.addEventListener('click',async()=>{
-      const currentAttempt=++attempt;const message=input.value;result=null;output.hidden=true;tamper.hidden=true;encrypt.disabled=true;status.textContent='Encrypting locally…';
+      if(busy||observer==='eve')return;busy=true;const currentAttempt=++attempt;const message=input.value;result=null;output.hidden=true;tamper.hidden=true;encrypt.disabled=true;status.textContent='Encrypting locally…';
       const isCurrent=()=>version===renderVersion&&currentAttempt===attempt;
       try {
         if(!window.crypto?.subtle)throw new Error('Web Crypto requires a supported browser and a secure context such as localhost.');
@@ -151,7 +151,7 @@
         const plain=new TextDecoder().decode(recovered);if(plain!==message)throw new Error('The round-trip comparison failed.');if(!isCurrent())return;
         result={key,iv,cipher,plain};output.replaceChildren(make('span','CIPHERTEXT + 128-BIT AUTHENTICATION TAG (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...new Uint8Array(cipher)))),make('span','NONCE (BASE64)'),document.createTextNode(btoa(String.fromCharCode(...iv))),make('span','RECOVERED MESSAGE'),document.createTextNode(plain||'(empty message)'));
         output.hidden=false;tamper.hidden=false;status.textContent=`Verified: ${bytes.length} plaintext bytes → ${cipher.byteLength} ciphertext/tag bytes. The recovered message matches exactly.`;setScene('encrypted',true);refreshAes();window.completeLearning('aes');
-      }catch(error){if(isCurrent())status.textContent=error.message;}finally{if(version===renderVersion)encrypt.disabled=observer==='eve';}
+      }catch(error){if(isCurrent())status.textContent=error.message;}finally{busy=false;if(version===renderVersion)encrypt.disabled=observer==='eve';}
     });
     tamper.addEventListener('click',async()=>{
       if(!result)return;const snapshot=result;const modified=new Uint8Array(snapshot.cipher.slice(0));modified[0]^=1;

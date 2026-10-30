@@ -36,6 +36,21 @@ const progressKey='post-quantum-lab.progress.v1';
    assert.match(await p.locator('#scene-motion-note').innerText(),/unavailable/);
    assert.equal(await p.locator('#pause').isDisabled(),true);assert.equal(await p.locator('#reset').isDisabled(),true);
    await p.check('#answers input[value="1"]');await p.locator('#quiz button').click();assert.match(await p.locator('#feedback').innerText(),/Correct/);
+  },
+  async 'aes-busy'(context,p){
+   for(const width of [1440,390]){
+    await p.setViewportSize({width,height:900});await p.goto(root+'?chapter=5');await p.waitForSelector('#encrypt');
+    // Hold key generation to exercise a slow real Web Crypto operation deterministically.
+    await p.evaluate(()=>{const original=crypto.subtle.generateKey.bind(crypto.subtle);crypto.subtle.generateKey=(...args)=>new Promise((resolve,reject)=>{window.releaseKey=()=>original(...args).then(resolve,reject);window.rejectKey=()=>reject(new Error('Key generation unavailable'));});});
+    await p.locator('#encrypt').click();await p.locator('[data-observer="eve"]').click();await p.locator('[data-observer="alice"]').click();
+    assert.equal(await p.locator('#encrypt').isDisabled(),true,'Perspective refresh must not re-enable a pending encryption');
+    await p.evaluate(()=>window.releaseKey());await p.waitForFunction(()=>document.getElementById('aes-status').textContent.startsWith('Verified:'));
+    assert.equal(await p.locator('#encrypt').isEnabled(),true);await p.locator('#tamper').click();await p.waitForFunction(()=>document.getElementById('aes-status').textContent.startsWith('Tampering detected:'));
+    await p.locator('#encrypt').click();await p.evaluate(()=>window.rejectKey());await p.waitForFunction(()=>document.getElementById('aes-status').textContent==='Key generation unavailable');assert.equal(await p.locator('#encrypt').isEnabled(),true);
+    await p.locator('#encrypt').click();await p.locator('[data-observer="eve"]').click();await p.evaluate(()=>window.releaseKey());await p.waitForFunction(()=>document.getElementById('aes-status').textContent.startsWith('Verified:'));
+    assert.equal(await p.locator('#encrypt').isDisabled(),true);assert.equal(await p.inputValue('#message'),'');assert.doesNotMatch(await p.locator('#aes-output').innerText(),/RECOVERED MESSAGE/);
+    assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   }
   }
  };
  let failed=0;
