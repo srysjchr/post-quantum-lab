@@ -46,7 +46,7 @@ window.createIndependentMissions = function () {
  $('ind-level').onchange=()=>{level=Number($('ind-level').value);render();};
  $('ind-reset').onclick=()=>{states[level]=fresh();render();};
  $('ind-hints').addEventListener('toggle',()=>{if($('ind-hints').open){states[level].hints=true;status();}});
- window.addEventListener('pqlab:activity',event=>{const s=states[level],type=event.detail?.type;if(type==='journey-reset'&&level===0){s.evidence.clear();s.complete=false;status();return;}if(s.valid&&levels[level].events.includes(type)){s.evidence.add(type);clearError();status();}});
+ window.addEventListener('pqlab:activity',event=>{const s=states[level],type=event.detail?.type;if(type==='journey-reset'&&level===0){s.evidence.clear();s.complete=false;status();return;}if(s.valid&&!s.evidence.has(type)&&levels[level].events.includes(type)){s.evidence.add(type);clearError();status();}});
  $('ind-form').onsubmit=event=>{event.preventDefault();clearError();const s=states[level],l=levels[level];if(!s.valid||!l.events.every(e=>s.evidence.has(e))){$('ind-error').textContent='Check a valid plan and perform all required experiment outcomes before explaining the result.';return;}
   const wrong=s.answers.map((answer,i)=>answer==='correct'?null:i).filter(i=>i!==null);if(wrong.length){$('ind-error').textContent='Revisit the highlighted actor claims. Separate public bytes, local computations, identity, integrity and freshness.';wrong.forEach(i=>{const e=$(`ind-claim-${i}`);e.setAttribute('aria-invalid','true');e.setAttribute('aria-describedby','ind-error');});$(`ind-claim-${wrong[0]}`).focus();return;}
   s.complete=true;history.add(level);window.completeLearning(`independent-${level}`);status();$('ind-current').focus({preventScroll:true});

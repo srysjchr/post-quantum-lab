@@ -208,7 +208,7 @@ window.createPracticeLabs = function () {
   window.addEventListener('pqlab:activity', event => {
     const type = event.detail.type;
     if (type === 'journey-reset' && mission === 0) { evidence.clear(); missionComplete = false; }
-    else if (missions[mission].requirements.some(([required]) => type === required)) evidence.add(type);
+    else if (!evidence.has(type)&&missions[mission].requirements.some(([required]) => type === required)) evidence.add(type);
     else return;
     renderMission(true);
   });

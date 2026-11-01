@@ -80,6 +80,15 @@ const cases={
   for(let i=0;i<6;i++)await p.selectOption('#assessment-answer-'+i,'correct');await p.locator('#assessment-submit').click();
   await p.locator('[data-progress-id="check-after"]').click();assert.equal(await p.inputValue('#assessment-phase'),'after');assert.equal(await p.inputValue('#assessment-answer-0'),'');
   await p.selectOption('#assessment-answer-0','wrong-a');await p.locator('[data-progress-id="check-after"]').click();assert.equal(await p.inputValue('#assessment-answer-0'),'wrong-a');
+ },
+ async 'duplicate-evidence-feedback'(context,p){
+  await p.goto(root+'?chapter=4');await journey(p);
+  await act(p,'#mission-options input[value="1"]','check');await p.locator('#mission-form button').click();assert.match(await p.locator('#mission-feedback').innerText(),/Not quite/);
+  await act(p,'#journey-verify','click');await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Verified:'));
+  await act(p,'#mission-form button','focus');const guidedErrorRetained=(await p.locator('#mission-feedback').innerText()).includes('Not quite');
+  await p.getByRole('link',{name:'Try an independent mission →',exact:true}).click();await act(p,'#ind-operation','selectOption','bind');await p.locator('#ind-add').click();for(const op of ['encaps','send','decaps','derive','encrypt','verify','fresh']){await p.selectOption('#ind-operation',op);await p.locator('#ind-add').click();}await p.locator('#ind-check-plan').click();
+  await act(p,'#journey-verify','click');await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Verified:'));await act(p,'#ind-form button','click');assert.equal(await p.locator('#ind-claims [aria-invalid="true"]').count(),3);
+  await act(p,'#journey-verify','click');await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Verified:'));await act(p,'#ind-form button','focus');assert.deepEqual({guided:guidedErrorRetained,independent:await p.locator('#ind-claims [aria-invalid="true"]').count()},{guided:true,independent:3},'Duplicate evidence must retain feedback in both mission forms');
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
