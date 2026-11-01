@@ -89,6 +89,15 @@ const cases={
   await p.getByRole('link',{name:'Try an independent mission →',exact:true}).click();await act(p,'#ind-operation','selectOption','bind');await p.locator('#ind-add').click();for(const op of ['encaps','send','decaps','derive','encrypt','verify','fresh']){await p.selectOption('#ind-operation',op);await p.locator('#ind-add').click();}await p.locator('#ind-check-plan').click();
   await act(p,'#journey-verify','click');await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Verified:'));await act(p,'#ind-form button','click');assert.equal(await p.locator('#ind-claims [aria-invalid="true"]').count(),3);
   await act(p,'#journey-verify','click');await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Verified:'));await act(p,'#ind-form button','focus');assert.deepEqual({guided:guidedErrorRetained,independent:await p.locator('#ind-claims [aria-invalid="true"]').count()},{guided:true,independent:3},'Duplicate evidence must retain feedback in both mission forms');
+ },
+ async 'kem-rejection-note'(context,p){
+  await p.goto(root+'?chapter=4');await p.waitForSelector('#kem-boundaries');
+  const summary=p.getByText('Does ML-KEM reject a changed ciphertext like AES-GCM?',{exact:true});assert.equal(await summary.count(),1,'Explain the different KEM and AEAD rejection boundaries');const faq=summary.locator('..');
+  for(const width of [1440,320]){
+   await p.setViewportSize({width,height:950});if(await faq.evaluate(e=>e.open))await summary.click();await summary.focus();await p.keyboard.press('Enter');assert.equal(await faq.locator('p').first().isVisible(),true);
+   assert.equal(await faq.locator('a').getAttribute('href'),'https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf#page=42');assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   if(process.env.EVIDENCE_DIR){await faq.scrollIntoViewIfNeeded();await p.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`kem-rejection-${width}.png`)});}
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
