@@ -16,6 +16,16 @@ const cases={
    assert.equal(await p.evaluate(()=>JSON.parse(localStorage.getItem('post-quantum-lab.progress.v1')).completed.includes('mission-0')),true,'Saved completion history is retained');
    await p.check('#mission-options input[value="0"]');await p.locator('#mission-form button').click();assert.match(await p.locator('#mission-counter').innerText(),/COMPLETE/);
   }
+ },
+ async 'teach-error-focus'(context,p){
+  await p.goto(root+'?chapter=4#build-the-wire');await p.waitForSelector('#wire-send');
+  for(const width of [1440,390]){
+   await p.setViewportSize({width,height:950});await act(p,'#wire-reset','click');for(const id of ['ek','c'])await p.check(`[data-wire-object="${id}"]`);await p.locator('#wire-send').click();
+   await act(p,'#teach-topic','selectOption','0');for(const [i,value]of ['dk','c','private-ek'].entries())await p.selectOption(`#teach-field-${i}`,value);
+   await p.locator('#teach-form button').press('Enter');assert.equal(await p.evaluate(()=>document.activeElement.id),'teach-field-0','Incorrect claims must focus the first field needing revision');
+   assert.equal(await p.locator('#teach-field-0').getAttribute('aria-invalid'),'true');
+   for(const [i,value]of ['pair','secret','resistance'].entries())await p.selectOption(`#teach-field-${i}`,value);await p.locator('#teach-form button').click();assert.equal(await p.locator('#teach-sentence').isVisible(),true);
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

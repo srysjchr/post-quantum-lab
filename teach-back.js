@@ -67,7 +67,7 @@ window.createTeachBack = function (readWire) {
     }
     const mistakes = values.map((value,index) => value === item.answers[index] ? null : index).filter(index => index !== null);
     if (mistakes.length) {
-      mistakes.forEach(index => { const paragraph = node('p', `${item.labels[index]}: ${item.hints[index]}`); paragraph.className = 'incorrect';paragraph.id=`teach-error-${index}`;markInvalid(index,paragraph.id); $('teach-feedback').append(paragraph); }); return;
+      mistakes.forEach(index => { const paragraph = node('p', `${item.labels[index]}: ${item.hints[index]}`); paragraph.className = 'incorrect';paragraph.id=`teach-error-${index}`;markInvalid(index,paragraph.id); $('teach-feedback').append(paragraph); }); $('teach-field-'+mistakes[0]).focus(); return;
     }
     window.completeLearning(`teach-${topic}`);
     const paragraph = node('p','Explanation supported by the experiment. These checks assess the selected claims; your optional notes are for your own reflection.'); paragraph.className = 'correct'; $('teach-feedback').append(paragraph);
