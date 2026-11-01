@@ -50,6 +50,16 @@ const cases={
    assert.equal(await p.locator('#ind-level option[value="2"]').isDisabled(),true,'Invalid cross-tab progress must revoke old mission unlocks');
    assert.equal(await p.inputValue('#ind-level'),'0');assert.match(await p.locator('#ind-current').innerText(),/not complete/);
   }
+ },
+ async 'modified-scene-shortcuts'(context,p){
+  await p.goto(root+'?chapter=4#build-the-wire');await p.waitForSelector('#wire-scene canvas');
+  for(const width of [1440,390]){
+   await p.setViewportSize({width,height:950});
+   for(const id of ['scene','wire-scene']){
+    const outcomes=await p.locator('#'+id).evaluate(el=>{const result=[];for(const modifier of ['ctrlKey','altKey','metaKey'])for(const key of ['Home','ArrowLeft']){const e=new KeyboardEvent('keydown',{key,[modifier]:true,bubbles:true,cancelable:true});el.dispatchEvent(e);result.push(e.defaultPrevented);}const plain=new KeyboardEvent('keydown',{key:'Home',bubbles:true,cancelable:true});el.dispatchEvent(plain);return {modified:result,plain:plain.defaultPrevented};});
+    assert.deepEqual(outcomes.modified,[false,false,false,false,false,false],id+' must leave browser/assistive modified shortcuts available');assert.equal(outcomes.plain,true,'Unmodified Home still resets the model');
+   }
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

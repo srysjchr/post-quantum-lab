@@ -237,7 +237,7 @@ window.createWireScene = function (transmit) {
   function resetCamera(){cancelDrag();yaw=0;if(snapshot)build();}
   document.getElementById('wire-camera-reset').onclick=resetCamera;
   host.addEventListener('keydown',event=>{
-    if(interrupted||event.target!==host||!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;
+    if(interrupted||event.target!==host||event.ctrlKey||event.altKey||event.metaKey||!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;
     event.preventDefault();if(event.key==='Home')resetCamera();else turn(event.key==='ArrowLeft'?-15:15);
   });
   function cancelDrag(rebuild=true){
