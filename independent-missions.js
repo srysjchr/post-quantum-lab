@@ -15,7 +15,11 @@ window.createIndependentMissions = function () {
  ];
  const fresh=()=>({plan:[],valid:false,evidence:new Set(),hints:false,answers:['','',''],complete:false});
  let states=levels.map(fresh),level=0,history=new Set();
- try{const x=JSON.parse(localStorage.getItem('post-quantum-lab.progress.v1'));if(x?.version===1&&Array.isArray(x.completed))for(let i=0;i<3;i++)if(x.completed.includes(`independent-${i}`))history.add(i);}catch{}
+ function decodeHistory(raw){
+  try{if(!raw||raw.length>20000)return new Set();const x=JSON.parse(raw);if(x?.version===1&&Array.isArray(x.completed))return new Set([0,1,2].filter(i=>x.completed.includes(`independent-${i}`)));}catch{}
+  return new Set();
+ }
+ try{history=decodeHistory(localStorage.getItem('post-quantum-lab.progress.v1'));}catch{}
  function clearError(){$('ind-error').textContent='';$('ind-claims').querySelectorAll('select').forEach(e=>{e.removeAttribute('aria-invalid');e.removeAttribute('aria-describedby');});}
  function status(){const s=states[level],l=levels[level];
   $('ind-evidence').textContent=`Current-run evidence: ${l.events.filter(e=>s.evidence.has(e)).length} / ${l.events.length}. ${!s.valid?'Check a valid plan before collecting evidence.':l.events.every(e=>s.evidence.has(e))?'Required outcomes observed. Explain the actor claims below.':'Collect the required outcomes in the linked experiment.'}`;
@@ -48,7 +52,7 @@ window.createIndependentMissions = function () {
   s.complete=true;history.add(level);window.completeLearning(`independent-${level}`);status();$('ind-current').focus({preventScroll:true});
  };
  window.addEventListener('pqlab:milestone-open',event=>{const id=event.detail?.id;if(/^independent-[0-2]$/.test(id||'')){const target=Number(id.slice(-1));if(target===0||history.has(target-1)){level=target;$('ind-level').value=String(level);render();}}});
- window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key!=='post-quantum-lab.progress.v1'||!event.newValue)return;try{const x=JSON.parse(event.newValue);if(x.version!==1||!Array.isArray(x.completed))return;history=new Set([0,1,2].filter(i=>x.completed.includes(`independent-${i}`)));if(level>0&&!history.has(level-1)){level=0;$('ind-level').value='0';render();}else status();}catch{}});
+ window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key!=='post-quantum-lab.progress.v1')return;history=decodeHistory(event.newValue);if(level>0&&!history.has(level-1)){level=0;$('ind-level').value='0';render();}else status();});
  window.addEventListener('pqlab:progress-cleared',()=>{history.clear();states=levels.map(fresh);level=0;$('ind-level').value='0';render();});
  render();
 };

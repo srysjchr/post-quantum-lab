@@ -38,6 +38,18 @@ const cases={
    assert.equal(await p.evaluate(()=>document.activeElement.id),'assessment-answer-2','A reset from another tab must not discard keyboard focus');
    assert.equal(await p.inputValue('#assessment-answer-2'),'');
   }
+ },
+ async 'invalid-history-sync'(context,p){
+  await p.goto(root+'?chapter=4#independent-missions');await p.waitForSelector('#ind-level');
+  const other=await context.newPage();await other.goto(root);await other.waitForSelector('#answers input');
+  for(const width of [1440,390])for(const raw of ['{broken',JSON.stringify({version:2,completed:['independent-0','independent-1']}),'']){
+   await p.setViewportSize({width,height:950});await other.evaluate(()=>localStorage.setItem('post-quantum-lab.progress.v1',JSON.stringify({version:1,completed:['independent-0','independent-1'],last:{chapter:3,section:'independent-missions'}})));
+   await p.waitForFunction(()=>!document.querySelector('#ind-level option[value="2"]').disabled);await p.selectOption('#ind-level','2');
+   await other.evaluate(raw=>localStorage.setItem('post-quantum-lab.progress.v1',raw),raw);
+   await p.waitForFunction(()=>document.getElementById('learning-summary').textContent.includes('0 / 29'));
+   assert.equal(await p.locator('#ind-level option[value="2"]').isDisabled(),true,'Invalid cross-tab progress must revoke old mission unlocks');
+   assert.equal(await p.inputValue('#ind-level'),'0');assert.match(await p.locator('#ind-current').innerText(),/not complete/);
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
