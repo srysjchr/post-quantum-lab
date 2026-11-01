@@ -70,6 +70,6 @@ window.createLearningCheck = function () {
   $('assessment-reset').onclick=reset;
   window.addEventListener('pqlab:progress-cleared',reset);
   window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key===key||event.key===null){results=decode(event.key===null?null:event.newValue);if(!results.before){$('assessment-phase').value='before';renderForm();}renderResults();$('assessment-submit').disabled=$('assessment-phase').value==='before'&&!!results.before;}});
-  window.addEventListener('pqlab:milestone-open',event=>{if(event.detail?.id==='check-before'||event.detail?.id==='check-after'){$('assessment-phase').value=event.detail.id==='check-after'&&results.before?'after':'before';renderForm();}});
+  window.addEventListener('pqlab:milestone-open',event=>{if(event.detail?.id==='check-before'||event.detail?.id==='check-after'){const phase=event.detail.id==='check-after'&&results.before?'after':'before';if($('assessment-phase').value!==phase){$('assessment-phase').value=phase;renderForm();}}});
   $('assessment-phase').value=results.before?'after':'before';renderForm();renderResults();
 };

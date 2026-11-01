@@ -69,6 +69,17 @@ const cases={
    await p.locator('[data-chapter="4"]').click();await p.fill('#message','Retain this in-page draft');await p.locator('[data-chapter="4"]').click();assert.equal(await p.inputValue('#message'),'Retain this in-page draft');
    await p.locator('[data-chapter="0"]').click();assert.equal(await p.locator('#rsa-product').isVisible(),true);
   }
+ },
+ async 'same-check-milestone'(context,p){
+  await p.goto(root+'?chapter=4#learning-check');await p.waitForSelector('#assessment-answer-0');
+  await p.locator('#learning-progress details>summary').click();
+  for(const width of [1440,390]){
+   await p.setViewportSize({width,height:950});await p.selectOption('#assessment-answer-0','correct');
+   await p.locator('[data-progress-id="check-before"]').click();assert.equal(await p.inputValue('#assessment-answer-0'),'correct','Opening the active learning-check milestone must keep unsent answers');
+  }
+  for(let i=0;i<6;i++)await p.selectOption('#assessment-answer-'+i,'correct');await p.locator('#assessment-submit').click();
+  await p.locator('[data-progress-id="check-after"]').click();assert.equal(await p.inputValue('#assessment-phase'),'after');assert.equal(await p.inputValue('#assessment-answer-0'),'');
+  await p.selectOption('#assessment-answer-0','wrong-a');await p.locator('[data-progress-id="check-after"]').click();assert.equal(await p.inputValue('#assessment-answer-0'),'wrong-a');
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
