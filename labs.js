@@ -212,7 +212,7 @@ window.createPracticeLabs = function () {
     else return;
     renderMission(true);
   });
-  $('mission-form').addEventListener('change', () => { clearMissionFeedback(); });
+  $('mission-form').addEventListener('change', () => { missionComplete=false;renderMission(true); });
   $('mission-form').onsubmit = event => {
     event.preventDefault();
     clearMissionFeedback();
