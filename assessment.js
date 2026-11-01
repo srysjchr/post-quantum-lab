@@ -34,6 +34,7 @@ window.createLearningCheck = function () {
   const node=(tag,text)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;return e;};
   function clearError(){ $('assessment-error').textContent='';$('assessment-fields').querySelectorAll('select').forEach(e=>{e.removeAttribute('aria-invalid');e.removeAttribute('aria-describedby');}); }
   function renderForm(){
+    const focusedAnswer=$('assessment-fields').contains(document.activeElement)?document.activeElement.id:null;
     clearError();const after=$('assessment-phase').value==='after';$('assessment-fields').replaceChildren();
     concepts.forEach((c,i)=>{const field=node('div'),label=node('label',`${i+1}. ${c[after?2:1]}`),select=node('select');select.id=`assessment-answer-${i}`;label.htmlFor=select.id;
       const options=[['','Choose an answer…'],['wrong-a',c[4][after?1:0]],['correct',c[3][after?1:0]],['wrong-b',c[5][after?1:0]]];
@@ -42,6 +43,7 @@ window.createLearningCheck = function () {
       options.forEach(([value,text])=>{const o=node('option',text);o.value=value;select.append(o);});const preview=node('p');preview.id=`assessment-choice-${i}`;preview.className='coach-choice';preview.hidden=true;select.addEventListener('change',()=>{preview.textContent=select.value?select.selectedOptions[0].textContent:'';preview.hidden=!select.value;});field.append(label,select,preview);$('assessment-fields').append(field);
     });
     $('assessment-submit').disabled=!after&&!!results.before;
+    if(focusedAnswer)$(focusedAnswer)?.focus({preventScroll:true});
   }
   function renderResults(){
     const score=v=>v.filter(Boolean).length,old=results.before,latest=results.after;

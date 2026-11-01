@@ -26,6 +26,18 @@ const cases={
    assert.equal(await p.locator('#teach-field-0').getAttribute('aria-invalid'),'true');
    for(const [i,value]of ['pair','secret','resistance'].entries())await p.selectOption(`#teach-field-${i}`,value);await p.locator('#teach-form button').click();assert.equal(await p.locator('#teach-sentence').isVisible(),true);
   }
+ },
+ async 'check-reset-focus'(context,p){
+  await p.goto(root+'?chapter=4#learning-check');await p.waitForSelector('#assessment-answer-0');
+  const other=await context.newPage();await other.goto(root+'?chapter=4#learning-check');await other.waitForSelector('#assessment-reset');
+  for(const width of [1440,390]){
+   await p.setViewportSize({width,height:950});await p.selectOption('#assessment-answer-2','correct');await p.locator('#assessment-answer-2').focus();
+   await other.evaluate(()=>localStorage.setItem('post-quantum-lab.check.v1',JSON.stringify({version:1,before:[true,true,true,true,true,true],after:null})));
+   await p.waitForFunction(()=>document.getElementById('assessment-summary').textContent.includes('Before: 6'));
+   await other.locator('#assessment-reset').click();await p.waitForFunction(()=>document.getElementById('assessment-summary').textContent.includes('No baseline'));
+   assert.equal(await p.evaluate(()=>document.activeElement.id),'assessment-answer-2','A reset from another tab must not discard keyboard focus');
+   assert.equal(await p.inputValue('#assessment-answer-2'),'');
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
