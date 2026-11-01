@@ -60,6 +60,15 @@ const cases={
     assert.deepEqual(outcomes.modified,[false,false,false,false,false,false],id+' must leave browser/assistive modified shortcuts available');assert.equal(outcomes.plain,true,'Unmodified Home still resets the model');
    }
   }
+ },
+ async 'same-chapter-draft'(context,p){
+  await p.goto(root+'?chapter=1');await p.waitForSelector('#rsa-product');
+  for(const width of [1440,390]){
+   await p.setViewportSize({width,height:950});await p.locator('[data-chapter="0"]').click();await p.check('#answers input[value="1"]');await p.selectOption('#rsa-product','899');
+   await p.locator('[data-chapter="0"]').click();assert.equal(await p.locator('#answers input[value="1"]').isChecked(),true,'Reopening the current chapter must retain a pending quiz');assert.equal(await p.inputValue('#rsa-product'),'899');
+   await p.locator('[data-chapter="4"]').click();await p.fill('#message','Retain this in-page draft');await p.locator('[data-chapter="4"]').click();assert.equal(await p.inputValue('#message'),'Retain this in-page draft');
+   await p.locator('[data-chapter="0"]').click();assert.equal(await p.locator('#rsa-product').isVisible(),true);
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

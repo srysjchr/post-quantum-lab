@@ -165,7 +165,7 @@
   }
   const renderers={rsa:renderRsa,quantum:renderQuantum,noise:renderNoise,kem:renderKem,aes:renderAes,migration:renderMigration};
   function select(index) {
-    chapter=Math.max(0,Math.min(lessons.length-1,index));renderVersion++;refreshAes=()=>{};const lesson=lessons[chapter];
+    const nextChapter=Math.max(0,Math.min(lessons.length-1,index));if(!initialRender&&nextChapter===chapter)return;chapter=nextChapter;renderVersion++;refreshAes=()=>{};const lesson=lessons[chapter];
     document.querySelectorAll('[data-chapter]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.chapter)===chapter)));
     $('chapter-count').textContent=`CHAPTER ${String(chapter+1).padStart(2,'0')} / 06`;$('lesson-title').textContent=lesson.title;$('summary').replaceChildren(...lesson.summary.map(text=>make('p',text)));$('formula').textContent=lesson.formula;
     $('scene').setAttribute('aria-label',`${lesson.name}: ${lesson.title} ${scene?'Illustrative 3D model. Drag or use arrow keys to rotate.':'3D is unavailable. Use the lesson text and controls.'}`);$('scene-annotation').textContent=lesson.annotation;
