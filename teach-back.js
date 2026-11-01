@@ -45,7 +45,9 @@ window.createTeachBack = function (readWire) {
       select.id = `teach-field-${index}`; label.htmlFor = select.id;
       const placeholder = node('option','Choose a claim…'); placeholder.value = ''; select.append(placeholder);
       options.forEach(([value,text]) => { const option = node('option',text); option.value = value; select.append(option); });
-      $('teach-fields').append(label,select);
+      const preview=node('p','');preview.id=`teach-choice-${index}`;preview.className='coach-choice';preview.hidden=true;
+      select.addEventListener('change',()=>{preview.textContent=select.value?select.selectedOptions[0].textContent:'';preview.hidden=!select.value;});
+      $('teach-fields').append(label,select,preview);
     });
     clearFeedback(); evidence();
   }

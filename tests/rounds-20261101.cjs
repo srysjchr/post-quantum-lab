@@ -98,6 +98,17 @@ const cases={
    assert.equal(await faq.locator('a').getAttribute('href'),'https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf#page=42');assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    if(process.env.EVIDENCE_DIR){await faq.scrollIntoViewIfNeeded();await p.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`kem-rejection-${width}.png`)});}
   }
+ },
+ async 'teach-choice-preview'(context,p){
+  await p.goto(root+'?chapter=4#teach-it-back');await p.waitForSelector('#teach-field-0');
+  for(const width of [1440,320]){
+   await p.setViewportSize({width,height:950});await p.selectOption('#teach-topic','1');await p.selectOption('#teach-field-2','decaps');const preview=p.locator('#teach-choice-2');
+   assert.equal(await preview.count(),1,'Show the entire selected claim outside the narrow native select');assert.equal(await preview.isVisible(),true);assert.match(await preview.innerText(),/Matching dk allows decapsulation of c/);
+   await p.selectOption('#teach-field-1','derived');await p.selectOption('#teach-field-0','private-pair');assert.equal(await p.locator('#teach-choice-0').isVisible(),true);
+   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   if(process.env.EVIDENCE_DIR){await preview.scrollIntoViewIfNeeded();await p.screenshot({path:require('node:path').join(process.env.EVIDENCE_DIR,`teach-preview-${width}.png`)});}
+   await p.selectOption('#teach-field-2','');assert.equal(await preview.isVisible(),false);await p.locator('#teach-reset').click();assert.equal(await p.locator('#teach-choice-0').isVisible(),false);
+  }
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
