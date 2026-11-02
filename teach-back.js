@@ -79,7 +79,7 @@ window.createTeachBack = function (readWire) {
   window.addEventListener('pqlab:activity', event => {
     const type = event.detail?.type;
     if (type === 'replay-unguarded' || type === 'replay-guarded') {
-      replay.add(type);
+      if(replay.has(type))return;replay.add(type);
       if (topic !== 2) return;
     } else if (type !== 'wire-updated' || topic === 2) return;
     evidence(); clearFeedback();
