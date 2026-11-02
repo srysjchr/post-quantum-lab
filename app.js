@@ -158,7 +158,7 @@
     tamper.addEventListener('click',async()=>{
       if(!result)return;const snapshot=result;const modified=new Uint8Array(snapshot.cipher.slice(0));modified[0]^=1;
       try {await crypto.subtle.decrypt({name:'AES-GCM',iv:snapshot.iv,tagLength:128},snapshot.key,modified);if(version===renderVersion&&result===snapshot)status.textContent='Unexpected result: modified ciphertext was accepted.';}
-      catch{if(version===renderVersion&&result===snapshot)status.textContent='Tampering detected: changing one ciphertext byte made authentication fail. No plaintext was accepted.';}
+      catch(error){if(version===renderVersion&&result===snapshot)status.textContent=error.name==='OperationError'?'Tampering detected: changing one ciphertext byte made authentication fail. No plaintext was accepted.':`Unable to test the modified ciphertext: ${error.message}`;}
     });setScene('encrypted',false);
   }
   function renderMigration(parent) {
