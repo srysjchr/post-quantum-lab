@@ -26,6 +26,9 @@ const cases={
  },
  async 'noise-value-context'(context,p){
   await p.goto(root+'?chapter=3');await p.waitForSelector('#noise');for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.locator('#noise').focus();await p.keyboard.press('Home');assert.match(await p.locator('#noise').getAttribute('aria-valuetext')||'',/0\.000 illustration units.*not.*security/i,'The slider must describe illustrative units rather than an unexplained security value');await p.keyboard.press('End');assert.match(await p.locator('#noise').getAttribute('aria-valuetext'),/1\.203 illustration units/);assert.match(await p.locator('#noise-description').innerText(),/1\.203/);}
+ },
+ async 'knowledge-table-keyboard'(context,p){
+  await p.goto(root+'?chapter=4');await p.waitForSelector('#kem-knowledge');const wrap=p.locator('#kem-knowledge').locator('..');assert.equal(await wrap.getAttribute('tabindex'),'0','Keyboard users need access to the horizontally scrollable table');assert.equal(await wrap.getAttribute('role'),'region');assert.equal(await wrap.getAttribute('aria-labelledby'),'kem-table-caption');for(const width of [1440,320]){await p.setViewportSize({width,height:950});await wrap.focus();await p.keyboard.press('End');assert.equal(await wrap.evaluate(e=>document.activeElement===e),true);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
