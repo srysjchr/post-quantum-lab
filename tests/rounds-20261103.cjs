@@ -19,6 +19,10 @@ const cases={
  async 'current-journey-stage'(context,p){
   await p.goto(root+'?chapter=4#message-journey');await p.waitForSelector('#authenticate');
   for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.locator('#journey-reset').click();await p.locator('#authenticate').click();const status=await p.locator('#journey-status').innerText();await p.locator('#journey-stages [data-stage="0"]').click();assert.equal(await p.locator('#journey-status').innerText(),status,'The current stage button must not erase its operation result');await p.locator('#journey-forward').click();assert.match(await p.locator('#journey-step-title').innerText(),/ML-KEM/);}
+ },
+ async 'journey-draft-salt'(context,p){
+  await p.goto(root+'?chapter=4');await journey(p);await act(p,'#journey-back','click');
+  for(const width of [1440,390]){await p.setViewportSize({width,height:950});const salt=await p.locator('#journey-payload code').first().innerText();await p.fill('#journey-message','Revised message '+width);assert.equal(await p.locator('#journey-payload').isVisible(),true,'Editing plaintext must retain the already-shared HKDF salt');assert.equal(await p.locator('#journey-payload code').count(),1,'The obsolete packet must disappear');assert.equal(await p.locator('#journey-payload code').innerText(),salt);assert.equal(await p.locator('#journey-forward').isDisabled(),true);await p.locator('#journey-encrypt').click();await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Encrypted'));assert.equal(await p.locator('#journey-payload code').count(),3);}
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;
