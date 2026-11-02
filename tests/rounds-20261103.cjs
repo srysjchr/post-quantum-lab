@@ -23,6 +23,9 @@ const cases={
  async 'journey-draft-salt'(context,p){
   await p.goto(root+'?chapter=4');await journey(p);await act(p,'#journey-back','click');
   for(const width of [1440,390]){await p.setViewportSize({width,height:950});const salt=await p.locator('#journey-payload code').first().innerText();await p.fill('#journey-message','Revised message '+width);assert.equal(await p.locator('#journey-payload').isVisible(),true,'Editing plaintext must retain the already-shared HKDF salt');assert.equal(await p.locator('#journey-payload code').count(),1,'The obsolete packet must disappear');assert.equal(await p.locator('#journey-payload code').innerText(),salt);assert.equal(await p.locator('#journey-forward').isDisabled(),true);await p.locator('#journey-encrypt').click();await p.waitForFunction(()=>document.getElementById('journey-status').textContent.startsWith('Encrypted'));assert.equal(await p.locator('#journey-payload code').count(),3);}
+ },
+ async 'noise-value-context'(context,p){
+  await p.goto(root+'?chapter=3');await p.waitForSelector('#noise');for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.locator('#noise').focus();await p.keyboard.press('Home');assert.match(await p.locator('#noise').getAttribute('aria-valuetext')||'',/0\.000 illustration units.*not.*security/i,'The slider must describe illustrative units rather than an unexplained security value');await p.keyboard.press('End');assert.match(await p.locator('#noise').getAttribute('aria-valuetext'),/1\.203 illustration units/);assert.match(await p.locator('#noise-description').innerText(),/1\.203/);}
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

@@ -124,7 +124,8 @@
     const label=make('label',undefined,'interaction-label');label.htmlFor='noise';label.append(document.createTextNode('Noise level'));const output=make('output','2');output.id='noise-value';output.htmlFor='noise';label.append(output);
     const input=make('input');input.id='noise';input.type='range';input.min=0;input.max=5;input.step=0.1;input.value=2;input.setAttribute('aria-describedby','noise-description');
     const description=make('p','Move the orange observation away from a fixed lattice point. This is a visual scale, not an ML-KEM parameter.','micro');description.id='noise-description';
-    input.addEventListener('input',()=>{output.value=input.value;setScene('noise',Number(input.value));const distance=Number(input.value)/5*Math.hypot(.85,.55,.65);description.textContent=`Observation displacement: ${distance.toFixed(3)} illustration units. This is not an ML-KEM parameter or a security score.`;});parent.append(label,input,description);setScene('noise',2);
+    const update=()=>{output.value=input.value;setScene('noise',Number(input.value));const distance=(Number(input.value)/5*Math.hypot(.85,.55,.65)).toFixed(3);input.setAttribute('aria-valuetext',`${distance} illustration units; not an ML-KEM parameter or security score`);description.textContent=`Observation displacement: ${distance} illustration units. This is not an ML-KEM parameter or a security score.`;};
+    input.addEventListener('input',update);parent.append(label,input,description);update();
   }
   function renderKem(parent) {
     const stages=[['KeyGen','Bob creates ek and dk. Only ek is published; dk remains private.'],['Encaps','Alice uses Bob’s authenticated ek to generate secret K and ciphertext c.'],['Decaps','Bob applies dk to c and obtains the same K for a valid encapsulation.'],['Derive','The protocol derives traffic keys from K, then protects messages with AES-GCM.']];
