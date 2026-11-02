@@ -15,6 +15,10 @@ const cases={
  async 'active-independent-milestone'(context,p){
   await p.goto(root+'?chapter=4#independent-missions');await p.waitForSelector('#ind-operation');await p.locator('#learning-progress details>summary').click();
   for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.selectOption('#ind-operation','bind');await p.locator('#ind-hints>summary').click();await p.waitForFunction(()=>document.getElementById('ind-hints').open);await p.locator('[data-progress-id="independent-0"]').click();assert.equal(await p.inputValue('#ind-operation'),'bind','Reopening the active mission must retain a pending operation');assert.equal(await p.locator('#ind-hints').evaluate(e=>e.open),true);await p.locator('#ind-add').press('Enter');assert.equal(await p.locator('#ind-plan li').count(),1);await p.locator('#ind-reset').click();}
+ },
+ async 'current-journey-stage'(context,p){
+  await p.goto(root+'?chapter=4#message-journey');await p.waitForSelector('#authenticate');
+  for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.locator('#journey-reset').click();await p.locator('#authenticate').click();const status=await p.locator('#journey-status').innerText();await p.locator('#journey-stages [data-stage="0"]').click();assert.equal(await p.locator('#journey-status').innerText(),status,'The current stage button must not erase its operation result');await p.locator('#journey-forward').click();assert.match(await p.locator('#journey-step-title').innerText(),/ML-KEM/);}
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

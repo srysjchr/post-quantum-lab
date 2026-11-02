@@ -11,7 +11,7 @@ window.createMessageJourney=function(){
  async function run(op){if(busy)return;const id=epoch;busy=true;status='Working locally…';render();try{const commit=await op();if(id===epoch)commit();}catch(e){if(id===epoch)status='Unable to complete this stage: '+e.message;}finally{if(id===epoch){busy=false;render();}}}
  function button(text,id,fn){const b=node('button',text);b.id=id;b.disabled=busy;b.onclick=fn;$('journey-controls').append(b);return b;}
  function renderStages(){
- $('journey-stages').replaceChildren(...names.map((text,i)=>{const li=node('li',''),b=node('button',`${i+1}. ${text}${done>=i?' ✓':''}`);b.dataset.stage=i;b.disabled=busy||i>done+1;b.setAttribute('aria-current',stage===i?'step':'false');b.onclick=()=>{stage=i;status='';render();};li.append(b);return li;}));
+ $('journey-stages').replaceChildren(...names.map((text,i)=>{const li=node('li',''),b=node('button',`${i+1}. ${text}${done>=i?' ✓':''}`);b.dataset.stage=i;b.disabled=busy||i>done+1;b.setAttribute('aria-current',stage===i?'step':'false');b.onclick=()=>{if(stage===i)return;stage=i;status='';render();};li.append(b);return li;}));
  }
  function render(){
  const active=document.activeElement;
