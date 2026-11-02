@@ -29,6 +29,9 @@ const cases={
  },
  async 'knowledge-table-keyboard'(context,p){
   await p.goto(root+'?chapter=4');await p.waitForSelector('#kem-knowledge');const wrap=p.locator('#kem-knowledge').locator('..');assert.equal(await wrap.getAttribute('tabindex'),'0','Keyboard users need access to the horizontally scrollable table');assert.equal(await wrap.getAttribute('role'),'region');assert.equal(await wrap.getAttribute('aria-labelledby'),'kem-table-caption');for(const width of [1440,320]){await p.setViewportSize({width,height:950});await wrap.focus();await p.keyboard.press('End');assert.equal(await wrap.evaluate(e=>document.activeElement===e),true);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
+ },
+ async 'restart-mission-hint'(context,p){
+  await p.goto(root+'?chapter=4#guided-missions');await p.waitForSelector('#mission-restart');for(const width of [1440,390]){await p.setViewportSize({width,height:950});await p.locator('#mission-hints>summary').click();await p.waitForFunction(()=>document.getElementById('mission-hints').open);await p.check('#mission-options input[value="0"]');await p.locator('#mission-restart').press('Enter');assert.equal(await p.locator('#mission-hints').evaluate(e=>e.open),false,'Restart should restore the closed optional hint like a mission switch');assert.equal(await p.locator('#mission-options input:checked').count(),0);assert.match(await p.locator('#mission-counter').innerText(),/IN PROGRESS/);}
  }
 };
 (async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||undefined,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let failed=0;

@@ -203,7 +203,7 @@ window.createPracticeLabs = function () {
     if(target>=0&&target!==mission){$('mission-select').value=String(target);$('mission-select').dispatchEvent(new Event('change',{bubbles:true}));}
   });
   $('mission-restart').onclick = () => {
-    evidence.clear(); missionComplete = false; renderMission();
+    evidence.clear(); missionComplete = false; $('mission-hints').open=false; renderMission();
   };
   window.addEventListener('pqlab:activity', event => {
     const type = event.detail.type;
