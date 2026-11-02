@@ -51,7 +51,7 @@ window.createIndependentMissions = function () {
   const wrong=s.answers.map((answer,i)=>answer==='correct'?null:i).filter(i=>i!==null);if(wrong.length){$('ind-error').textContent='Revisit the highlighted actor claims. Separate public bytes, local computations, identity, integrity and freshness.';wrong.forEach(i=>{const e=$(`ind-claim-${i}`);e.setAttribute('aria-invalid','true');e.setAttribute('aria-describedby','ind-error');});$(`ind-claim-${wrong[0]}`).focus();return;}
   s.complete=true;history.add(level);window.completeLearning(`independent-${level}`);status();$('ind-current').focus({preventScroll:true});
  };
- window.addEventListener('pqlab:milestone-open',event=>{const id=event.detail?.id;if(/^independent-[0-2]$/.test(id||'')){const target=Number(id.slice(-1));if(target===0||history.has(target-1)){level=target;$('ind-level').value=String(level);render();}}});
+ window.addEventListener('pqlab:milestone-open',event=>{const id=event.detail?.id;if(/^independent-[0-2]$/.test(id||'')){const target=Number(id.slice(-1));if(target!==level&&(target===0||history.has(target-1))){level=target;$('ind-level').value=String(level);render();}}});
  window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key!=='post-quantum-lab.progress.v1')return;history=decodeHistory(event.newValue);if(level>0&&!history.has(level-1)){level=0;$('ind-level').value='0';render();}else status();});
  window.addEventListener('pqlab:progress-cleared',()=>{history.clear();states=levels.map(fresh);level=0;$('ind-level').value='0';render();});
  render();
