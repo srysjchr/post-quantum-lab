@@ -18,7 +18,15 @@ window.createWireScene = function (transmit) {
   function syncMotion(){motionControl.disabled=motion.matches||interrupted;motionControl.checked=userMotion&&!motion.matches;document.getElementById('wire-motion-note').textContent=interrupted?'3D is interrupted. Send buttons and knowledge cards still work.':motion.matches?'System reduced motion is active. Packets update without animated travel.':userMotion?'Packet travel is animated; final knowledge updates immediately.':'Packet travel is off; transmission and knowledge rules are unchanged.';}
   function syncControls(){
     for(const id of ['wire-turn-left','wire-turn-right','wire-camera-reset'])document.getElementById(id).disabled=interrupted;
-    if(interrupted)host.removeAttribute('aria-keyshortcuts');else host.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight Home');
+    if(interrupted){
+      host.removeAttribute('tabindex');
+      host.removeAttribute('aria-keyshortcuts');
+      document.getElementById('wire-keyboard-help').textContent='3D camera is unavailable. Use the Send buttons and participant knowledge cards while the browser restores it.';
+    }else{
+      host.setAttribute('tabindex','0');
+      host.setAttribute('aria-keyshortcuts','ArrowLeft ArrowRight Home');
+      document.getElementById('wire-keyboard-help').textContent='Focus the 3D view: Left/Right arrows rotate; Home resets the camera. Sending uses separate controls.';
+    }
     syncMotion();
   }
   const meshes = new Map();
@@ -57,7 +65,7 @@ window.createWireScene = function (transmit) {
   } catch {
     for(const id of ['wire-turn-left','wire-turn-right','wire-camera-reset'])document.getElementById(id).disabled=true;
     motionControl.disabled=true;document.getElementById('wire-motion-note').textContent='3D motion is unavailable; the experiment controls still work.';
-    host.removeAttribute('aria-keyshortcuts');
+    host.removeAttribute('tabindex');host.removeAttribute('aria-keyshortcuts');document.getElementById('wire-keyboard-help').textContent='3D camera is unavailable. Use the Send buttons and participant knowledge cards; the same experiment still works.';
     host.classList.add('unavailable');fallback.textContent='3D is unavailable. Use the Send buttons and participant knowledge cards below; the same experiment still works.';
     return {render:announce};
   }
@@ -280,7 +288,7 @@ window.createWireScene = function (transmit) {
   syncControls();motionControl.onchange=()=>{userMotion=motionControl.checked;syncMotion();if(snapshot)build();};
   motion.addEventListener('change',()=>{syncMotion();if(snapshot)build();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;cancelDrag();}else if(snapshot)build();});
-  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;syncControls();cancelAnimationFrame(frame);frame=0;cancelDrag();if(snapshot)renderRoute(snapshot);fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';});
+  renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();interrupted=true;fallback.hidden=false;fallback.textContent='3D was interrupted. Use the Send buttons while the browser restores it.';syncControls();cancelAnimationFrame(frame);frame=0;cancelDrag();if(snapshot)renderRoute(snapshot);});
   renderer.domElement.addEventListener('webglcontextrestored',()=>{interrupted=false;syncControls();fallback.hidden=true;if(snapshot)build();});
   window.addEventListener('pagehide',()=>{cancelDrag(false);disposed=true;cancelAnimationFrame(frame);frame=0;});
   window.addEventListener('pageshow',()=>{disposed=false;if(snapshot)build();});
