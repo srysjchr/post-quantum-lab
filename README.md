@@ -123,7 +123,7 @@ Run `node tests/teach-back.cjs` using the existing Playwright configuration. Opt
 
 ## Learning Progress
 
-The learning panel saves a versioned, browser-local completion history for six chapter quizzes and 24 exercise milestones. A visit alone never completes a lesson. Existing exercise success paths record milestones; all three guided predictions must be correct in one run. Continue learning opens the last chapter or exercise section. The completion checklist opens the relevant section, and chapter buttons show completion badges.
+The learning panel saves a versioned, browser-local completion history for six chapter quizzes and 29 exercise milestones. A visit alone never completes a lesson. Existing exercise success paths record milestones; all three guided predictions must be correct in one run. Continue learning opens the last chapter or exercise section. The completion checklist opens the relevant section, and chapter buttons show completion badges.
 
 Only milestone IDs and the last chapter/section are saved under `post-quantum-lab.progress.v1` in localStorage. Messages, secret keys, ciphertext, radio answers, reflection notes and running experiments are not saved. Exercise counters and experimental state restart for the page session; past completion history remains independent. No account, backend or cross-device sync is used. Progress is specific to this browser/profile and origin. Clearing browser data also clears it.
 
