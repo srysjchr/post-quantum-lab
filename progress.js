@@ -38,6 +38,15 @@ window.createLearningProgress = function (selectChapter) {
     visit(destination.section,destination.chapter);
   }
   const nextUnfinished=()=>entries.find(entry=>!state.completed.includes(entry.id));
+  function openNext(){const nextEntry=nextUnfinished();if(nextEntry)go(nextEntry);}
+  function syncExerciseNext(panel,create=false){
+    const footer=panel?.querySelector('.exercise-footer');if(!footer)return;
+    let button=footer.querySelector('[data-learning-next]');
+    if(!button&&create){button=document.createElement('button');button.type='button';button.className='primary';button.dataset.learningNext='';button.addEventListener('click',openNext);footer.append(button);}
+    if(!button)return;const target=nextUnfinished();button.hidden=!target;if(target)button.textContent=`Continue to ${target.label}`;
+  }
+  function refreshExerciseNext(){document.querySelectorAll('[data-learning-next]').forEach(button=>syncExerciseNext(button.closest('[data-exercise-panel]')));}
+  function onCompletion(id){const entry=entries.find(item=>item.id===id);complete(id);const panel=entry&&$(entry.section)?.closest('[data-exercise-panel]');if(panel?.open)syncExerciseNext(panel,true);refreshExerciseNext();}
   function complete(id){if(!ids.has(id)||state.completed.includes(id))return;state.completed.push(id);save();}
   function render(){
     const focusedEntry=$('learning-checklist').contains(document.activeElement)?document.activeElement.dataset.progressId:null;
@@ -55,18 +64,19 @@ window.createLearningProgress = function (selectChapter) {
     $('learning-empty').hidden=visibleEntries.length>0;
     $('learning-checklist').replaceChildren(...visibleEntries.map(entry=>{const li=document.createElement('li'),button=document.createElement('button');button.textContent=`${state.completed.includes(entry.id)?'✓ Completed':'○ Not completed'} · ${entry.label}`;button.dataset.progressId=entry.id;button.onclick=()=>go(entry);li.append(button);return li;}));
     if(focusedEntry)([...$('learning-checklist').querySelectorAll('button')].find(button=>button.dataset.progressId===focusedEntry)||$('learning-filter')).focus({preventScroll:true});
-    document.querySelectorAll('[data-chapter]').forEach(button=>{const index=Number(button.dataset.chapter),done=state.completed.includes(`chapter-${index}`);button.dataset.completed=String(done);button.setAttribute('aria-label',`${entries[index].label}${done?' · completed':''}`);});
+    document.querySelectorAll('[data-chapter]').forEach(button=>{const index=Number(button.dataset.chapter),done=state.completed.includes(`chapter-${index}`);button.dataset.completed=String(done);button.setAttribute('aria-label',`${entries[index].label}${done?' · completed':''}`);});refreshExerciseNext();
   }
   sections.forEach(section=>{const element=$(section);if(element)element.dataset.progressSection=section;});
   document.querySelector('.explorer').dataset.progressSection='lesson-title';
   document.addEventListener('focusin',event=>{const section=event.target.closest('[data-progress-section]')?.dataset.progressSection;if(section)visit(section==='interaction'&&currentChapter!==4?'lesson-title':section);});
-  window.addEventListener('pqlab:completion',event=>complete(event.detail?.id));
-  window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')complete('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))complete(type);});
+  window.addEventListener('pqlab:completion',event=>onCompletion(event.detail?.id));
+  window.addEventListener('pqlab:activity',event=>{const type=event.detail?.type;if(type==='verified')onCompletion('journey');else if(['untrusted-blocked','tamper-rejected','drop-observed','replay-unguarded','replay-guarded'].includes(type))onCompletion(type);});
+  window.addEventListener('pqlab:progress-cleared',()=>document.querySelectorAll('[data-learning-next]').forEach(button=>button.remove()));
   window.addEventListener('storage',event=>{try{if(event.storageArea!==localStorage)return;}catch{return;}if(event.key===key||event.key===null){state=decode(event.newValue);if(event.newValue===null)window.dispatchEvent(new Event('pqlab:progress-cleared'));render();}});
-  $('learning-next').onclick=()=>{const nextEntry=nextUnfinished();if(nextEntry)go(nextEntry);};
+  $('learning-next').onclick=openNext;
   $('learning-filter').onchange=render;
   $('learning-continue').onclick=()=>go(state.last);
   $('learning-clear').onclick=()=>{state=empty();try{localStorage.removeItem(key);}catch{persistent=false;}window.dispatchEvent(new Event('pqlab:progress-cleared'));render();};
   render();
-  return {chapterChanged(index,remember=true){currentChapter=index;if(remember)visit('lesson-title',index);else render();},rememberRoute(index){if(state.last.chapter!==index)visit('lesson-title',index);}};
+  return {chapterChanged(index,remember=true){currentChapter=index;if(remember)visit('lesson-title',index);else render();},rememberRoute(index){if(state.last.chapter!==index)visit('lesson-title',index);},nextEntry:nextUnfinished,openNext};
 };
