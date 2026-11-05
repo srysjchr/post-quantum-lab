@@ -73,6 +73,9 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   $('exercise-open').onclick=()=>open($('exercise-picker').value);
   $('exercise-prev').onclick=()=>{const index=exercises.findIndex(([id])=>id===active);if(index>0)open(exercises[index-1][0]);};
   $('exercise-next').onclick=()=>{const index=exercises.findIndex(([id])=>id===active);if(index>=0&&index<exercises.length-1)open(exercises[index+1][0]);};
+  const quickJump=$('quick-jump');
+  quickJump.addEventListener('click',event=>{if(event.target.closest('a'))quickJump.open=false;});
+  quickJump.addEventListener('keydown',event=>{if(event.key==='Escape'&&quickJump.open){event.preventDefault();quickJump.open=false;quickJump.querySelector('summary').focus();}});
   document.addEventListener('click',event=>{
     if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
     const link=event.target.closest('a[href^="#"]');if(!link||link.hasAttribute('download')||(link.target&&link.target!=='_self'))return;const section=link.getAttribute('href').slice(1);
