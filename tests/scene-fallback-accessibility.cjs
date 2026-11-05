@@ -12,7 +12,7 @@ const assert=require('node:assert/strict');
   assert.equal(await scene.getAttribute('tabindex'),null,'Unavailable lesson 3D must not stay in the tab order');
   assert.equal(await scene.getAttribute('aria-keyshortcuts'),null);
   assert.match(await scene.getAttribute('aria-label'),/unavailable/i);
-  assert.equal(await page.locator('#pause').isDisabled(),true);assert.equal(await page.locator('#reset').isDisabled(),true);
+  assert.equal(await page.locator('#pause').isDisabled(),true);assert.equal(await page.locator('#reset').isDisabled(),true);assert.equal(await page.locator('#scene-rotate-left').isDisabled(),true);assert.equal(await page.locator('#scene-rotate-right').isDisabled(),true);
   assert.equal(await wire.getAttribute('tabindex'),null,'Unavailable wire camera must not stay in the tab order');
   assert.equal(await wire.getAttribute('aria-keyshortcuts'),null);
   assert.equal(await wire.evaluate(e=>e.classList.contains('unavailable')),true);
@@ -37,7 +37,7 @@ const assert=require('node:assert/strict');
   await live.evaluate(()=>{window.mainLoss.restoreContext();window.wireLoss.restoreContext();});
   await live.waitForFunction(()=>document.getElementById('fallback').hidden&&document.getElementById('wire-scene-fallback').hidden);
   assert.equal(await live.locator('#scene').getAttribute('tabindex'),'0');assert.match(await live.locator('#scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);
-  assert.equal(await live.locator('#wire-scene').getAttribute('tabindex'),'0');assert.match(await live.locator('#wire-scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);assert.equal(await live.locator('#wire-turn-left').isDisabled(),false);
+  assert.equal(await live.locator('#wire-scene').getAttribute('tabindex'),'0');assert.match(await live.locator('#wire-scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);assert.equal(await live.locator('#wire-turn-left').isDisabled(),false);assert.equal(await live.locator('#scene-rotate-left').isDisabled(),false);assert.equal(await live.locator('#scene-rotate-right').isDisabled(),false);
   for(const width of [390,1440]){await live.setViewportSize({width,height:900});assert.equal(await live.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'restored-scene overflow at '+width);}
   assert.deepEqual(liveErrors,[]);
   assert.equal(await live.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);

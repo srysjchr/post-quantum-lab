@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const lessons = window.LESSONS;
   const scene = window.createLearningScene($('scene'), $('fallback'));
-  if (!scene) { $('pause').disabled=true; $('reset').disabled=true; $('scene').removeAttribute('aria-keyshortcuts'); $('scene-motion-note').textContent='3D is unavailable. Lesson controls and exercises still work.'; $('scene-controls-help').textContent='Use the lesson text, protocol summaries and knowledge tables to explore the same concepts.'; }
+  if (!scene) { $('pause').disabled=true; $('reset').disabled=true; $('scene-rotate-left').disabled=true; $('scene-rotate-right').disabled=true; $('scene').removeAttribute('aria-keyshortcuts'); $('scene-motion-note').textContent='3D is unavailable. Lesson controls and exercises still work.'; $('scene-controls-help').textContent='Use the lesson text, protocol summaries and knowledge tables to explore the same concepts.'; }
   let chapter=0, renderVersion=0, observer='learner', rsa={n:323,p:17,q:19,revealed:false}, phase=0, threatMode='passive', prediction=null;
   const learningNavigation=window.createLearningNavigation(index=>select(index),()=>chapter);
   const learningProgress=window.createLearningProgress(index=>select(index));
@@ -117,8 +117,9 @@
   function renderQuantum(parent) {
     const buttons=make('div',undefined,'choice-buttons');const description=make('p',undefined,'micro');description.id='quantum-description';
     const values=[['shor','Shor','Factoring and discrete logarithms: a structural threat to RSA, DH, and ECC.'],['grover','Grover','Generic search: an idealized square-root query reduction, not an instant AES break.']];
-    values.forEach(([value,name,text],index)=>{const button=make('button',name);button.dataset.algorithm=value;button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>{buttons.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));description.textContent=text;setScene('algorithm',value);});buttons.append(button);});
-    description.textContent=values[0][2];parent.append(buttons,description);setScene('algorithm','shor');
+    const updateAnnotation=value=>{$('scene-annotation').textContent=value==='shor'?'SHOR · PERIOD FINDING\nIllustrative wave, not a quantum circuit':'GROVER · SEARCH AMPLIFICATION\nIllustrative search pattern, not a quantum circuit';};
+    values.forEach(([value,name,text],index)=>{const button=make('button',name);button.dataset.algorithm=value;button.setAttribute('aria-pressed',String(index===0));button.addEventListener('click',()=>{buttons.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));description.textContent=text;updateAnnotation(value);setScene('algorithm',value);});buttons.append(button);});
+    description.textContent=values[0][2];parent.append(buttons,description);updateAnnotation('shor');setScene('algorithm','shor');
   }
   function renderNoise(parent) {
     const label=make('label',undefined,'interaction-label');label.htmlFor='noise';label.append(document.createTextNode('Noise level'));const output=make('output','2');output.id='noise-value';output.htmlFor='noise';label.append(output);
