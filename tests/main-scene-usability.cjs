@@ -28,6 +28,7 @@ const path=require('node:path');
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Page overflow at '+width+'px');
+   if(width<=740){const hintFont=await page.locator('#scene-controls-help').evaluate(element=>parseFloat(getComputedStyle(element).fontSize));assert.ok(hintFont>=11,'Mobile camera guidance below 11px at '+width+'px');}
    for(const [id,label] of [['scene-rotate-left','Rotate view left'],['scene-rotate-right','Rotate view right']]){
     const button=page.locator('#'+id),box=await button.boundingBox();assert.ok(box&&box.width>=44&&box.height>=44,id+' touch target below 44px at '+width+'px');
     assert.equal(await button.getAttribute('aria-label'),label);
