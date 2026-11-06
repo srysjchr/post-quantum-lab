@@ -190,7 +190,7 @@ window.createLearningScene = function (container, fallback) {
     document.getElementById('scene-rotate-left').disabled=lost;
     document.getElementById('scene-rotate-right').disabled=lost;
     syncSceneAccess();
-    button.textContent=lost?'3D interrupted':motion.matches?'Motion reduced':paused?'Play motion':'Pause motion';button.setAttribute('aria-pressed',String(paused));
+    button.textContent=lost?'3D interrupted':motion.matches?'Motion reduced':paused?'Play motion':'Pause motion';
     document.getElementById('scene-motion-note').textContent=lost?'3D is interrupted. Lesson controls and exercises still work.':motion.matches?'System reduced motion is active. Manual rotation and lesson controls still work.':userPaused?'Motion is paused. Manual rotation and lesson controls still work.':'Automatic motion is on. Use Pause motion to stop it.';
   }
   function cancelDrag(){

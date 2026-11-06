@@ -54,8 +54,8 @@ const assert=require('node:assert/strict');
  }
  assert.equal(await page.locator('#prediction-next').isVisible(),false);
  // Main-scene context loss must also expose unavailable controls accurately.
- await page.goto(root);await page.waitForSelector('#scene canvas');await page.emulateMedia({reducedMotion:'no-preference'});
- await page.locator('#pause').click();assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true');
+ await page.goto(root);await page.waitForSelector('#scene canvas');await page.emulateMedia({reducedMotion:'no-preference'});await page.waitForFunction(()=>document.getElementById('pause').textContent==='Pause motion');
+ assert.equal(await page.getByRole('button',{name:'Pause motion',exact:true}).count(),1);await page.getByRole('button',{name:'Pause motion',exact:true}).click();assert.equal(await page.locator('#pause').innerText(),'Play motion');assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),null,'An action-labeled button must not expose a contradictory toggle state.');assert.equal(await page.getByRole('button',{name:'Play motion',exact:true}).count(),1);
  await page.evaluate(()=>{window.mainLoss=document.querySelector('#scene canvas').getContext('webgl2').getExtension('WEBGL_lose_context');window.mainLoss.loseContext();});
  await page.waitForSelector('#fallback:not([hidden])');
  assert.equal(await page.locator('#reset').isDisabled(),true,'Interrupted main camera reset must be disabled');
@@ -66,7 +66,7 @@ const assert=require('node:assert/strict');
  await page.locator('[data-chapter="3"]').click();assert.equal(await page.locator('[data-phase="1"]').isEnabled(),true);
  await page.evaluate(()=>window.mainLoss.restoreContext());await page.waitForSelector('#fallback[hidden]',{state:'attached'});
  assert.equal(await page.locator('#reset').isEnabled(),true);assert.equal(await page.locator('#pause').isEnabled(),true);
- assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),'true','Restoration retains manual pause preference');
+ assert.equal(await page.locator('#pause').innerText(),'Play motion','Restoration retains manual pause preference');assert.equal(await page.locator('#pause').getAttribute('aria-pressed'),null);assert.equal(await page.getByRole('button',{name:'Play motion',exact:true}).count(),1);await page.getByRole('button',{name:'Play motion',exact:true}).click();assert.equal(await page.getByRole('button',{name:'Pause motion',exact:true}).count(),1);assert.match(await page.locator('#scene-motion-note').innerText(),/Automatic motion is on/);
  assert.match(await page.locator('#scene').getAttribute('aria-keyshortcuts'),/ArrowLeft/);
  // Sequential navigation announces the new lesson/case instead of losing focus at an endpoint.
  await page.goto(root+'?chapter=5');await page.waitForSelector('#next');await page.locator('#next').press('Enter');
