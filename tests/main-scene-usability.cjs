@@ -29,6 +29,7 @@ const path=require('node:path');
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Page overflow at '+width+'px');
+   const undersized=await page.locator('button').evaluateAll(buttons=>buttons.filter(button=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&getComputedStyle(button).visibility!=='hidden'&&!button.closest('[hidden],[aria-hidden="true"],details:not([open])')&&rect.height<44}).map(button=>`${button.textContent.trim()||button.id||'unnamed'}: ${Math.round(button.getBoundingClientRect().height)}px`));assert.deepEqual(undersized,[],`Interactive buttons below 44px at ${width}px`);
    if(width<=740){const hintFont=await page.locator('#scene-controls-help').evaluate(element=>parseFloat(getComputedStyle(element).fontSize));assert.ok(hintFont>=11,'Mobile camera guidance below 11px at '+width+'px');for(const link of await page.locator('header nav a').all()){const box=await link.boundingBox();assert.ok(box&&box.height>=44,'Mobile navigation target below 44px at '+width+'px');assert.ok(box.x>=0&&box.x+box.width<=width,'Mobile navigation target outside viewport at '+width+'px');}}
    for(const [id,label] of [['scene-rotate-left','Rotate view left'],['scene-rotate-right','Rotate view right']]){
     const button=page.locator('#'+id),box=await button.boundingBox();assert.ok(box&&box.width>=44&&box.height>=44,id+' touch target below 44px at '+width+'px');
