@@ -11,10 +11,10 @@ const assert=require('node:assert/strict');
   assert.equal(await links.nth(0).getAttribute('href'),'#chapters');
   assert.equal(await links.nth(1).getAttribute('href'),'#kem-prediction');
   assert.equal(await links.nth(2).getAttribute('href'),'#reference');
-  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`quick-start overflow at ${width}px`);}
+  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:950});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`quick-start overflow at ${width}px`);const heights=await page.locator('.coach-entry a').evaluateAll(links=>links.map(link=>Math.round(link.getBoundingClientRect().height)));assert.ok(heights.every(height=>height>=44),`Learning entry links need 44px targets at ${width}px: ${heights}`);}
   await links.nth(1).click();await page.waitForFunction(()=>document.querySelector('[data-exercise-panel="kem-prediction"]')?.open);
   assert.equal(await page.locator('[data-chapter="3"]').getAttribute('aria-pressed'),'true','KEM shortcut should open its chapter automatically');
-  assert.equal(await page.evaluate(()=>location.hash),'#kem-prediction');
+  assert.equal(await page.evaluate(()=>location.hash),'#kem-prediction');await page.waitForFunction(()=>!document.getElementById('kem-boundaries').hidden);const glossaryRoute=page.locator('#kem-boundaries a[href="#wire-glossary"]');for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:950});const bounds=await glossaryRoute.boundingBox();assert.ok(bounds&&bounds.height>=44,`KEM glossary route needs a 44px target at ${width}px`);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`KEM route overflow at ${width}px`);}
   await page.locator('.quick-start a[href="#reference"]').click();assert.equal(await page.evaluate(()=>location.hash),'#reference');
   assert.equal(await page.locator('.intro .coach-entry a').count(),2,'Existing learning-check and independent-mission entry points remain available');
   assert.deepEqual(errors,[]);
