@@ -10,7 +10,7 @@ const assert=require('node:assert/strict');
   assert.equal(await menu.evaluate(element=>element.open),false);
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:844});const bounds=await summary.boundingBox();
-   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}px`);
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}px`);const smallDisclosures=await page.locator('summary').evaluateAll(items=>items.filter(item=>item.getClientRects().length&&item.getBoundingClientRect().height<44).map(item=>`${item.textContent.trim()}: ${Math.round(item.getBoundingClientRect().height)}px`));assert.deepEqual(smallDisclosures,[],`Disclosure targets below 44px at ${width}px`);
    assert.ok(bounds&&bounds.x>=0&&bounds.x+bounds.width<=width,`jump control must fit at ${width}px`);
   }
   await summary.click();assert.equal(await menu.evaluate(element=>element.open),true);
