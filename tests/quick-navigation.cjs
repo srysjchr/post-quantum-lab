@@ -18,6 +18,13 @@ const assert=require('node:assert/strict');
   await page.keyboard.press('Tab');await page.keyboard.press('Escape');
   assert.equal(await menu.evaluate(element=>element.open),false,'Escape should close quick navigation');
   assert.equal(await page.evaluate(()=>document.activeElement===document.querySelector('#quick-jump summary')),true,'Escape should return focus to the disclosure');
+  for(const width of [320,390,768,1440]){
+   await page.setViewportSize({width,height:844});
+   await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));
+   await page.waitForFunction(()=>scrollY+innerHeight>=document.documentElement.scrollHeight-2);
+   const {footerBottom,jumpTop}=await page.evaluate(()=>({footerBottom:document.querySelector('footer').getBoundingClientRect().bottom,jumpTop:document.querySelector('#quick-jump>summary').getBoundingClientRect().top}));
+   assert.ok(footerBottom<=jumpTop-8,`Quick navigation must not cover the footer at ${width}px: footer bottom ${footerBottom}, jump top ${jumpTop}`);
+  }
   await summary.click();await page.locator('#quick-jump a[href="#kem-prediction"]').click();
   await page.waitForFunction(()=>document.querySelector('[data-exercise-panel="kem-prediction"]')?.open);
   assert.equal(await menu.evaluate(element=>element.open),false,'Following a route should close the menu');
