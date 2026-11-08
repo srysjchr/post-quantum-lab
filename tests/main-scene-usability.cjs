@@ -29,6 +29,7 @@ const path=require('node:path');
   for(const width of [320,390,768,1440]){
    await page.setViewportSize({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Page overflow at '+width+'px');
+   assert.match(await page.locator('#scene').evaluate(element=>getComputedStyle(element).touchAction),/\bpinch-zoom\b/,'The 3D view must preserve browser pinch zoom at '+width+'px');
    const undersized=await page.locator('button').evaluateAll(buttons=>buttons.filter(button=>{const rect=button.getBoundingClientRect();return rect.width>0&&rect.height>0&&getComputedStyle(button).visibility!=='hidden'&&!button.closest('[hidden],[aria-hidden="true"],details:not([open])')&&rect.height<44}).map(button=>`${button.textContent.trim()||button.id||'unnamed'}: ${Math.round(button.getBoundingClientRect().height)}px`));assert.deepEqual(undersized,[],`Interactive buttons below 44px at ${width}px`);
    if(width<=740){const hintFont=await page.locator('#scene-controls-help').evaluate(element=>parseFloat(getComputedStyle(element).fontSize));assert.ok(hintFont>=11,'Mobile camera guidance below 11px at '+width+'px');for(const link of await page.locator('header nav a').all()){const box=await link.boundingBox();assert.ok(box&&box.height>=44,'Mobile navigation target below 44px at '+width+'px');assert.ok(box.x>=0&&box.x+box.width<=width,'Mobile navigation target outside viewport at '+width+'px');}}
    for(const [id,label] of [['scene-rotate-left','Rotate view left'],['scene-rotate-right','Rotate view right']]){
@@ -41,7 +42,16 @@ const path=require('node:path');
   await page.setViewportSize({width:390,height:844});await page.locator('#scene-rotate-left').scrollIntoViewIfNeeded();
   const left=await page.locator('#scene-rotate-left').boundingBox();await page.touchscreen.tap(left.x+left.width/2,left.y+left.height/2);
   assert.match(await page.locator('#scene-rotation-status').innerText(),/left/i);
+  const zoomContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1,isMobile:true,hasTouch:true}),zoomPage=await zoomContext.newPage();
+  zoomPage.on('pageerror',e=>errors.push(e.message));zoomPage.on('requestfailed',r=>errors.push(r.url()));zoomPage.on('response',r=>{if(r.status()>=400)errors.push(r.url());});
+  await zoomPage.goto(root);await zoomPage.waitForSelector('#scene canvas');await zoomPage.locator('#scene').scrollIntoViewIfNeeded();
+  const sceneBox=await zoomPage.locator('#scene').boundingBox(),centerY=sceneBox.y+sceneBox.height/2,centerX=sceneBox.x+sceneBox.width/2;
+  const touch=await zoomContext.newCDPSession(zoomPage),scaleBefore=await zoomPage.evaluate(()=>visualViewport.scale);
+  await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:centerX-45,y:centerY,id:1},{x:centerX+45,y:centerY,id:2}]});
+  await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:centerX-85,y:centerY,id:1},{x:centerX+85,y:centerY,id:2}]});
+  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await zoomPage.waitForTimeout(100);
+  assert.ok(await zoomPage.evaluate(()=>visualViewport.scale)>scaleBefore+0.05,'Two-finger pinch on the 3D area must zoom the page.');await zoomContext.close();
   assert.deepEqual(errors,[]);assert.equal(await page.evaluate(()=>/[\u0e00-\u0e7f]/.test(document.body.innerText)),false);
-  console.log('PASS: main-scene rotation buttons; rendered rotation and reset; keyboard and touch; Shor/Grover annotation; 320/390/768/1440 widths; English; no runtime/request errors.');
+  console.log('PASS: main-scene rotation buttons; rendered rotation and reset; keyboard and touch; pinch zoom; Shor/Grover annotation; 320/390/768/1440 widths; English; no runtime/request errors.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});
