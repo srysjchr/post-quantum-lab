@@ -50,12 +50,13 @@
     renderPrediction();
     const names=['KeyGen + publish ek','Encaps + deliver c','Decaps locally at Bob','Derive traffic keys locally'];
     $('kem-table-caption').textContent=`${names[phase]} · ${observer.toUpperCase()} perspective`;
-    $('kem-phase-summary').textContent=[
+    const phaseSummary=[
       'Bob creates (ek, dk) and publishes ek. Alice and Eve can see ek; only Bob has dk. Neither c nor K has been created.',
       'Alice runs Encaps(ek) and obtains (K, c), then sends c to Bob. Eve can copy c. Bob has c and dk, but has not yet run Decaps.',
       'Bob runs Decaps(dk, c) locally. For this valid encapsulation, his K matches Alice’s K. No shared secret is transmitted.',
       'Both endpoints derive a traffic key from K and agreed protocol context. Only public context needs to be shared; secret K and traffic keys stay local.'
     ][phase];
+    if($('kem-phase-summary').textContent!==phaseSummary)$('kem-phase-summary').textContent=phaseSummary;
     $('kem-knowledge').querySelector('tbody').replaceChildren(...kemKnowledge().rows.map(([name,...values])=>{
       const row=make('tr');row.dataset.object=name.split(' · ')[0];const heading=make('th',name);heading.scope='row';row.append(heading);
       values.forEach((value,i)=>{const cell=make('td',value,value==='Private'?'knowledge-private':value==='Public'?'knowledge-public':'knowledge-unavailable');cell.dataset.role=['alice','bob','eve'][i];row.append(cell);});return row;
