@@ -15,6 +15,16 @@ window.createLearningNavigation = function (selectChapter, currentChapter) {
   ];
   const wrappers = new Map();let active=null,routing=false;
   const node=(tag,text)=>{const element=document.createElement(tag);if(text!==undefined)element.textContent=text;return element;};
+  const pageLinks=[...document.querySelectorAll('header nav a[href^="#"]')].map(link=>({link,section:$(link.hash.slice(1))})).filter(entry=>entry.section);
+  function syncPageLocation(){
+    let current=pageLinks[0];const marker=window.innerHeight*.2;
+    for(const entry of pageLinks)if(entry.section.getBoundingClientRect().top<=marker)current=entry;
+    if(window.scrollY+window.innerHeight>=document.documentElement.scrollHeight-2)current=pageLinks[pageLinks.length-1];
+    pageLinks.forEach(entry=>{if(entry===current)entry.link.setAttribute('aria-current','location');else entry.link.removeAttribute('aria-current');});
+  }
+  let pageLocationFrame=0;
+  function schedulePageLocation(){if(pageLocationFrame)return;pageLocationFrame=requestAnimationFrame(()=>{pageLocationFrame=0;syncPageLocation();});}
+  window.addEventListener('scroll',schedulePageLocation,{passive:true});window.addEventListener('resize',schedulePageLocation,{passive:true});window.addEventListener('hashchange',schedulePageLocation);syncPageLocation();
   function sync(){
     const index=exercises.findIndex(([id])=>id===active);
     $('exercise-current').textContent=index<0?'Choose an exercise, or follow the recommended path.':`EXERCISE ${index+1} / ${exercises.length} · ${exercises[index][1]}`;
