@@ -9,6 +9,7 @@ const path=require('node:path');
   page.on('pageerror',e=>errors.push(e.message));page.on('requestfailed',r=>errors.push(r.url()));page.on('response',r=>{if(r.status()>=400)errors.push(r.url());});
   const root=process.env.TEST_URL||'http://127.0.0.1:8765/';
   await page.goto(root+'?chapter=2');await page.waitForSelector('#scene canvas');
+  assert.equal(await page.locator('#scene').getAttribute('aria-describedby'),'scene-controls-help','The focused 3D view must announce its keyboard instructions.');assert.equal(await page.locator('#scene-controls-help').count(),1);
   assert.equal(await page.locator('#scene-rotate-left').isDisabled(),false);
   assert.equal(await page.locator('#scene-rotate-right').isDisabled(),false);
   assert.match(await page.locator('#scene-annotation').innerText(),/SHOR.*PERIOD FINDING/);
