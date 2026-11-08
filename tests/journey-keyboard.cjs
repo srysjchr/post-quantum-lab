@@ -5,7 +5,7 @@ const assert=require('node:assert/strict');
  try{
  const page=await browser.newPage({viewport:{width:1440,height:1000},reducedMotion:'reduce'}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto((process.env.TEST_URL||'http://127.0.0.1:8766/')+'?chapter=4#message-journey');await page.waitForSelector('#authenticate');
+ await page.goto((process.env.TEST_URL||'http://127.0.0.1:8766/')+'?chapter=4#message-journey');await page.waitForSelector('#authenticate');assert.equal(await page.getByRole('group',{name:'Network transmission',exact:true}).count(),1,'The message channel must have an accessible group name.');
  await page.locator('#authenticate').press('Enter');assert.equal(await page.evaluate(()=>document.activeElement.id),'authenticate','Rerendering a journey action must retain keyboard focus');
  await page.locator('#journey-forward').press('Enter');await page.locator('#encapsulate').press('Space');assert.equal(await page.evaluate(()=>document.activeElement.id),'encapsulate');
  await page.locator('#journey-forward').press('Enter');await page.locator('#derive').press('Enter');

@@ -10,6 +10,7 @@ const path=require('node:path');
  await page.goto(process.env.TEST_URL||'http://127.0.0.1:8765/');await page.waitForSelector('#scenario-options input',{state:'attached'});
  assert.match(await page.title(),/Post.*Quantum/);assert.equal(await page.locator('html').getAttribute('lang'),'en');
  const click=s=>act(page,s,'click'),text=s=>act(page,s,'innerText');
+ await act(page,'#exercise-picker','selectOption','attack-playground');await click('#exercise-open');assert.equal(await page.getByRole('group',{name:'Public network packet',exact:true}).count(),1,'The changing attack packet must have an accessible group name.');await act(page,'#exercise-picker','selectOption','scenario-lab');await click('#exercise-open');
  const missionError=async invalid=>{assert.equal(await page.locator('#mission-options').getAttribute('aria-invalid'),invalid?'true':null,'Mission errors must identify the answer group');assert.equal(await page.locator('#mission-options').getAttribute('aria-describedby'),invalid?'mission-feedback':null);};
  const waitStatus=(id,word)=>page.waitForFunction(({id,word})=>document.getElementById(id).textContent.includes(word),{id,word});
  await click('#scenario-form button');assert.match(await text('#scenario-feedback'),/Choose a tool/);
