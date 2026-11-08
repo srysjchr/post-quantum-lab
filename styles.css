@@ -91,3 +91,4 @@ summary{min-height:44px;padding-block:9px}.quick-jump{position:fixed;right:16px;
 #kem-threat-link,#wire-reflect,#teach-action,#ind-link{display:inline-flex;align-items:center;min-height:44px}
 
 main p a{display:inline-flex;align-items:center;max-width:100%;min-height:44px;vertical-align:middle}
+@media(max-width:360px){header{padding:0 12px;gap:6px}.brand{font-size:14px;letter-spacing:.4px}header nav{gap:6px}header nav a{white-space:nowrap}}

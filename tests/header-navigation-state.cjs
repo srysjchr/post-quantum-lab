@@ -12,9 +12,11 @@ const assert=require('node:assert/strict');
   const waitCurrent=href=>page.waitForFunction(href=>document.querySelector('header nav a[aria-current="location"]')?.getAttribute('href')===href,href);
   assert.equal(await current().count(),1,'The visible lesson section starts as the current navigation location');
   assert.equal(await current().getAttribute('href'),'#lesson');
-  for(const width of [320,390,768,1440]){
+  for(const width of [320,360,390,768,1440]){
    await page.setViewportSize({width,height:900});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`header navigation overflows at ${width}px`);
+   const navLayout=await page.locator('header nav').evaluate(nav=>({right:nav.getBoundingClientRect().right,links:[...nav.querySelectorAll('a')].map(link=>{const range=document.createRange();range.selectNodeContents(link);return{height:link.getBoundingClientRect().height,lines:range.getClientRects().length};})}));
+   if(width<=360){assert.ok(navLayout.right<=width-12,`header navigation must keep a 12px edge gutter at ${width}px: ${navLayout.right}`);assert.ok(navLayout.links.every(link=>link.height>=44&&link.lines===1),`narrow mobile links need single-line 44px targets at ${width}px: ${JSON.stringify(navLayout.links)}`);}
    await page.locator('header nav a[href="#exercise-navigation"]').click();
    await waitCurrent('#exercise-navigation');
    assert.equal(await current().evaluate(link=>getComputedStyle(link).color),'rgb(166, 244, 197)');
@@ -27,6 +29,6 @@ const assert=require('node:assert/strict');
    await page.evaluate(()=>scrollTo(0,0));await waitCurrent('#lesson');
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS: header navigation tracks the visible lesson, practice and reference sections at 320/390/768/1440px.');
+  console.log('PASS: section-aware header navigation and narrow-screen targets at 320/360/390/768/1440px.');
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1);});
